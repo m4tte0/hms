@@ -24,7 +24,7 @@ const Checklist = ({ projectId }) => {
   // Phase configuration - can be customized per project
   const [phases, setPhases] = useState([
     { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue' },
-    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'purple' },
+    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow' },
     { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green' }
   ]);
   
@@ -78,8 +78,69 @@ const Checklist = ({ projectId }) => {
     if (projectId) {
       loadChecklistItems();
       loadPhaseNames();
+      loadCollapseState();
     }
   }, [projectId]);
+
+  // Load collapse state from localStorage for this project
+  const loadCollapseState = () => {
+    try {
+      const savedPhaseState = localStorage.getItem(`project_${projectId}_collapsedPhases`);
+      const savedCategoryState = localStorage.getItem(`project_${projectId}_collapsedCategories`);
+
+      if (savedPhaseState) {
+        setCollapsedPhases(JSON.parse(savedPhaseState));
+      } else {
+        // Default: all phases collapsed for new project
+        const initialCollapsedPhases = {};
+        phases.forEach(phase => {
+          initialCollapsedPhases[phase.id] = true;
+        });
+        setCollapsedPhases(initialCollapsedPhases);
+      }
+
+      if (savedCategoryState) {
+        setCollapsedCategories(JSON.parse(savedCategoryState));
+      } else {
+        // Default: all categories collapsed for new project
+        setCollapsedCategories({});
+      }
+    } catch (error) {
+      console.error('Error loading collapse state:', error);
+    }
+  };
+
+  // Save collapse state to localStorage
+  const saveCollapseState = (phaseState, categoryState) => {
+    try {
+      if (phaseState !== null) {
+        localStorage.setItem(`project_${projectId}_collapsedPhases`, JSON.stringify(phaseState));
+      }
+      if (categoryState !== null) {
+        localStorage.setItem(`project_${projectId}_collapsedCategories`, JSON.stringify(categoryState));
+      }
+    } catch (error) {
+      console.error('Error saving collapse state:', error);
+    }
+  };
+
+  // Initialize categories as collapsed when items first load
+  useEffect(() => {
+    if (items.length > 0) {
+      const savedCategoryState = localStorage.getItem(`project_${projectId}_collapsedCategories`);
+
+      if (!savedCategoryState) {
+        // First time loading this project - collapse all categories
+        const initialCollapsedCategories = {};
+        items.forEach(item => {
+          const categoryKey = `${item.phase}-${item.category}`;
+          initialCollapsedCategories[categoryKey] = true;
+        });
+        setCollapsedCategories(initialCollapsedCategories);
+        saveCollapseState(null, initialCollapsedCategories);
+      }
+    }
+  }, [items.length]);
 
   const loadChecklistItems = async () => {
     try {
@@ -484,17 +545,25 @@ const Checklist = ({ projectId }) => {
   };
 
   const togglePhase = (phaseId) => {
-    setCollapsedPhases(prev => ({
-      ...prev,
-      [phaseId]: !prev[phaseId]
-    }));
+    setCollapsedPhases(prev => {
+      const newState = {
+        ...prev,
+        [phaseId]: !prev[phaseId]
+      };
+      saveCollapseState(newState, null);
+      return newState;
+    });
   };
 
   const toggleCategory = (key) => {
-    setCollapsedCategories(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    setCollapsedCategories(prev => {
+      const newState = {
+        ...prev,
+        [key]: !prev[key]
+      };
+      saveCollapseState(null, newState);
+      return newState;
+    });
   };
 
   const getStatusColor = (status) => {
@@ -521,12 +590,12 @@ const Checklist = ({ projectId }) => {
 
   const getPhaseColor = (color) => {
     const colors = {
-      blue: 'from-blue-500 to-blue-600',
-      purple: 'from-purple-500 to-purple-600',
-      green: 'from-green-500 to-green-600',
-      orange: 'from-orange-500 to-orange-600',
-      red: 'from-red-500 to-red-600',
-      indigo: 'from-indigo-500 to-indigo-600'
+      blue: 'from-blue-300 to-blue-400',
+      yellow: 'from-yellow-300 to-yellow-400',
+      green: 'from-green-300 to-green-400',
+      orange: 'from-orange-300 to-orange-400',
+      red: 'from-red-300 to-red-400',
+      indigo: 'from-indigo-300 to-indigo-400'
     };
     return colors[color] || colors.blue;
   };
@@ -786,11 +855,11 @@ const Checklist = ({ projectId }) => {
         return (
           <div key={phaseInfo.id} className="bg-white rounded-lg shadow-md border-2 border-gray-200 overflow-hidden">
             {/* Phase Header */}
-            <div 
+            <div
               className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer group`}
               onClick={() => togglePhase(phaseInfo.id)}
             >
-              <div className="flex items-center justify-between text-white">
+              <div className="flex items-center justify-between text-gray-900">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     {editingPhaseId === phaseInfo.id ? (
@@ -809,14 +878,14 @@ const Checklist = ({ projectId }) => {
                         />
                         <button
                           onClick={() => handleSaveEditPhase(phaseInfo.id)}
-                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
                           title="Save"
                         >
                           <Save className="w-5 h-5" />
                         </button>
                         <button
                           onClick={handleCancelEditPhase}
-                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
                           title="Cancel"
                         >
                           <X className="w-5 h-5" />
@@ -830,7 +899,7 @@ const Checklist = ({ projectId }) => {
                             e.stopPropagation();
                             handleStartEditPhase(phaseInfo.id);
                           }}
-                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-white hover:bg-opacity-20 rounded-lg transition-all"
+                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-gray-800 hover:bg-opacity-20 rounded-lg transition-all"
                           title="Edit phase name"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -844,7 +913,7 @@ const Checklist = ({ projectId }) => {
                     )}
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
-                    <p className="text-sm mt-1 opacity-90">
+                    <p className="text-sm mt-1 text-gray-700">
                       {phaseItems.filter(i => i.status === 'Complete').length} of {phaseItems.length} completed
                     </p>
                   )}
@@ -857,7 +926,7 @@ const Checklist = ({ projectId }) => {
                         e.stopPropagation();
                         handleAddCategoryClick(phaseInfo.id);
                       }}
-                      className="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
                       title="Add new category"
                     >
                       <Plus className="w-4 h-4" />
@@ -868,7 +937,7 @@ const Checklist = ({ projectId }) => {
                         e.stopPropagation();
                         handleAddCustomItem(phaseInfo.id);
                       }}
-                      className="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
                       title="Add item to existing category"
                     >
                       <Plus className="w-4 h-4" />
@@ -877,11 +946,11 @@ const Checklist = ({ projectId }) => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Phase Progress Bar */}
-              <div className="w-full bg-white bg-opacity-30 rounded-full h-2 mt-4">
+              <div className="w-full bg-white bg-opacity-40 rounded-full h-2 mt-4">
                 <div
-                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  className="bg-white border border-black h-2 rounded-full transition-all duration-500"
                   style={{ width: `${phaseProgress}%` }}
                 />
               </div>
@@ -1113,25 +1182,6 @@ const Checklist = ({ projectId }) => {
         );
       })}
 
-      {/* Help Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5" />
-          Quick Guide
-        </h3>
-        <div className="text-sm text-blue-800 space-y-1">
-          <p>• <strong>Edit phase names</strong> - Hover over phase header and click the edit icon</p>
-          <p>• <strong>Add Category button</strong> - Click to create a brand new category/subphase in any phase</p>
-          <p>• <strong>Edit category names</strong> - Hover over category header and click the edit icon</p>
-          <p>• <strong>Delete categories</strong> - Hover over category header and click the trash icon (deletes all items in category)</p>
-          <p>• <strong>Edit item names</strong> - Hover over any item and click the edit icon</p>
-          <p>• <strong>Delete items</strong> - Hover over any item and click the trash icon</p>
-          <p>• <strong>Click headers</strong> to expand/collapse phases and categories</p>
-          <p>• <strong>Add Item button</strong> - Add individual items to existing categories</p>
-          <p>• <strong>All changes auto-save</strong> as you make them</p>
-          <p>• <strong>Phase names are saved per project</strong> and will persist</p>
-        </div>
-      </div>
     </div>
   );
 };
