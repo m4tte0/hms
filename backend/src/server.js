@@ -359,8 +359,8 @@ app.post('/api/issues/:projectId', async (req, res) => {
     } = req.body;
 
     const result = await db.runAsync(
-      `INSERT INTO issues (project_id, issue_id, date_reported, reporter, 
-       priority, description, assigned_to, target_resolution) 
+      `INSERT INTO issues (project_id, issue_id, date_reported, reporter,
+       priority, description, assigned_to, target_resolution)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [req.params.projectId, issue_id, date_reported, reporter, priority,
        description, assigned_to, target_resolution]
@@ -370,6 +370,81 @@ app.post('/api/issues/:projectId', async (req, res) => {
   } catch (error) {
     console.error('Error creating issue:', error);
     res.status(500).json({ error: 'Failed to create issue' });
+  }
+});
+
+// ==================== TEAM CONTACTS ROUTES ====================
+
+// Get team contacts for project
+app.get('/api/team-contacts/:projectId', async (req, res) => {
+  try {
+    const contacts = await db.allAsync(
+      'SELECT * FROM team_contacts WHERE project_id = ? ORDER BY department, role',
+      [req.params.projectId]
+    );
+    res.json(contacts);
+  } catch (error) {
+    console.error('Error fetching team contacts:', error);
+    res.status(500).json({ error: 'Failed to fetch team contacts' });
+  }
+});
+
+// Create team contact
+app.post('/api/team-contacts/:projectId', async (req, res) => {
+  try {
+    const { department, role, name, email, phone } = req.body;
+
+    const result = await db.runAsync(
+      `INSERT INTO team_contacts (project_id, department, role, name, email, phone)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [req.params.projectId, department, role, name, email, phone]
+    );
+
+    res.status(201).json({ id: result.id, message: 'Team contact added' });
+  } catch (error) {
+    console.error('Error adding team contact:', error);
+    res.status(500).json({ error: 'Failed to add team contact' });
+  }
+});
+
+// Update team contact
+app.put('/api/team-contacts/:projectId/:contactId', async (req, res) => {
+  try {
+    const { department, role, name, email, phone } = req.body;
+
+    await db.runAsync(
+      `UPDATE team_contacts SET
+       department = COALESCE(?, department),
+       role = COALESCE(?, role),
+       name = COALESCE(?, name),
+       email = COALESCE(?, email),
+       phone = COALESCE(?, phone),
+       updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND project_id = ?`,
+      [department, role, name, email, phone, req.params.contactId, req.params.projectId]
+    );
+
+    res.json({ message: 'Team contact updated' });
+  } catch (error) {
+    console.error('Error updating team contact:', error);
+    res.status(500).json({ error: 'Failed to update team contact' });
+  }
+});
+
+// Delete team contact
+app.delete('/api/team-contacts/:projectId/:contactId', async (req, res) => {
+  try {
+    console.log(`🗑️ Deleting team contact ${req.params.contactId} from project ${req.params.projectId}`);
+
+    await db.runAsync(
+      'DELETE FROM team_contacts WHERE id = ? AND project_id = ?',
+      [req.params.contactId, req.params.projectId]
+    );
+
+    res.json({ message: 'Team contact deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting team contact:', error);
+    res.status(500).json({ error: 'Failed to delete team contact' });
   }
 });
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, CheckCircle, BarChart3, Clock, Users, 
+import {
+  FileText, CheckCircle, BarChart3, Clock, Users,
   Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle
 } from 'lucide-react';
 import Checklist from './components/Checklist';
+import Overview from './components/Overview';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -580,160 +581,7 @@ function App() {
                 </div>
               </div>
             ) : activeTab === 'overview' ? (
-              <div className="space-y-6">
-                {/* Database Info Box */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-green-900">Database Connected</h3>
-                      <div className="text-sm text-green-800 mt-1 space-y-1">
-                        <p>📊 Total Projects: <strong>{projects.length}</strong></p>
-                        <p>📂 Current Project ID: <strong>{currentProject.id}</strong></p>
-                        <p>🔄 Data Source: <strong>SQLite Database</strong></p>
-                        {lastSaved && (
-                          <p>💾 Last Saved: <strong>{lastSaved.toLocaleTimeString()}</strong></p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Project Information Card */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Project Information
-                    </h2>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDeleteClick(currentProject)}
-                        className="flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
-                      <button
-                        onClick={handleAutoSave}
-                        className="flex items-center gap-2 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-                      >
-                        <Save className="w-4 h-4" />
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Project Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={currentProject.project_name || ''}
-                        onChange={(e) => handleProjectChange('project_name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter project name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Handover ID <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={currentProject.handover_id || ''}
-                        onChange={(e) => handleProjectChange('handover_id', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="HTD-YYYY-XXX"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        R&D Project Lead
-                      </label>
-                      <input
-                        type="text"
-                        value={currentProject.rd_lead || ''}
-                        onChange={(e) => handleProjectChange('rd_lead', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Name and email"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Automation Team Lead
-                      </label>
-                      <input
-                        type="text"
-                        value={currentProject.automation_lead || ''}
-                        onChange={(e) => handleProjectChange('automation_lead', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Name and email"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={currentProject.start_date || ''}
-                        onChange={(e) => handleProjectChange('start_date', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Target Completion Date
-                      </label>
-                      <input
-                        type="date"
-                        value={currentProject.target_date || ''}
-                        onChange={(e) => handleProjectChange('target_date', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Business Priority
-                      </label>
-                      <select
-                        value={currentProject.business_priority || 'Standard'}
-                        onChange={(e) => handleProjectChange('business_priority', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Mission Critical">Mission Critical</option>
-                        <option value="Business Critical">Business Critical</option>
-                        <option value="Important">Important</option>
-                        <option value="Standard">Standard</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Current Phase
-                      </label>
-                      <select
-                        value={currentProject.current_phase || 'Phase 1'}
-                        onChange={(e) => handleProjectChange('current_phase', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="Phase 1">Phase 1: Pre-Handover Assessment</option>
-                        <option value="Phase 2">Phase 2: Knowledge Transfer</option>
-                        <option value="Phase 3">Phase 3: Acceptance Testing</option>
-                        <option value="Phase 4">Phase 4: Official Handover</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Overview project={currentProject} setProject={setCurrentProject} />
             ) : activeTab === 'checklist' ? (
               <Checklist projectId={currentProject.id} />
             ) : (

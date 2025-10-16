@@ -89,15 +89,30 @@ export const assessmentAPI = {
 
 export const issuesAPI = {
   getIssues: (projectId) => api.get(`/issues/${projectId}`),
-  
-  createIssue: (projectId, issueData) => 
+
+  createIssue: (projectId, issueData) =>
     api.post(`/issues/${projectId}`, issueData),
-  
-  updateIssue: (projectId, issueId, issueData) => 
+
+  updateIssue: (projectId, issueId, issueData) =>
     api.put(`/issues/${projectId}/${issueId}`, issueData),
-  
-  deleteIssue: (projectId, issueId) => 
+
+  deleteIssue: (projectId, issueId) =>
     api.delete(`/issues/${projectId}/${issueId}`),
+};
+
+// ==================== TEAM CONTACTS API ====================
+
+export const teamContactsAPI = {
+  getContacts: (projectId) => api.get(`/team-contacts/${projectId}`),
+
+  addContact: (projectId, contactData) =>
+    api.post(`/team-contacts/${projectId}`, contactData),
+
+  updateContact: (projectId, contactId, contactData) =>
+    api.put(`/team-contacts/${projectId}/${contactId}`, contactData),
+
+  deleteContact: (projectId, contactId) =>
+    api.delete(`/team-contacts/${projectId}/${contactId}`),
 };
 
 // ==================== UTILITY FUNCTIONS ====================
