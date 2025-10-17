@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, CheckCircle, AlertCircle, Edit2, X, ChevronDown, ChevronUp, Award, Target, Trash2, Plus } from 'lucide-react';
+import { BarChart3, TrendingUp, CheckCircle, AlertCircle, Edit2, X, ChevronDown, ChevronUp, Award, Target, Trash2, Plus, Save } from 'lucide-react';
 
 const Assessment = ({ projectId }) => {
   const [assessments, setAssessments] = useState([]);
@@ -7,18 +7,24 @@ const Assessment = ({ projectId }) => {
   const [saveStatus, setSaveStatus] = useState('');
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingCategoryText, setEditingCategoryText] = useState('');
+  const [editingPhaseId, setEditingPhaseId] = useState(null);
+  const [editingPhaseText, setEditingPhaseText] = useState('');
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editingItemText, setEditingItemText] = useState('');
   const [collapsedPhases, setCollapsedPhases] = useState({});
   const [collapsedCategories, setCollapsedCategories] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [showDeleteCategoryModal, setShowDeleteCategoryModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
   
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-  const phases = [
+  const [phases, setPhases] = useState([
     { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
     { id: 'Phase 2', name: 'Phase 2: Documentation Quality', color: 'purple', weight: 25 },
     { id: 'Phase 3', name: 'Phase 3: Operational Readiness', color: 'green', weight: 25 }
-  ];
+  ]);
 
   const defaultAssessments = [
     // Phase 1: Pre-Handover Assessment (50% weight)
@@ -333,9 +339,38 @@ const Assessment = ({ projectId }) => {
 
   useEffect(() => {
     if (projectId) {
+      // Reset phases to default first, then load custom names
+      setPhases([
+        { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
+        { id: 'Phase 2', name: 'Phase 2: Documentation Quality', color: 'purple', weight: 25 },
+        { id: 'Phase 3', name: 'Phase 3: Operational Readiness', color: 'green', weight: 25 }
+      ]);
       loadAssessments();
+      loadPhaseNames();
     }
   }, [projectId]);
+
+  const loadPhaseNames = async () => {
+    try {
+      const savedPhases = localStorage.getItem(`assessment_project_${projectId}_phases`);
+      if (savedPhases) {
+        const parsedPhases = JSON.parse(savedPhases);
+        setPhases(parsedPhases);
+        console.log('✅ Loaded custom phase names');
+      }
+    } catch (error) {
+      console.error('❌ Error loading phase names:', error);
+    }
+  };
+
+  const savePhaseNames = async (updatedPhases) => {
+    try {
+      localStorage.setItem(`assessment_project_${projectId}_phases`, JSON.stringify(updatedPhases));
+      console.log('✅ Saved custom phase names');
+    } catch (error) {
+      console.error('❌ Error saving phase names:', error);
+    }
+  };
 
   const loadAssessments = async () => {
     try {
@@ -466,23 +501,73 @@ const Assessment = ({ projectId }) => {
     }
 
     try {
-      const itemsToUpdate = assessments.filter(item => 
+      const itemsToUpdate = assessments.filter(item =>
         item.phase === phase && item.category === oldCategory
       );
 
       const promises = itemsToUpdate.map(item =>
-        handleUpdateAssessment(item.id, { category: editingCategoryText })
+        fetch(`${API_BASE_URL}/assessment/${projectId}/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: editingCategoryText })
+        })
       );
 
-      await Promise.all(promises);
-      
+      const responses = await Promise.all(promises);
+      const allSuccessful = responses.every(response => response.ok);
+      if (!allSuccessful) {
+        throw new Error('Some updates failed');
+      }
+
       setEditingCategoryId(null);
       setEditingCategoryText('');
-      
+
+      await loadAssessments();
+
       setSaveStatus('Category updated');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error updating category:', error);
+      setSaveStatus('Error updating category');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleStartEditPhase = (phaseId) => {
+    const phase = phases.find(p => p.id === phaseId);
+    if (phase) {
+      setEditingPhaseId(phaseId);
+      setEditingPhaseText(phase.name);
+    }
+  };
+
+  const handleCancelEditPhase = () => {
+    setEditingPhaseId(null);
+    setEditingPhaseText('');
+  };
+
+  const handleSaveEditPhase = async (phaseId) => {
+    if (!editingPhaseText.trim()) {
+      setSaveStatus('Phase name cannot be empty');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    try {
+      const updatedPhases = phases.map(p =>
+        p.id === phaseId ? { ...p, name: editingPhaseText } : p
+      );
+
+      setPhases(updatedPhases);
+      await savePhaseNames(updatedPhases);
+
+      setEditingPhaseId(null);
+      setEditingPhaseText('');
+
+      setSaveStatus('Phase name updated');
+      setTimeout(() => setSaveStatus(''), 2000);
+    } catch (error) {
+      console.error('❌ Error updating phase name:', error);
     }
   };
 
@@ -520,6 +605,78 @@ const Assessment = ({ projectId }) => {
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
     setItemToDelete(null);
+  };
+
+  const handleDeleteCategoryClick = (phase, category) => {
+    setCategoryToDelete({ phase, category });
+    setShowDeleteCategoryModal(true);
+  };
+
+  const handleDeleteCategoryConfirm = async () => {
+    if (!categoryToDelete) return;
+
+    try {
+      console.log(`🗑️ Deleting category ${categoryToDelete.category} from ${categoryToDelete.phase}`);
+
+      const itemsToDelete = assessments.filter(item =>
+        item.phase === categoryToDelete.phase && item.category === categoryToDelete.category
+      );
+
+      const promises = itemsToDelete.map(item =>
+        fetch(`${API_BASE_URL}/assessment/${projectId}/${item.id}`, {
+          method: 'DELETE'
+        })
+      );
+
+      await Promise.all(promises);
+
+      setAssessments(assessments.filter(item =>
+        !(item.phase === categoryToDelete.phase && item.category === categoryToDelete.category)
+      ));
+
+      setShowDeleteCategoryModal(false);
+      setCategoryToDelete(null);
+
+      setSaveStatus('Category deleted');
+      setTimeout(() => setSaveStatus(''), 2000);
+
+      console.log('✅ Category deleted successfully');
+    } catch (error) {
+      console.error('❌ Error deleting category:', error);
+      setSaveStatus('Error deleting category');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleDeleteCategoryCancel = () => {
+    setShowDeleteCategoryModal(false);
+    setCategoryToDelete(null);
+  };
+
+  const handleStartEditItem = (item) => {
+    setEditingItemId(item.id);
+    setEditingItemText(item.criteria);
+  };
+
+  const handleCancelEditItem = () => {
+    setEditingItemId(null);
+    setEditingItemText('');
+  };
+
+  const handleSaveEditItem = async (itemId) => {
+    if (!editingItemText.trim()) {
+      setSaveStatus('Criteria cannot be empty');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    try {
+      await handleUpdateAssessment(itemId, { criteria: editingItemText });
+      setEditingItemId(null);
+      setEditingItemText('');
+    } catch (error) {
+      console.error('❌ Error updating criteria:', error);
+    }
   };
 
   const togglePhase = (phaseId) => {
@@ -635,7 +792,7 @@ const Assessment = ({ projectId }) => {
 
   return (
     <div className="space-y-6">
-      {/* Delete Confirmation Modal */}
+      {/* Delete Item Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
@@ -670,6 +827,52 @@ const Assessment = ({ projectId }) => {
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Category Confirmation Modal */}
+      {showDeleteCategoryModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Entire Category?</h3>
+                <p className="text-sm text-gray-500">This will delete all items in this category</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
+              <p className="font-semibold text-gray-900">{categoryToDelete?.category}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Phase: {categoryToDelete?.phase}
+              </p>
+              <p className="text-sm text-red-600 mt-2 font-medium">
+                {assessments.filter(item =>
+                  item.phase === categoryToDelete?.phase && item.category === categoryToDelete?.category
+                ).length} item(s) will be deleted
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteCategoryCancel}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCategoryConfirm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete Category
               </button>
             </div>
           </div>
@@ -767,23 +970,68 @@ const Assessment = ({ projectId }) => {
         return (
           <div key={phaseInfo.id} className="bg-white rounded-lg shadow-md border-2 border-gray-200 overflow-hidden">
             {/* Phase Header */}
-            <div 
-              className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer`}
+            <div
+              className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer group`}
               onClick={() => togglePhase(phaseInfo.id)}
             >
               <div className="flex items-center justify-between text-white">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold">{phaseInfo.name}</h2>
-                    {isPhaseCollapsed ? (
-                      <ChevronDown className="w-5 h-5" />
+                    {editingPhaseId === phaseInfo.id ? (
+                      <div className="flex items-center gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="text"
+                          value={editingPhaseText}
+                          onChange={(e) => setEditingPhaseText(e.target.value)}
+                          className="flex-1 px-4 py-2 text-gray-900 border-2 border-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                          autoFocus
+                          placeholder="Enter phase name..."
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEditPhase(phaseInfo.id);
+                            if (e.key === 'Escape') handleCancelEditPhase();
+                          }}
+                        />
+                        <button
+                          onClick={() => handleSaveEditPhase(phaseInfo.id)}
+                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          title="Save"
+                        >
+                          <Save className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={handleCancelEditPhase}
+                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          title="Cancel"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
                     ) : (
-                      <ChevronUp className="w-5 h-5" />
+                      <>
+                        <h2 className="text-xl font-bold">{phaseInfo.name}</h2>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartEditPhase(phaseInfo.id);
+                          }}
+                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-white hover:bg-opacity-20 rounded-lg transition-all"
+                          title="Edit phase name"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        {isPhaseCollapsed ? (
+                          <ChevronDown className="w-5 h-5" />
+                        ) : (
+                          <ChevronUp className="w-5 h-5" />
+                        )}
+                      </>
                     )}
                   </div>
-                  <p className="text-sm mt-1 opacity-90">
-                    {phaseItems.filter(i => i.score !== null && i.score > 0).length} of {phaseItems.length} scored • {phaseInfo.weight}% of total
-                  </p>
+                  {editingPhaseId !== phaseInfo.id && (
+                    <p className="text-sm mt-1 opacity-90">
+                      {phaseItems.filter(i => i.score !== null && i.score > 0).length} of {phaseItems.length} scored • {phaseInfo.weight}% of total
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold">{phaseScore}%</div>
@@ -821,8 +1069,8 @@ const Assessment = ({ projectId }) => {
                   return (
                     <div key={category} className="bg-gray-50">
                       {/* Category Header */}
-                      <div 
-                        className="px-6 py-4 bg-white border-b border-gray-200 cursor-pointer hover:bg-gray-50"
+                      <div
+                        className="px-6 py-4 bg-white border-b border-gray-200 cursor-pointer hover:bg-gray-50 group"
                         onClick={() => toggleCategory(categoryKey)}
                       >
                         <div className="flex items-center justify-between">
@@ -832,7 +1080,7 @@ const Assessment = ({ projectId }) => {
                             ) : (
                               <ChevronUp className="w-4 h-4 text-gray-400" />
                             )}
-                            
+
                             {editingCategoryId === categoryKey ? (
                               <div className="flex items-center gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
                                 <input
@@ -841,6 +1089,7 @@ const Assessment = ({ projectId }) => {
                                   onChange={(e) => setEditingCategoryText(e.target.value)}
                                   className="flex-1 px-3 py-1 border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   autoFocus
+                                  placeholder="Enter category name..."
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleSaveEditCategory(phaseInfo.id, category);
                                     if (e.key === 'Escape') handleCancelEditCategory();
@@ -867,16 +1116,28 @@ const Assessment = ({ projectId }) => {
                                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                                   {categoryWeight}% weight
                                 </span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleStartEditCategory(phaseInfo.id, category);
-                                  }}
-                                  className="p-1 hover:bg-blue-100 text-blue-600 rounded opacity-0 hover:opacity-100 transition-opacity"
-                                  title="Edit category name"
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStartEditCategory(phaseInfo.id, category);
+                                    }}
+                                    className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
+                                    title="Edit category name"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteCategoryClick(phaseInfo.id, category);
+                                    }}
+                                    className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
+                                    title="Delete category"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </>
                             )}
                           </div>
@@ -902,31 +1163,54 @@ const Assessment = ({ projectId }) => {
 
                       {/* Category Items */}
                       {!isCategoryCollapsed && (
-                        <div className="divide-y divide-gray-200">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
                           {categoryItems.map((item) => (
-                            <div key={item.id} className="p-4 hover:bg-white transition-colors">
-                              <div className="flex items-start gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between gap-4 mb-3">
-                                    <div className="flex-1">
-                                      <div className="flex items-start justify-between gap-2 mb-2 group">
-                                        <h4 className="font-medium text-gray-900 flex-1">{item.criteria}</h4>
-                                        <button
-                                          onClick={() => handleDeleteClick(item)}
-                                          className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-100 text-red-600 rounded transition-all"
-                                          title="Delete criteria"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </button>
-                                      </div>
-                                      
-                                      <div className="flex items-center gap-2">
+                            <div key={item.id} className="px-4 py-2 hover:bg-white transition-colors group border-b border-gray-100">
+                              {editingItemId === item.id ? (
+                                <div className="flex items-center gap-2 mb-2">
+                                  <input
+                                    type="text"
+                                    value={editingItemText}
+                                    onChange={(e) => setEditingItemText(e.target.value)}
+                                    className="flex-1 px-3 py-1 text-sm border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    autoFocus
+                                    placeholder="Enter criteria..."
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleSaveEditItem(item.id);
+                                      if (e.key === 'Escape') handleCancelEditItem();
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => handleSaveEditItem(item.id)}
+                                    className="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                    title="Save"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEditItem}
+                                    className="p-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                    title="Cancel"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex items-center gap-3">
+                                    {/* Criteria and Score in one line */}
+                                    <div className="flex-1 flex items-center gap-3 min-w-0">
+                                      <h4 className="text-sm text-gray-900 flex-1 truncate" title={item.criteria}>
+                                        {item.criteria}
+                                      </h4>
+
+                                      <div className="flex items-center gap-2 flex-shrink-0">
                                         <select
                                           value={item.score || ''}
-                                          onChange={(e) => handleUpdateAssessment(item.id, { 
-                                            score: e.target.value ? parseInt(e.target.value) : null 
+                                          onChange={(e) => handleUpdateAssessment(item.id, {
+                                            score: e.target.value ? parseInt(e.target.value) : null
                                           })}
-                                          className={`px-3 py-1 rounded-full text-sm font-medium border ${getScoreColor(item.score)} cursor-pointer hover:shadow-sm transition-shadow`}
+                                          className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getScoreColor(item.score)} cursor-pointer hover:shadow-sm transition-shadow`}
                                         >
                                           <option value="">Not Scored</option>
                                           <option value="1">1 - Poor</option>
@@ -935,38 +1219,59 @@ const Assessment = ({ projectId }) => {
                                           <option value="4">4 - Good</option>
                                           <option value="5">5 - Excellent</option>
                                         </select>
-                                        
+
                                         {item.score && (
-                                          <div className="flex items-center gap-1">
+                                          <div className="flex items-center gap-0.5">
                                             {[...Array(5)].map((_, i) => (
                                               <div
                                                 key={i}
-                                                className={`w-2 h-2 rounded-full ${
+                                                className={`w-1.5 h-1.5 rounded-full ${
                                                   i < item.score ? 'bg-blue-600' : 'bg-gray-300'
                                                 }`}
                                               />
                                             ))}
                                           </div>
                                         )}
+
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <button
+                                            onClick={() => handleStartEditItem(item)}
+                                            className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
+                                            title="Edit criteria"
+                                          >
+                                            <Edit2 className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteClick(item)}
+                                            className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
+                                            title="Delete criteria"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
 
-                                  {/* Evidence/Notes */}
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                                      Evidence / Notes
-                                    </label>
-                                    <textarea
-                                      value={item.evidence || ''}
-                                      onChange={(e) => handleUpdateAssessment(item.id, { evidence: e.target.value })}
-                                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      placeholder="Add evidence, metrics, or notes to support the score..."
-                                      rows="2"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
+                                  {/* Evidence/Notes - Compact */}
+                                  {item.evidence && (
+                                    <div className="mt-1 ml-0">
+                                      <p className="text-xs text-gray-600 italic">{item.evidence}</p>
+                                    </div>
+                                  )}
+                                  {!item.evidence && (
+                                    <div className="mt-1 ml-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <input
+                                        type="text"
+                                        value={item.evidence || ''}
+                                        onChange={(e) => handleUpdateAssessment(item.id, { evidence: e.target.value })}
+                                        className="w-full px-2 py-0.5 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Add evidence or notes..."
+                                      />
+                                    </div>
+                                  )}
+                                </>
+                              )}
                             </div>
                           ))}
                         </div>

@@ -76,6 +76,12 @@ const Checklist = ({ projectId }) => {
 
   useEffect(() => {
     if (projectId) {
+      // Reset phases to default first, then load custom names
+      setPhases([
+        { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue' },
+        { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow' },
+        { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green' }
+      ]);
       loadChecklistItems();
       loadPhaseNames();
       loadCollapseState();
