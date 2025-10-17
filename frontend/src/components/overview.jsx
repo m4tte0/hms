@@ -9,6 +9,11 @@ const Overview = ({ project, setProject }) => {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
+  const [phaseNames, setPhaseNames] = useState({
+    'Phase 1': 'Phase 1: Pre-Handover Assessment',
+    'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
+    'Phase 3': 'Phase 3: Final Sign-Offs'
+  });
   const [newContact, setNewContact] = useState({
     name: '',
     role: '',
@@ -31,8 +36,35 @@ const Overview = ({ project, setProject }) => {
     if (project?.id) {
       loadTeamContacts();
       loadChecklistItems();
+      loadPhaseNamesFromStorage();
     }
   }, [project?.id]);
+
+  const loadPhaseNamesFromStorage = async () => {
+    try {
+      // Load custom phase names from database for this project
+      const response = await fetch(`${API_BASE_URL}/phase-names/${project.id}`);
+
+      if (!response.ok) {
+        console.log('No custom phase names found, using defaults');
+        return;
+      }
+
+      const phaseNamesData = await response.json();
+
+      if (phaseNamesData.length > 0) {
+        // Convert database format to phase name map
+        const phaseNameMap = {};
+        phaseNamesData.forEach(pn => {
+          phaseNameMap[pn.phase_id] = pn.phase_name;
+        });
+        setPhaseNames(phaseNameMap);
+        console.log('✅ Loaded custom phase names from database');
+      }
+    } catch (error) {
+      console.error('Error loading phase names:', error);
+    }
+  };
 
   const loadTeamContacts = async () => {
     try {
@@ -155,11 +187,11 @@ const Overview = ({ project, setProject }) => {
     return Math.round((completedItems / phaseItems.length) * 100);
   };
 
-  // Dynamic phases based on checklist data
+  // Dynamic phases based on checklist data and custom phase names
   const phases = [
     {
       id: 'Phase 1',
-      name: 'Phase 1: Pre-Handover Assessment',
+      name: phaseNames['Phase 1'],
       duration: '2-4 weeks',
       status: calculatePhaseStatus('Phase 1'),
       progress: calculatePhaseProgress('Phase 1'),
@@ -168,7 +200,7 @@ const Overview = ({ project, setProject }) => {
     },
     {
       id: 'Phase 2',
-      name: 'Phase 2: Knowledge Transfer',
+      name: phaseNames['Phase 2'],
       duration: '2-6 weeks',
       status: calculatePhaseStatus('Phase 2'),
       progress: calculatePhaseProgress('Phase 2'),
@@ -177,7 +209,7 @@ const Overview = ({ project, setProject }) => {
     },
     {
       id: 'Phase 3',
-      name: 'Phase 3: Final Sign-Offs',
+      name: phaseNames['Phase 3'],
       duration: '1-2 weeks',
       status: calculatePhaseStatus('Phase 3'),
       progress: calculatePhaseProgress('Phase 3'),

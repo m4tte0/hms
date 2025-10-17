@@ -178,12 +178,25 @@ const Checklist = ({ projectId }) => {
 
   const loadPhaseNames = async () => {
     try {
-      // Try to load custom phase names from localStorage for this project
-      const savedPhases = localStorage.getItem(`project_${projectId}_phases`);
-      if (savedPhases) {
-        const parsedPhases = JSON.parse(savedPhases);
-        setPhases(parsedPhases);
-        console.log('✅ Loaded custom phase names');
+      // Load custom phase names from database for this project
+      const response = await fetch(`${API_BASE_URL}/phase-names/${projectId}`);
+
+      if (!response.ok) {
+        console.log('No custom phase names found, using defaults');
+        return;
+      }
+
+      const phaseNamesData = await response.json();
+
+      if (phaseNamesData.length > 0) {
+        // Convert database format to phase array format
+        const customPhases = phaseNamesData.map(pn => ({
+          id: pn.phase_id,
+          name: pn.phase_name,
+          color: pn.phase_color
+        }));
+        setPhases(customPhases);
+        console.log('✅ Loaded custom phase names from database');
       }
     } catch (error) {
       console.error('❌ Error loading phase names:', error);
@@ -192,11 +205,21 @@ const Checklist = ({ projectId }) => {
 
   const savePhaseNames = async (updatedPhases) => {
     try {
-      // Save custom phase names to localStorage for this project
-      localStorage.setItem(`project_${projectId}_phases`, JSON.stringify(updatedPhases));
-      console.log('✅ Saved custom phase names');
+      // Save custom phase names to database for this project
+      const response = await fetch(`${API_BASE_URL}/phase-names/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phases: updatedPhases })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      console.log('✅ Saved custom phase names to database');
     } catch (error) {
       console.error('❌ Error saving phase names:', error);
+      throw error;
     }
   };
 

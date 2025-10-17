@@ -191,12 +191,28 @@ function initializeDatabase() {
       )
     `);
 
+    // Phase names table for custom phase names per project
+    db.run(`
+      CREATE TABLE IF NOT EXISTS phase_names (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        phase_id TEXT NOT NULL,
+        phase_name TEXT NOT NULL,
+        phase_color TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+        UNIQUE(project_id, phase_id)
+      )
+    `);
+
     // Create indexes for better performance
     db.run('CREATE INDEX IF NOT EXISTS idx_project_handover_id ON projects(handover_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_checklist_project ON checklist_items(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_sessions_project ON knowledge_sessions(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_assessment_project ON assessment_scores(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_phase_names_project ON phase_names(project_id)');
 
     console.log('Database initialized successfully');
   });

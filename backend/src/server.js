@@ -373,6 +373,53 @@ app.post('/api/issues/:projectId', async (req, res) => {
   }
 });
 
+// ==================== PHASE NAMES ROUTES ====================
+
+// Get phase names for project
+app.get('/api/phase-names/:projectId', async (req, res) => {
+  try {
+    const phaseNames = await db.allAsync(
+      'SELECT * FROM phase_names WHERE project_id = ? ORDER BY phase_id',
+      [req.params.projectId]
+    );
+    res.json(phaseNames);
+  } catch (error) {
+    console.error('Error fetching phase names:', error);
+    res.status(500).json({ error: 'Failed to fetch phase names' });
+  }
+});
+
+// Save or update phase names for project (upsert all phases)
+app.post('/api/phase-names/:projectId', async (req, res) => {
+  try {
+    const { phases } = req.body; // Expecting array of { id, name, color }
+
+    if (!Array.isArray(phases)) {
+      return res.status(400).json({ error: 'Phases must be an array' });
+    }
+
+    // Delete existing phase names for this project
+    await db.runAsync(
+      'DELETE FROM phase_names WHERE project_id = ?',
+      [req.params.projectId]
+    );
+
+    // Insert new phase names
+    for (const phase of phases) {
+      await db.runAsync(
+        `INSERT INTO phase_names (project_id, phase_id, phase_name, phase_color)
+         VALUES (?, ?, ?, ?)`,
+        [req.params.projectId, phase.id, phase.name, phase.color]
+      );
+    }
+
+    res.json({ message: 'Phase names saved successfully' });
+  } catch (error) {
+    console.error('Error saving phase names:', error);
+    res.status(500).json({ error: 'Failed to save phase names' });
+  }
+});
+
 // ==================== TEAM CONTACTS ROUTES ====================
 
 // Get team contacts for project

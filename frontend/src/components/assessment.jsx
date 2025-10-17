@@ -22,8 +22,8 @@ const Assessment = ({ projectId }) => {
 
   const [phases, setPhases] = useState([
     { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
-    { id: 'Phase 2', name: 'Phase 2: Documentation Quality', color: 'purple', weight: 25 },
-    { id: 'Phase 3', name: 'Phase 3: Operational Readiness', color: 'green', weight: 25 }
+    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow', weight: 25 },
+    { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green', weight: 25 }
   ]);
 
   const defaultAssessments = [
@@ -342,8 +342,8 @@ const Assessment = ({ projectId }) => {
       // Reset phases to default first, then load custom names
       setPhases([
         { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
-        { id: 'Phase 2', name: 'Phase 2: Documentation Quality', color: 'purple', weight: 25 },
-        { id: 'Phase 3', name: 'Phase 3: Operational Readiness', color: 'green', weight: 25 }
+        { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow', weight: 25 },
+        { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green', weight: 25 }
       ]);
       loadAssessments();
       loadPhaseNames();
@@ -352,11 +352,26 @@ const Assessment = ({ projectId }) => {
 
   const loadPhaseNames = async () => {
     try {
-      const savedPhases = localStorage.getItem(`assessment_project_${projectId}_phases`);
-      if (savedPhases) {
-        const parsedPhases = JSON.parse(savedPhases);
-        setPhases(parsedPhases);
-        console.log('✅ Loaded custom phase names');
+      // Load custom phase names from database for this project
+      const response = await fetch(`${API_BASE_URL}/phase-names/${projectId}`);
+
+      if (!response.ok) {
+        console.log('No custom phase names found, using defaults');
+        return;
+      }
+
+      const phaseNamesData = await response.json();
+
+      if (phaseNamesData.length > 0) {
+        // Convert database format to phase array format
+        const customPhases = phaseNamesData.map(pn => ({
+          id: pn.phase_id,
+          name: pn.phase_name,
+          color: pn.phase_color,
+          weight: phases.find(p => p.id === pn.phase_id)?.weight || 25
+        }));
+        setPhases(customPhases);
+        console.log('✅ Loaded custom phase names from database');
       }
     } catch (error) {
       console.error('❌ Error loading phase names:', error);
@@ -365,10 +380,21 @@ const Assessment = ({ projectId }) => {
 
   const savePhaseNames = async (updatedPhases) => {
     try {
-      localStorage.setItem(`assessment_project_${projectId}_phases`, JSON.stringify(updatedPhases));
-      console.log('✅ Saved custom phase names');
+      // Save custom phase names to database for this project
+      const response = await fetch(`${API_BASE_URL}/phase-names/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phases: updatedPhases })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      console.log('✅ Saved custom phase names to database');
     } catch (error) {
       console.error('❌ Error saving phase names:', error);
+      throw error;
     }
   };
 
@@ -714,9 +740,12 @@ const Assessment = ({ projectId }) => {
 
   const getPhaseColor = (color) => {
     const colors = {
-      blue: 'from-blue-500 to-blue-600',
-      purple: 'from-purple-500 to-purple-600',
-      green: 'from-green-500 to-green-600'
+      blue: 'from-blue-300 to-blue-400',
+      yellow: 'from-yellow-300 to-yellow-400',
+      green: 'from-green-300 to-green-400',
+      orange: 'from-orange-300 to-orange-400',
+      red: 'from-red-300 to-red-400',
+      indigo: 'from-indigo-300 to-indigo-400'
     };
     return colors[color] || colors.blue;
   };
@@ -974,7 +1003,7 @@ const Assessment = ({ projectId }) => {
               className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer group`}
               onClick={() => togglePhase(phaseInfo.id)}
             >
-              <div className="flex items-center justify-between text-white">
+              <div className="flex items-center justify-between text-gray-900">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     {editingPhaseId === phaseInfo.id ? (
@@ -993,14 +1022,14 @@ const Assessment = ({ projectId }) => {
                         />
                         <button
                           onClick={() => handleSaveEditPhase(phaseInfo.id)}
-                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
                           title="Save"
                         >
                           <Save className="w-5 h-5" />
                         </button>
                         <button
                           onClick={handleCancelEditPhase}
-                          className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
                           title="Cancel"
                         >
                           <X className="w-5 h-5" />
@@ -1014,7 +1043,7 @@ const Assessment = ({ projectId }) => {
                             e.stopPropagation();
                             handleStartEditPhase(phaseInfo.id);
                           }}
-                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-white hover:bg-opacity-20 rounded-lg transition-all"
+                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-gray-800 hover:bg-opacity-20 rounded-lg transition-all"
                           title="Edit phase name"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -1028,7 +1057,7 @@ const Assessment = ({ projectId }) => {
                     )}
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
-                    <p className="text-sm mt-1 opacity-90">
+                    <p className="text-sm mt-1 text-gray-700">
                       {phaseItems.filter(i => i.score !== null && i.score > 0).length} of {phaseItems.length} scored • {phaseInfo.weight}% of total
                     </p>
                   )}
@@ -1040,18 +1069,18 @@ const Assessment = ({ projectId }) => {
                       e.stopPropagation();
                       handleAddCustomCriteria(phaseInfo.id);
                     }}
-                    className="mt-2 px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                    className="mt-2 px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add Criteria
                   </button>
                 </div>
               </div>
-              
+
               {/* Phase Progress Bar */}
-              <div className="w-full bg-white bg-opacity-30 rounded-full h-2 mt-4">
+              <div className="w-full bg-white bg-opacity-40 rounded-full h-2 mt-4">
                 <div
-                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  className="bg-white border border-black h-2 rounded-full transition-all duration-500"
                   style={{ width: `${phaseScore}%` }}
                 />
               </div>
