@@ -1313,22 +1313,6 @@ const Assessment = ({ projectId }) => {
           </div>
         );
       })}
-
-      {/* Help Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5" />
-          Assessment Guidelines
-        </h3>
-        <div className="text-sm text-blue-800 space-y-1">
-          <p>• <strong>Score each criterion</strong> from 1 (Poor) to 5 (Excellent) based on actual evidence</p>
-          <p>• <strong>Provide evidence</strong> in the notes field to support your scores</p>
-          <p>• <strong>Phase weights:</strong> Phase 1 (50%), Phase 2 (25%), Phase 3 (25%)</p>
-          <p>• <strong>Edit section names</strong> by clicking the edit icon next to category names</p>
-          <p>• <strong>Add custom criteria</strong> using the "Add Criteria" button in each phase</p>
-          <p>• <strong>Overall score</strong> is calculated as a weighted average of all phases</p>
-        </div>
-      </div>
     </div>
   );
 };

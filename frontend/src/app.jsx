@@ -11,6 +11,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [currentProject, setCurrentProject] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [projectsProgress, setProjectsProgress] = useState({});
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [showProjectList, setShowProjectList] = useState(false);
@@ -57,22 +58,25 @@ function App() {
     try {
       if (!silent) setLoading(true);
       console.log(`📥 Fetching projects from: ${API_BASE_URL}/projects`);
-      
+
       const response = await fetch(`${API_BASE_URL}/projects`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       console.log('✅ Projects loaded:', data);
-      
-      const sortedData = data.sort((a, b) => 
+
+      const sortedData = data.sort((a, b) =>
         new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
       );
-      
+
       setProjects(sortedData);
-      
+
+      // Load progress for all projects
+      await loadAllProjectsProgress(sortedData);
+
       if (sortedData.length > 0) {
         if (currentProject && currentProject.id) {
           const updatedProject = sortedData.find(p => p.id === currentProject.id);
@@ -99,6 +103,65 @@ function App() {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const loadAllProjectsProgress = async (projectsList) => {
+    try {
+      const progressData = {};
+
+      // Fetch checklist data for each project in parallel
+      const progressPromises = projectsList.map(async (project) => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/checklist/${project.id}`);
+          if (response.ok) {
+            const checklistItems = await response.json();
+            const totalItems = checklistItems.length;
+            const completedItems = checklistItems.filter(item => item.status === 'Complete').length;
+            const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+            // Calculate current phase based on checklist progress
+            const currentPhase = calculateCurrentPhase(checklistItems);
+
+            progressData[project.id] = {
+              percentage,
+              completedItems,
+              totalItems,
+              currentPhase
+            };
+          }
+        } catch (error) {
+          console.error(`Error loading progress for project ${project.id}:`, error);
+          progressData[project.id] = { percentage: 0, completedItems: 0, totalItems: 0, currentPhase: 'Phase 1' };
+        }
+      });
+
+      await Promise.all(progressPromises);
+      setProjectsProgress(progressData);
+      console.log('✅ Projects progress loaded:', progressData);
+    } catch (error) {
+      console.error('❌ Error loading projects progress:', error);
+    }
+  };
+
+  const calculateCurrentPhase = (checklistItems) => {
+    // Group items by phase
+    const phases = ['Phase 1', 'Phase 2', 'Phase 3'];
+
+    for (const phase of phases) {
+      const phaseItems = checklistItems.filter(item => item.phase === phase);
+      if (phaseItems.length === 0) continue;
+
+      const completedInPhase = phaseItems.filter(item => item.status === 'Complete').length;
+      const inProgressInPhase = phaseItems.filter(item => item.status === 'In Progress').length;
+
+      // If phase is not fully complete, it's the current phase
+      if (completedInPhase < phaseItems.length) {
+        return phase;
+      }
+    }
+
+    // If all phases are complete, return Phase 3
+    return 'Phase 3';
   };
 
   const handleRefresh = () => {
@@ -475,45 +538,75 @@ function App() {
             </div>
 
             <div className="space-y-2">
-              {filteredProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className={`group relative rounded-lg transition-colors ${
-                    currentProject?.id === project.id
-                      ? 'bg-blue-50 border-2 border-blue-500'
-                      : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
-                  }`}
-                >
-                  <button
-                    onClick={() => handleProjectSelect(project)}
-                    className="w-full text-left p-3 pr-10"
+              {filteredProjects.map((project) => {
+                const progress = projectsProgress[project.id] || { percentage: 0, completedItems: 0, totalItems: 0, currentPhase: 'Phase 1' };
+
+                return (
+                  <div
+                    key={project.id}
+                    className={`group relative rounded-lg transition-colors ${
+                      currentProject?.id === project.id
+                        ? 'bg-blue-50 border-2 border-blue-500'
+                        : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                    }`}
                   >
-                    <div className="font-medium text-gray-900 truncate">
-                      {project.project_name}
-                    </div>
-                    <div className="text-sm text-gray-500 truncate">
-                      {project.handover_id}
-                    </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <div className="text-xs text-gray-400">
-                        {project.current_phase || 'Phase 1'}
+                    <button
+                      onClick={() => handleProjectSelect(project)}
+                      className="w-full text-left p-3 pr-10"
+                    >
+                      <div className="font-medium text-gray-900 truncate mb-1">
+                        {project.project_name}
                       </div>
-                      <div className="text-xs text-gray-400">
-                        {project.business_priority}
+                      <div className="text-xs text-gray-500 truncate mb-2">
+                        {project.handover_id}
                       </div>
-                    </div>
-                  </button>
-                  
-                  {/* Delete button for each project */}
-                  <button
-                    onClick={(e) => handleDeleteClick(project, e)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:bg-red-100 text-red-600 rounded transition-all"
-                    title="Delete project"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+
+                      {/* Current Phase */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-xs font-medium text-blue-600">
+                          {progress.currentPhase}
+                        </div>
+                        <div className="text-xs font-semibold text-gray-700">
+                          {progress.percentage}%
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                        <div
+                          className={`h-1.5 rounded-full transition-all duration-500 ${
+                            progress.percentage >= 100 ? 'bg-green-500' :
+                            progress.percentage >= 75 ? 'bg-blue-500' :
+                            progress.percentage >= 50 ? 'bg-yellow-500' :
+                            progress.percentage >= 25 ? 'bg-orange-500' :
+                            'bg-red-500'
+                          }`}
+                          style={{ width: `${progress.percentage}%` }}
+                        />
+                      </div>
+
+                      {/* Completed Items Count */}
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-gray-400">
+                          {progress.completedItems}/{progress.totalItems} tasks
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {project.business_priority}
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Delete button for each project */}
+                    <button
+                      onClick={(e) => handleDeleteClick(project, e)}
+                      className="absolute right-2 top-3 p-2 opacity-0 group-hover:opacity-100 hover:bg-red-100 text-red-600 rounded transition-all"
+                      title="Delete project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {filteredProjects.length === 0 && (

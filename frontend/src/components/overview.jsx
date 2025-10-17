@@ -6,6 +6,7 @@ import { teamContactsAPI } from '../services/api';
 const Overview = ({ project, setProject }) => {
   const [teamContacts, setTeamContacts] = useState([]);
   const [checklistItems, setChecklistItems] = useState([]);
+  const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
@@ -36,6 +37,7 @@ const Overview = ({ project, setProject }) => {
     if (project?.id) {
       loadTeamContacts();
       loadChecklistItems();
+      loadIssues();
       loadPhaseNamesFromStorage();
     }
   }, [project?.id]);
@@ -87,6 +89,18 @@ const Overview = ({ project, setProject }) => {
       }
     } catch (error) {
       console.error('Error loading checklist:', error);
+    }
+  };
+
+  const loadIssues = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/issues/${project.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setIssues(data);
+      }
+    } catch (error) {
+      console.error('Error loading issues:', error);
     }
   };
 
@@ -185,6 +199,25 @@ const Overview = ({ project, setProject }) => {
 
     const completedItems = phaseItems.filter(item => item.status === 'Complete').length;
     return Math.round((completedItems / phaseItems.length) * 100);
+  };
+
+  // Calculate overall statistics
+  const calculateOverallProgress = () => {
+    if (checklistItems.length === 0) return 0;
+    const completedItems = checklistItems.filter(item => item.status === 'Complete').length;
+    return Math.round((completedItems / checklistItems.length) * 100);
+  };
+
+  const getCompletedTasksCount = () => {
+    return checklistItems.filter(item => item.status === 'Complete').length;
+  };
+
+  const getInProgressTasksCount = () => {
+    return checklistItems.filter(item => item.status === 'In Progress').length;
+  };
+
+  const getNotStartedTasksCount = () => {
+    return checklistItems.filter(item => item.status === 'Not Started').length;
   };
 
   // Dynamic phases based on checklist data and custom phase names
@@ -366,20 +399,20 @@ const Overview = ({ project, setProject }) => {
           {/* Quick Stats - 2x2 Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-blue-600 mb-1">25%</div>
+              <div className="text-2xl font-bold text-blue-600 mb-1">{calculateOverallProgress()}%</div>
               <div className="text-sm text-gray-600">Overall Progress</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-green-600 mb-1">12</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">{getCompletedTasksCount()}</div>
               <div className="text-sm text-gray-600">Tasks Completed</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-yellow-600 mb-1">8</div>
+              <div className="text-2xl font-bold text-yellow-600 mb-1">{getInProgressTasksCount()}</div>
               <div className="text-sm text-gray-600">Tasks In Progress</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-red-600 mb-1">3</div>
-              <div className="text-sm text-gray-600">Pending Issues</div>
+              <div className="text-2xl font-bold text-gray-600 mb-1">{getNotStartedTasksCount()}</div>
+              <div className="text-sm text-gray-600">Not Started</div>
             </div>
           </div>
 
