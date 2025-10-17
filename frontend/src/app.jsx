@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
+import Assessment from './components/Assessment';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -584,6 +585,8 @@ function App() {
               <Overview project={currentProject} setProject={setCurrentProject} />
             ) : activeTab === 'checklist' ? (
               <Checklist projectId={currentProject.id} />
+            ) : activeTab === 'assessment' ? (
+              <Assessment projectId={currentProject.id} />
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
