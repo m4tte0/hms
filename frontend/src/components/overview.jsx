@@ -175,8 +175,28 @@ const Overview = ({ project, setProject }) => {
     setEditContact({ name: '', role: '', department: '', email: '', phone: '' });
   };
 
+  const calculateProjectScore = (priority, complexity) => {
+    const priorityScores = { 'Alta': 3, 'Media': 2, 'Bassa': 1 };
+    const complexityScores = { 'Alta': 3, 'Media': 2, 'Bassa': 1 };
+
+    const priorityValue = priorityScores[priority] || 2;
+    const complexityValue = complexityScores[complexity] || 2;
+
+    // Score formula: (Priority * 2 + Complexity * 3) = Max 15 points
+    return (priorityValue * 2) + (complexityValue * 3);
+  };
+
   const handleChange = (field, value) => {
-    setProject({ ...project, [field]: value });
+    const updatedProject = { ...project, [field]: value };
+
+    // Auto-calculate project score when priority or complexity changes
+    if (field === 'business_priority' || field === 'complexity_level') {
+      const priority = field === 'business_priority' ? value : (project.business_priority || 'Media');
+      const complexity = field === 'complexity_level' ? value : (project.complexity_level || 'Media');
+      updatedProject.project_score = calculateProjectScore(priority, complexity);
+    }
+
+    setProject(updatedProject);
   };
 
   // Calculate phase status based on checklist completion
@@ -375,21 +395,68 @@ const Overview = ({ project, setProject }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+        </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Project Priority
-            </label>
-            <select
-              value={project.business_priority || 'Standard'}
-              onChange={(e) => handleChange('business_priority', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="Mission Critical">Mission Critical</option>
-              <option value="Business Critical">Business Critical</option>
-              <option value="Important">Important</option>
-              <option value="Standard">Standard</option>
-            </select>
+        {/* Project Metrics Section - Separated */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-700 mb-4">Project Metrics</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Project Priority
+              </label>
+              <select
+                value={project.business_priority || 'Media'}
+                onChange={(e) => handleChange('business_priority', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Bassa">Bassa</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Complexity Level
+              </label>
+              <select
+                value={project.complexity_level || 'Media'}
+                onChange={(e) => handleChange('complexity_level', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Bassa">Bassa</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Project Score
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 bg-gray-50 px-3 py-2 border border-gray-300 rounded-md text-gray-700 font-semibold">
+                  {project.project_score || 0} / 15
+                </div>
+                <div className="flex-1">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className={`h-3 rounded-full transition-all duration-500 ${
+                        (project.project_score || 0) >= 12 ? 'bg-red-500' :
+                        (project.project_score || 0) >= 9 ? 'bg-orange-500' :
+                        (project.project_score || 0) >= 6 ? 'bg-yellow-500' :
+                        'bg-green-500'
+                      }`}
+                      style={{ width: `${((project.project_score || 0) / 15) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Calculated from Priority (weight: 2) and Complexity (weight: 3)
+              </p>
+            </div>
           </div>
         </div>
         </div>

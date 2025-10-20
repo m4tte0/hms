@@ -73,11 +73,12 @@ app.put('/api/projects/:id', async (req, res) => {
   try {
     const {
       handover_id, project_name, rd_lead, automation_lead,
-      start_date, target_date, business_priority, status, current_phase
+      start_date, target_date, business_priority, complexity_level,
+      project_score, status, current_phase
     } = req.body;
 
     await db.runAsync(
-      `UPDATE projects SET 
+      `UPDATE projects SET
        handover_id = COALESCE(?, handover_id),
        project_name = COALESCE(?, project_name),
        rd_lead = COALESCE(?, rd_lead),
@@ -85,12 +86,14 @@ app.put('/api/projects/:id', async (req, res) => {
        start_date = COALESCE(?, start_date),
        target_date = COALESCE(?, target_date),
        business_priority = COALESCE(?, business_priority),
+       complexity_level = COALESCE(?, complexity_level),
+       project_score = COALESCE(?, project_score),
        status = COALESCE(?, status),
        current_phase = COALESCE(?, current_phase),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [handover_id, project_name, rd_lead, automation_lead, start_date, target_date,
-       business_priority, status, current_phase, req.params.id]
+       business_priority, complexity_level, project_score, status, current_phase, req.params.id]
     );
 
     res.json({ message: 'Project updated successfully' });

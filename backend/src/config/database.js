@@ -206,6 +206,23 @@ function initializeDatabase() {
       )
     `);
 
+    // Add complexity_level and project_score columns if they don't exist
+    db.run(`
+      ALTER TABLE projects ADD COLUMN complexity_level TEXT DEFAULT 'Media'
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding complexity_level column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN project_score INTEGER DEFAULT 0
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding project_score column:', err.message);
+      }
+    });
+
     // Create indexes for better performance
     db.run('CREATE INDEX IF NOT EXISTS idx_project_handover_id ON projects(handover_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_checklist_project ON checklist_items(project_id)');
