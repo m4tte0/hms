@@ -4,6 +4,7 @@ import { Calendar, Clock, Users, Plus, Edit2, Trash2, X, Save, BookOpen, CheckCi
 
 const Knowledge = ({ projectId }) => {
   const [sessions, setSessions] = useState([]);
+  const [teamContacts, setTeamContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
   const [showAddModal, setShowAddModal] = useState(false);
@@ -12,9 +13,14 @@ const Knowledge = ({ projectId }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedAttendees, setSelectedAttendees] = useState([]);
+  const [editSelectedAttendees, setEditSelectedAttendees] = useState([]);
+  const [customAttendee, setCustomAttendee] = useState('');
+  const [editCustomAttendee, setEditCustomAttendee] = useState('');
   const [newSession, setNewSession] = useState({
     session_topic: '',
     scheduled_date: '',
+    start_time: '',
     duration: '',
     attendees: '',
     status: 'Scheduled',
@@ -27,8 +33,21 @@ const Knowledge = ({ projectId }) => {
   useEffect(() => {
     if (projectId) {
       loadSessions();
+      loadTeamContacts();
     }
   }, [projectId]);
+
+  const loadTeamContacts = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/team-contacts/${projectId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTeamContacts(data);
+      }
+    } catch (error) {
+      console.error('Error loading team contacts:', error);
+    }
+  };
 
   const loadSessions = async () => {
     try {
@@ -52,18 +71,27 @@ const Knowledge = ({ projectId }) => {
     }
 
     try {
+      // Convert selected attendees to comma-separated string
+      const attendeesString = selectedAttendees.join(', ');
+
       const response = await fetch(`${API_BASE_URL}/knowledge/${projectId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSession)
+        body: JSON.stringify({
+          ...newSession,
+          attendees: attendeesString
+        })
       });
 
       if (response.ok) {
         await loadSessions();
         setShowAddModal(false);
+        setSelectedAttendees([]);
+        setCustomAttendee('');
         setNewSession({
           session_topic: '',
           scheduled_date: '',
+          start_time: '',
           duration: '',
           attendees: '',
           status: 'Scheduled',
@@ -85,14 +113,18 @@ const Knowledge = ({ projectId }) => {
     }
 
     try {
+      // Convert selected attendees to comma-separated string
+      const attendeesString = editSelectedAttendees.join(', ');
+
       const response = await fetch(`${API_BASE_URL}/knowledge/${projectId}/${editingSession.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_topic: editingSession.session_topic,
           scheduled_date: editingSession.scheduled_date,
+          start_time: editingSession.start_time,
           duration: editingSession.duration,
-          attendees: editingSession.attendees,
+          attendees: attendeesString,
           status: editingSession.status,
           effectiveness_rating: editingSession.effectiveness_rating,
           notes: editingSession.notes
@@ -103,10 +135,60 @@ const Knowledge = ({ projectId }) => {
         await loadSessions();
         setShowEditModal(false);
         setEditingSession(null);
+        setEditSelectedAttendees([]);
+        setEditCustomAttendee('');
       }
     } catch (error) {
       console.error('Error updating session:', error);
     }
+  };
+
+  const toggleAttendee = (attendeeName) => {
+    setSelectedAttendees(prev =>
+      prev.includes(attendeeName)
+        ? prev.filter(name => name !== attendeeName)
+        : [...prev, attendeeName]
+    );
+  };
+
+  const toggleEditAttendee = (attendeeName) => {
+    setEditSelectedAttendees(prev =>
+      prev.includes(attendeeName)
+        ? prev.filter(name => name !== attendeeName)
+        : [...prev, attendeeName]
+    );
+  };
+
+  const addCustomAttendee = () => {
+    if (customAttendee.trim() && !selectedAttendees.includes(customAttendee.trim())) {
+      setSelectedAttendees(prev => [...prev, customAttendee.trim()]);
+      setCustomAttendee('');
+    }
+  };
+
+  const addEditCustomAttendee = () => {
+    if (editCustomAttendee.trim() && !editSelectedAttendees.includes(editCustomAttendee.trim())) {
+      setEditSelectedAttendees(prev => [...prev, editCustomAttendee.trim()]);
+      setEditCustomAttendee('');
+    }
+  };
+
+  const removeAttendee = (attendeeName) => {
+    setSelectedAttendees(prev => prev.filter(name => name !== attendeeName));
+  };
+
+  const removeEditAttendee = (attendeeName) => {
+    setEditSelectedAttendees(prev => prev.filter(name => name !== attendeeName));
+  };
+
+  const openEditModal = (session) => {
+    setEditingSession(session);
+    // Parse existing attendees string into array
+    const attendeesArray = session.attendees
+      ? session.attendees.split(',').map(a => a.trim()).filter(a => a)
+      : [];
+    setEditSelectedAttendees(attendeesArray);
+    setShowEditModal(true);
   };
 
   const handleDeleteSession = async () => {
@@ -218,7 +300,7 @@ const Knowledge = ({ projectId }) => {
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
-      currentWeek.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 border border-gray-200"></div>);
+      currentWeek.push(<div key={`empty-${i}`} className="h-32 bg-gray-50 border border-gray-200"></div>);
       dayCounter++;
     }
 
@@ -254,7 +336,7 @@ const Knowledge = ({ projectId }) => {
       currentWeek.push(
         <div
           key={day}
-          className={`h-24 border border-gray-200 p-2 overflow-y-auto ${bgColor} relative`}
+          className={`h-32 border border-gray-200 p-2 overflow-y-auto ${bgColor} relative`}
         >
           {isMondayColumn && (
             <div className="absolute top-0 left-0 bg-gray-700 text-white text-[10px] font-bold px-1 rounded-br">
@@ -268,14 +350,20 @@ const Knowledge = ({ projectId }) => {
             {daySessions.map(session => (
               <div
                 key={session.id}
-                className={`text-xs p-1 rounded cursor-pointer ${getStatusColor(session.status)}`}
-                onClick={() => {
-                  setEditingSession(session);
-                  setShowEditModal(true);
-                }}
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs p-2 rounded cursor-pointer hover:from-blue-100 hover:to-indigo-100 transition-colors"
+                onClick={() => openEditModal(session)}
               >
-                <div className="font-medium truncate">{session.session_topic}</div>
-                <div className="text-xs opacity-75">{session.duration}</div>
+                <div className="font-semibold text-gray-900 truncate mb-1">{session.session_topic}</div>
+                <div className="flex items-center gap-1 text-blue-600">
+                  {session.start_time && (
+                    <>
+                      <Clock className="w-3 h-3" />
+                      <span className="font-medium">{session.start_time}</span>
+                    </>
+                  )}
+                  {session.start_time && session.duration && <span className="text-gray-400">•</span>}
+                  {session.duration && <span className="text-gray-700">{session.duration} h</span>}
+                </div>
               </div>
             ))}
           </div>
@@ -299,7 +387,7 @@ const Knowledge = ({ projectId }) => {
     if (currentWeek.length > 0) {
       while (currentWeek.length < 7) {
         currentWeek.push(
-          <div key={`empty-end-${currentWeek.length}`} className="h-24 bg-gray-50 border border-gray-200"></div>
+          <div key={`empty-end-${currentWeek.length}`} className="h-32 bg-gray-50 border border-gray-200"></div>
         );
       }
       weeks.push(
@@ -446,10 +534,7 @@ const Knowledge = ({ projectId }) => {
 
                   <div className="flex gap-2 ml-4">
                     <button
-                      onClick={() => {
-                        setEditingSession(session);
-                        setShowEditModal(true);
-                      }}
+                      onClick={() => openEditModal(session)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                       title="Edit session"
                     >
@@ -555,6 +640,44 @@ const Knowledge = ({ projectId }) => {
         </div>
       </div>
 
+      {/* Completion Progress Bar */}
+      {(() => {
+        const completedSessions = sessions.filter(s => s.status === 'Completed').length;
+        const totalSessions = sessions.length;
+        const progressPercentage = totalSessions > 0 ? (completedSessions / totalSessions) * 100 : 0;
+
+        return (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <h3 className="text-sm font-semibold text-gray-900">Knowledge Transfer Progress</h3>
+              </div>
+              <span className="text-sm font-bold text-gray-900">
+                {completedSessions} / {totalSessions} Sessions
+              </span>
+            </div>
+            <div className="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 ease-out flex items-center justify-center"
+                style={{ width: `${progressPercentage}%` }}
+              >
+                {progressPercentage > 10 && (
+                  <span className="text-xs font-bold text-white">
+                    {progressPercentage.toFixed(0)}%
+                  </span>
+                )}
+              </div>
+              {progressPercentage <= 10 && progressPercentage > 0 && (
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">
+                  {progressPercentage.toFixed(0)}%
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Next Incoming Event */}
       {(() => {
         const now = new Date();
@@ -583,26 +706,34 @@ const Knowledge = ({ projectId }) => {
                       <Calendar className="w-4 h-4 text-blue-600" />
                       <div>
                         <div className="text-xs text-gray-500">Date</div>
-                        <div className="font-semibold">{sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                        <div className="font-semibold">
+                          {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
                       </div>
                     </div>
 
-                    {nextSession.duration && (
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <div>
-                          <div className="text-xs text-gray-500">Duration</div>
-                          <div className="font-semibold">{nextSession.duration}</div>
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">Time & Duration</div>
+                        <div className="font-semibold">
+                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
+                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
+                          {nextSession.duration && <span>{nextSession.duration} h</span>}
                         </div>
                       </div>
-                    )}
+                    </div>
 
                     {nextSession.attendees && (
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <Users className="w-4 h-4 text-blue-600" />
+                      <div className="flex items-start gap-2 text-gray-700">
+                        <Users className="w-4 h-4 text-blue-600 mt-1" />
                         <div>
-                          <div className="text-xs text-gray-500">Attendees</div>
-                          <div className="font-semibold">{nextSession.attendees}</div>
+                          <div className="text-xs text-gray-500 mb-1">Attendees</div>
+                          <div className="font-semibold">
+                            {nextSession.attendees.split(',').map((attendee, index) => (
+                              <div key={index}>{attendee.trim()}</div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -662,7 +793,7 @@ const Knowledge = ({ projectId }) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date <span className="text-red-500">*</span>
@@ -671,6 +802,15 @@ const Knowledge = ({ projectId }) => {
                     type="date"
                     value={newSession.scheduled_date}
                     onChange={(e) => setNewSession({ ...newSession, scheduled_date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    value={newSession.start_time}
+                    onChange={(e) => setNewSession({ ...newSession, start_time: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -687,14 +827,77 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Attendees</label>
-                <input
-                  type="text"
-                  value={newSession.attendees}
-                  onChange={(e) => setNewSession({ ...newSession, attendees: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., John Doe, Jane Smith"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Attendees</label>
+
+                {/* Team Members */}
+                {teamContacts.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-xs text-gray-600 mb-1 font-medium">Team Members</div>
+                    <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
+                      <div className="space-y-2">
+                        {teamContacts.map(contact => (
+                          <label key={contact.id} className="flex items-start gap-2 cursor-pointer hover:bg-white p-2 rounded">
+                            <input
+                              type="checkbox"
+                              checked={selectedAttendees.includes(contact.name)}
+                              onChange={() => toggleAttendee(contact.name)}
+                              className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">{contact.name}</div>
+                              <div className="text-xs text-gray-500">{contact.role} • {contact.department}</div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Attendees */}
+                <div>
+                  <div className="text-xs text-gray-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={customAttendee}
+                      onChange={(e) => setCustomAttendee(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addCustomAttendee()}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="Enter name and press Add"
+                    />
+                    <button
+                      type="button"
+                      onClick={addCustomAttendee}
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Selected Attendees */}
+                {selectedAttendees.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-xs text-gray-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedAttendees.map((attendee, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {attendee}
+                          <button
+                            onClick={() => removeAttendee(attendee)}
+                            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -752,7 +955,7 @@ const Knowledge = ({ projectId }) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date <span className="text-red-500">*</span>
@@ -761,6 +964,15 @@ const Knowledge = ({ projectId }) => {
                     type="date"
                     value={editingSession.scheduled_date}
                     onChange={(e) => setEditingSession({ ...editingSession, scheduled_date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    value={editingSession.start_time || ''}
+                    onChange={(e) => setEditingSession({ ...editingSession, start_time: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -777,14 +989,77 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Attendees</label>
-                <input
-                  type="text"
-                  value={editingSession.attendees || ''}
-                  onChange={(e) => setEditingSession({ ...editingSession, attendees: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., John Doe, Jane Smith"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Attendees</label>
+
+                {/* Team Members */}
+                {teamContacts.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-xs text-gray-600 mb-1 font-medium">Team Members</div>
+                    <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
+                      <div className="space-y-2">
+                        {teamContacts.map(contact => (
+                          <label key={contact.id} className="flex items-start gap-2 cursor-pointer hover:bg-white p-2 rounded">
+                            <input
+                              type="checkbox"
+                              checked={editSelectedAttendees.includes(contact.name)}
+                              onChange={() => toggleEditAttendee(contact.name)}
+                              className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">{contact.name}</div>
+                              <div className="text-xs text-gray-500">{contact.role} • {contact.department}</div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Attendees */}
+                <div>
+                  <div className="text-xs text-gray-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editCustomAttendee}
+                      onChange={(e) => setEditCustomAttendee(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && addEditCustomAttendee()}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="Enter name and press Add"
+                    />
+                    <button
+                      type="button"
+                      onClick={addEditCustomAttendee}
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Selected Attendees */}
+                {editSelectedAttendees.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-xs text-gray-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="flex flex-wrap gap-2">
+                      {editSelectedAttendees.map((attendee, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {attendee}
+                          <button
+                            onClick={() => removeEditAttendee(attendee)}
+                            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
