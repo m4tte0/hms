@@ -1289,13 +1289,16 @@ const Checklist = ({ projectId }) => {
                                       <label className="block text-xs font-medium text-gray-700 mb-1">
                                         Verified By
                                       </label>
-                                      <input
-                                        type="text"
+                                      <select
                                         value={item.verified_by || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verified_by: e.target.value })}
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Name"
-                                      />
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+                                      >
+                                        <option value="">Select verifier...</option>
+                                        <option value="Matteo Hon Fucci">Matteo Hon Fucci (Automation Manager)</option>
+                                        <option value="Stefano Corbelli">Stefano Corbelli (Technical Director)</option>
+                                        <option value="Ivan De Zanet">Ivan De Zanet (R&D Manager)</option>
+                                      </select>
                                     </div>
 
                                     <div>

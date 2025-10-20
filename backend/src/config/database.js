@@ -206,6 +206,23 @@ function initializeDatabase() {
       )
     `);
 
+    // Attachments table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS attachments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        file_name TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        file_size INTEGER,
+        mime_type TEXT,
+        description TEXT,
+        uploaded_by TEXT,
+        uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      )
+    `);
+
     // Add complexity_level and project_score columns if they don't exist
     db.run(`
       ALTER TABLE projects ADD COLUMN complexity_level TEXT DEFAULT 'Media'
@@ -239,6 +256,7 @@ function initializeDatabase() {
     db.run('CREATE INDEX IF NOT EXISTS idx_assessment_project ON assessment_scores(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_phase_names_project ON phase_names(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_attachments_project ON attachments(project_id)');
 
     console.log('Database initialized successfully');
   });

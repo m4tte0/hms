@@ -3,6 +3,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const db = require('./config/database');
 
 const app = express();
@@ -500,6 +503,139 @@ app.delete('/api/team-contacts/:projectId/:contactId', async (req, res) => {
   } catch (error) {
     console.error('❌ Error deleting team contact:', error);
     res.status(500).json({ error: 'Failed to delete team contact' });
+  }
+});
+
+// ==================== ATTACHMENTS ROUTES ====================
+
+// Configure multer for file uploads
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB max file size
+});
+
+// Get attachments for project
+app.get('/api/attachments/:projectId', async (req, res) => {
+  try {
+    const attachments = await db.allAsync(
+      'SELECT * FROM attachments WHERE project_id = ? ORDER BY uploaded_at DESC',
+      [req.params.projectId]
+    );
+    res.json(attachments);
+  } catch (error) {
+    console.error('Error fetching attachments:', error);
+    res.status(500).json({ error: 'Failed to fetch attachments' });
+  }
+});
+
+// Upload attachment
+app.post('/api/attachments/:projectId', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const { description, uploaded_by } = req.body;
+
+    const result = await db.runAsync(
+      `INSERT INTO attachments (project_id, file_name, original_name, file_path,
+       file_size, mime_type, description, uploaded_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        req.params.projectId,
+        req.file.filename,
+        req.file.originalname,
+        req.file.path,
+        req.file.size,
+        req.file.mimetype,
+        description || null,
+        uploaded_by || null
+      ]
+    );
+
+    res.status(201).json({
+      id: result.id,
+      message: 'File uploaded successfully',
+      filename: req.file.originalname
+    });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    // Delete the uploaded file if database insert fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: 'Failed to upload file' });
+  }
+});
+
+// Download attachment
+app.get('/api/attachments/:projectId/:attachmentId/download', async (req, res) => {
+  try {
+    const attachment = await db.getAsync(
+      'SELECT * FROM attachments WHERE id = ? AND project_id = ?',
+      [req.params.attachmentId, req.params.projectId]
+    );
+
+    if (!attachment) {
+      return res.status(404).json({ error: 'Attachment not found' });
+    }
+
+    if (!fs.existsSync(attachment.file_path)) {
+      return res.status(404).json({ error: 'File not found on disk' });
+    }
+
+    res.download(attachment.file_path, attachment.original_name);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    res.status(500).json({ error: 'Failed to download file' });
+  }
+});
+
+// Delete attachment
+app.delete('/api/attachments/:projectId/:attachmentId', async (req, res) => {
+  try {
+    console.log(`🗑️ Deleting attachment ${req.params.attachmentId} from project ${req.params.projectId}`);
+
+    // Get attachment info to delete file from disk
+    const attachment = await db.getAsync(
+      'SELECT * FROM attachments WHERE id = ? AND project_id = ?',
+      [req.params.attachmentId, req.params.projectId]
+    );
+
+    if (!attachment) {
+      return res.status(404).json({ error: 'Attachment not found' });
+    }
+
+    // Delete from database
+    await db.runAsync(
+      'DELETE FROM attachments WHERE id = ? AND project_id = ?',
+      [req.params.attachmentId, req.params.projectId]
+    );
+
+    // Delete file from disk
+    if (fs.existsSync(attachment.file_path)) {
+      fs.unlinkSync(attachment.file_path);
+    }
+
+    res.json({ message: 'Attachment deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting attachment:', error);
+    res.status(500).json({ error: 'Failed to delete attachment' });
   }
 });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FileText, CheckCircle, BarChart3, Clock, Users,
+  FileText, CheckCircle, BarChart3, Clock, Users, Paperclip,
   Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle
 } from 'lucide-react';
 import Checklist from './components/Checklist';
@@ -8,6 +8,7 @@ import Overview from './components/Overview';
 import Assessment from './components/Assessment';
 import Tracking from './components/Tracking';
 import Knowledge from './components/Knowledge';
+import Attachments from './components/Attachments';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,6 +35,7 @@ function App() {
     { id: 'assessment', label: 'Assessment', icon: BarChart3 },
     { id: 'tracking', label: 'Tracking', icon: Clock },
     { id: 'knowledge', label: 'Knowledge', icon: Users },
+    { id: 'attachments', label: 'Attachments', icon: Paperclip },
   ];
 
   // Load projects on mount
@@ -690,6 +692,8 @@ function App() {
               <Tracking projectId={currentProject.id} />
             ) : activeTab === 'knowledge' ? (
               <Knowledge projectId={currentProject.id} />
+            ) : activeTab === 'attachments' ? (
+              <Attachments projectId={currentProject.id} />
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
