@@ -144,6 +144,21 @@ const Knowledge = ({ projectId }) => {
     }
   };
 
+  // Italian bank holidays for 2025
+  const italianBankHolidays2025 = [
+    '2025-01-01', // Capodanno
+    '2025-01-06', // Epifania
+    '2025-04-21', // Lunedì dell'Angelo (Easter Monday)
+    '2025-04-25', // Festa della Liberazione
+    '2025-05-01', // Festa dei Lavoratori
+    '2025-06-02', // Festa della Repubblica
+    '2025-08-15', // Ferragosto
+    '2025-11-01', // Ognissanti
+    '2025-12-08', // Immacolata Concezione
+    '2025-12-25', // Natale
+    '2025-12-26', // Santo Stefano
+  ];
+
   // Calendar helper functions
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -151,9 +166,28 @@ const Knowledge = ({ projectId }) => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
+    // Get day of week (0=Sunday, 1=Monday, etc.) and adjust so Monday=0
     const startingDayOfWeek = firstDay.getDay();
+    const adjustedStartDay = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1;
 
-    return { daysInMonth, startingDayOfWeek, year, month };
+    return { daysInMonth, startingDayOfWeek: adjustedStartDay, year, month };
+  };
+
+  const getWeekNumber = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  const isBankHoliday = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return italianBankHolidays2025.includes(dateStr);
+  };
+
+  const isSunday = (date) => {
+    return date.getDay() === 0;
   };
 
   const getSessionsForDate = (date) => {
@@ -165,13 +199,16 @@ const Knowledge = ({ projectId }) => {
 
   const renderCalendar = () => {
     const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
-    const days = [];
+    const weeks = [];
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                         'July', 'August', 'September', 'October', 'November', 'December'];
 
+    let currentWeek = [];
+    let weekNumber = null;
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 bg-gray-50"></div>);
+      currentWeek.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 border border-gray-200"></div>);
     }
 
     // Add cells for each day of the month
@@ -179,15 +216,35 @@ const Knowledge = ({ projectId }) => {
       const date = new Date(year, month, day);
       const daySessions = getSessionsForDate(date);
       const isToday = new Date().toDateString() === date.toDateString();
+      const isSundayDay = isSunday(date);
+      const isBankHolidayDay = isBankHoliday(date);
 
-      days.push(
+      // Get week number for the first day of the week (Monday)
+      if (currentWeek.length === 0) {
+        weekNumber = getWeekNumber(date);
+      }
+
+      // Determine background color based on day type
+      let bgColor = 'bg-white hover:bg-gray-50';
+      let textColor = 'text-gray-700';
+
+      if (isToday) {
+        bgColor = 'bg-blue-50 border-blue-300';
+        textColor = 'text-blue-600';
+      } else if (isBankHolidayDay) {
+        bgColor = 'bg-red-50 hover:bg-red-100';
+        textColor = 'text-red-700';
+      } else if (isSundayDay) {
+        bgColor = 'bg-orange-50 hover:bg-orange-100';
+        textColor = 'text-orange-700';
+      }
+
+      currentWeek.push(
         <div
           key={day}
-          className={`h-24 border border-gray-200 p-2 overflow-y-auto ${
-            isToday ? 'bg-blue-50 border-blue-300' : 'bg-white hover:bg-gray-50'
-          }`}
+          className={`h-24 border border-gray-200 p-2 overflow-y-auto ${bgColor}`}
         >
-          <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-600' : 'text-gray-700'}`}>
+          <div className={`text-sm font-semibold mb-1 ${textColor}`}>
             {day}
           </div>
           <div className="space-y-1">
@@ -205,6 +262,36 @@ const Knowledge = ({ projectId }) => {
               </div>
             ))}
           </div>
+        </div>
+      );
+
+      // When we complete a week (7 days), add it to weeks array
+      if (currentWeek.length === 7) {
+        weeks.push(
+          <div key={`week-${weeks.length}`} className="grid grid-cols-8 gap-0">
+            <div className="h-24 bg-gray-100 border border-gray-300 flex items-center justify-center">
+              <span className="text-xs font-bold text-gray-600">W{weekNumber}</span>
+            </div>
+            {currentWeek}
+          </div>
+        );
+        currentWeek = [];
+      }
+    }
+
+    // Add remaining cells to complete the last week
+    if (currentWeek.length > 0) {
+      while (currentWeek.length < 7) {
+        currentWeek.push(
+          <div key={`empty-end-${currentWeek.length}`} className="h-24 bg-gray-50 border border-gray-200"></div>
+        );
+      }
+      weeks.push(
+        <div key={`week-${weeks.length}`} className="grid grid-cols-8 gap-0">
+          <div className="h-24 bg-gray-100 border border-gray-300 flex items-center justify-center">
+            <span className="text-xs font-bold text-gray-600">W{weekNumber}</span>
+          </div>
+          {currentWeek}
         </div>
       );
     }
@@ -238,9 +325,26 @@ const Knowledge = ({ projectId }) => {
           </div>
         </div>
 
-        {/* Day Names */}
-        <div className="grid grid-cols-7 gap-0 mb-2">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+        {/* Legend */}
+        <div className="flex items-center gap-4 mb-4 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-blue-50 border border-blue-300 rounded"></div>
+            <span className="text-gray-600">Today</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-orange-50 border border-gray-200 rounded"></div>
+            <span className="text-gray-600">Sunday</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-red-50 border border-gray-200 rounded"></div>
+            <span className="text-gray-600">Bank Holiday</span>
+          </div>
+        </div>
+
+        {/* Day Names with Week column */}
+        <div className="grid grid-cols-8 gap-0 mb-2">
+          <div className="text-center font-semibold text-gray-600 text-sm py-2">Week</div>
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
             <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
               {day}
             </div>
@@ -248,8 +352,8 @@ const Knowledge = ({ projectId }) => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-0 border border-gray-200">
-          {days}
+        <div className="border border-gray-200">
+          {weeks}
         </div>
       </div>
     );
