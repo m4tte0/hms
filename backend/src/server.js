@@ -235,16 +235,20 @@ app.post('/api/knowledge/:projectId', async (req, res) => {
 // Update knowledge transfer session
 app.put('/api/knowledge/:projectId/:sessionId', async (req, res) => {
   try {
-    const { status, effectiveness_rating, notes } = req.body;
+    const { session_topic, scheduled_date, duration, attendees, status, effectiveness_rating, notes } = req.body;
 
     await db.runAsync(
-      `UPDATE knowledge_sessions SET 
+      `UPDATE knowledge_sessions SET
+       session_topic = COALESCE(?, session_topic),
+       scheduled_date = COALESCE(?, scheduled_date),
+       duration = COALESCE(?, duration),
+       attendees = COALESCE(?, attendees),
        status = COALESCE(?, status),
        effectiveness_rating = COALESCE(?, effectiveness_rating),
        notes = COALESCE(?, notes),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ? AND project_id = ?`,
-      [status, effectiveness_rating, notes, req.params.sessionId, req.params.projectId]
+      [session_topic, scheduled_date, duration, attendees, status, effectiveness_rating, notes, req.params.sessionId, req.params.projectId]
     );
 
     res.json({ message: 'Session updated' });

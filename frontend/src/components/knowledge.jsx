@@ -79,11 +79,20 @@ const Knowledge = ({ projectId }) => {
   const handleUpdateSession = async () => {
     if (!editingSession) return;
 
+    if (!editingSession.session_topic || !editingSession.scheduled_date) {
+      alert('Please fill in Topic and Date fields');
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/knowledge/${projectId}/${editingSession.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          session_topic: editingSession.session_topic,
+          scheduled_date: editingSession.scheduled_date,
+          duration: editingSession.duration,
+          attendees: editingSession.attendees,
           status: editingSession.status,
           effectiveness_rating: editingSession.effectiveness_rating,
           notes: editingSession.notes
@@ -205,10 +214,12 @@ const Knowledge = ({ projectId }) => {
 
     let currentWeek = [];
     let weekNumber = null;
+    let dayCounter = 0;
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       currentWeek.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 border border-gray-200"></div>);
+      dayCounter++;
     }
 
     // Add cells for each day of the month
@@ -218,9 +229,10 @@ const Knowledge = ({ projectId }) => {
       const isToday = new Date().toDateString() === date.toDateString();
       const isSundayDay = isSunday(date);
       const isBankHolidayDay = isBankHoliday(date);
+      const isMondayColumn = dayCounter % 7 === 0;
 
-      // Get week number for the first day of the week (Monday)
-      if (currentWeek.length === 0) {
+      // Get week number for Monday
+      if (isMondayColumn) {
         weekNumber = getWeekNumber(date);
       }
 
@@ -242,9 +254,14 @@ const Knowledge = ({ projectId }) => {
       currentWeek.push(
         <div
           key={day}
-          className={`h-24 border border-gray-200 p-2 overflow-y-auto ${bgColor}`}
+          className={`h-24 border border-gray-200 p-2 overflow-y-auto ${bgColor} relative`}
         >
-          <div className={`text-sm font-semibold mb-1 ${textColor}`}>
+          {isMondayColumn && (
+            <div className="absolute top-0 left-0 bg-gray-700 text-white text-[10px] font-bold px-1 rounded-br">
+              W{weekNumber}
+            </div>
+          )}
+          <div className={`text-sm font-semibold mb-1 ${textColor} ${isMondayColumn ? 'mt-3' : ''}`}>
             {day}
           </div>
           <div className="space-y-1">
@@ -265,13 +282,12 @@ const Knowledge = ({ projectId }) => {
         </div>
       );
 
+      dayCounter++;
+
       // When we complete a week (7 days), add it to weeks array
       if (currentWeek.length === 7) {
         weeks.push(
-          <div key={`week-${weeks.length}`} className="grid grid-cols-8 gap-0">
-            <div className="h-24 bg-gray-100 border border-gray-300 flex items-center justify-center">
-              <span className="text-xs font-bold text-gray-600">W{weekNumber}</span>
-            </div>
+          <div key={`week-${weeks.length}`} className="grid grid-cols-7 gap-0">
             {currentWeek}
           </div>
         );
@@ -287,10 +303,7 @@ const Knowledge = ({ projectId }) => {
         );
       }
       weeks.push(
-        <div key={`week-${weeks.length}`} className="grid grid-cols-8 gap-0">
-          <div className="h-24 bg-gray-100 border border-gray-300 flex items-center justify-center">
-            <span className="text-xs font-bold text-gray-600">W{weekNumber}</span>
-          </div>
+        <div key={`week-${weeks.length}`} className="grid grid-cols-7 gap-0">
           {currentWeek}
         </div>
       );
@@ -341,9 +354,8 @@ const Knowledge = ({ projectId }) => {
           </div>
         </div>
 
-        {/* Day Names with Week column */}
-        <div className="grid grid-cols-8 gap-0 mb-2">
-          <div className="text-center font-semibold text-gray-600 text-sm py-2">Week</div>
+        {/* Day Names */}
+        <div className="grid grid-cols-7 gap-0 mb-2">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
             <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
               {day}
@@ -543,6 +555,85 @@ const Knowledge = ({ projectId }) => {
         </div>
       </div>
 
+      {/* Next Incoming Event */}
+      {(() => {
+        const now = new Date();
+        const upcomingSessions = sessions
+          .filter(s => new Date(s.scheduled_date) >= now && s.status !== 'Cancelled')
+          .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
+
+        const nextSession = upcomingSessions[0];
+
+        if (nextSession) {
+          const sessionDate = new Date(nextSession.scheduled_date);
+          const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
+
+          return (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Next Incoming Event</h3>
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-3">{nextSession.session_topic}</h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">Date</div>
+                        <div className="font-semibold">{sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                      </div>
+                    </div>
+
+                    {nextSession.duration && (
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <div className="text-xs text-gray-500">Duration</div>
+                          <div className="font-semibold">{nextSession.duration}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {nextSession.attendees && (
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Users className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <div className="text-xs text-gray-500">Attendees</div>
+                          <div className="font-semibold">{nextSession.attendees}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {nextSession.notes && (
+                    <div className="mt-3 text-sm text-gray-600 bg-white bg-opacity-60 p-3 rounded">
+                      {nextSession.notes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="ml-4 text-center">
+                  <div className="bg-blue-600 text-white rounded-lg px-4 py-3 min-w-[80px]">
+                    <div className="text-3xl font-bold">{daysUntil}</div>
+                    <div className="text-xs uppercase tracking-wide">
+                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
+                    {getStatusIcon(nextSession.status)}
+                    {nextSession.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Calendar or List View */}
       {viewMode === 'calendar' ? renderCalendar() : renderList()}
 
@@ -639,7 +730,7 @@ const Knowledge = ({ projectId }) => {
       {/* Edit Session Modal */}
       {showEditModal && editingSession && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Edit Session</h3>
               <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
@@ -648,11 +739,52 @@ const Knowledge = ({ projectId }) => {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-900">{editingSession.session_topic}</h4>
-                <p className="text-sm text-gray-600 mt-1">
-                  {new Date(editingSession.scheduled_date).toLocaleDateString()} • {editingSession.duration}
-                </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Session Topic <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editingSession.session_topic}
+                  onChange={(e) => setEditingSession({ ...editingSession, session_topic: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., System Architecture Overview"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={editingSession.scheduled_date}
+                    onChange={(e) => setEditingSession({ ...editingSession, scheduled_date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                  <input
+                    type="text"
+                    value={editingSession.duration || ''}
+                    onChange={(e) => setEditingSession({ ...editingSession, duration: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., 2 hours"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Attendees</label>
+                <input
+                  type="text"
+                  value={editingSession.attendees || ''}
+                  onChange={(e) => setEditingSession({ ...editingSession, attendees: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., John Doe, Jane Smith"
+                />
               </div>
 
               <div>
