@@ -18,6 +18,9 @@ const Checklist = ({ projectId }) => {
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [newCategoryPhase, setNewCategoryPhase] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [newItemPhase, setNewItemPhase] = useState('');
+  const [newItemCategory, setNewItemCategory] = useState('');
   const [collapsedPhases, setCollapsedPhases] = useState({});
   const [collapsedCategories, setCollapsedCategories] = useState({});
   
@@ -573,6 +576,64 @@ const Checklist = ({ projectId }) => {
     setNewCategoryName('');
   };
 
+  const handleAddItemClick = (phaseId) => {
+    setNewItemPhase(phaseId);
+    // Get the first category in the phase as default
+    const categoriesInPhase = Object.keys(groupedItems[phaseId] || {});
+    setNewItemCategory(categoriesInPhase[0] || '');
+    setShowAddItemModal(true);
+  };
+
+  const handleAddItemConfirm = async () => {
+    if (!newItemCategory) {
+      setSaveStatus('Please select a category');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    const newItem = {
+      phase: newItemPhase,
+      category: newItemCategory,
+      requirement: 'New requirement',
+      status: 'Not Started',
+      verification_date: null,
+      verified_by: '',
+      notes: ''
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/checklist/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItem)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      setItems([...items, { ...newItem, id: result.id }]);
+
+      setShowAddItemModal(false);
+      setNewItemPhase('');
+      setNewItemCategory('');
+
+      setSaveStatus('Item added');
+      setTimeout(() => setSaveStatus(''), 2000);
+    } catch (error) {
+      console.error('❌ Error adding item:', error);
+      setSaveStatus('Error adding item');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleAddItemCancel = () => {
+    setShowAddItemModal(false);
+    setNewItemPhase('');
+    setNewItemCategory('');
+  };
+
   const togglePhase = (phaseId) => {
     setCollapsedPhases(prev => {
       const newState = {
@@ -810,6 +871,60 @@ const Checklist = ({ projectId }) => {
         </div>
       )}
 
+      {/* Add Item Modal */}
+      {showAddItemModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <Plus className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Add New Item</h3>
+                <p className="text-sm text-gray-500">Add an item to an existing category in {phases.find(p => p.id === newItemPhase)?.name}</p>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Category
+              </label>
+              <select
+                value={newItemCategory}
+                onChange={(e) => setNewItemCategory(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                autoFocus
+              >
+                {Object.keys(groupedItems[newItemPhase] || {}).map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                A new item will be added to the selected category
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleAddItemCancel}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddItemConfirm}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -964,7 +1079,7 @@ const Checklist = ({ projectId }) => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddCustomItem(phaseInfo.id);
+                        handleAddItemClick(phaseInfo.id);
                       }}
                       className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
                       title="Add item to existing category"
