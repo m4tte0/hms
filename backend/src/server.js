@@ -263,6 +263,23 @@ app.put('/api/knowledge/:projectId/:sessionId', async (req, res) => {
   }
 });
 
+// Delete knowledge transfer session
+app.delete('/api/knowledge/:projectId/:sessionId', async (req, res) => {
+  try {
+    console.log(`🗑️ Deleting knowledge session ${req.params.sessionId} from project ${req.params.projectId}`);
+
+    await db.runAsync(
+      'DELETE FROM knowledge_sessions WHERE id = ? AND project_id = ?',
+      [req.params.sessionId, req.params.projectId]
+    );
+
+    res.json({ message: 'Knowledge session deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting knowledge session:', error);
+    res.status(500).json({ error: 'Failed to delete knowledge session' });
+  }
+});
+
 // ==================== ASSESSMENT ROUTES ====================
 
 // Get assessment scores for project

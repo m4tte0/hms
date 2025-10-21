@@ -1,15 +1,17 @@
 // frontend/src/components/Overview.jsx
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar } from 'lucide-react';
 import { teamContactsAPI } from '../services/api';
 
 const Overview = ({ project, setProject }) => {
   const [teamContacts, setTeamContacts] = useState([]);
   const [checklistItems, setChecklistItems] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
+  const [showNextEvent, setShowNextEvent] = useState(true);
   const [phaseNames, setPhaseNames] = useState({
     'Phase 1': 'Phase 1: Pre-Handover Assessment',
     'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
@@ -38,6 +40,7 @@ const Overview = ({ project, setProject }) => {
       loadTeamContacts();
       loadChecklistItems();
       loadIssues();
+      loadSessions();
       loadPhaseNamesFromStorage();
     }
   }, [project?.id]);
@@ -101,6 +104,18 @@ const Overview = ({ project, setProject }) => {
       }
     } catch (error) {
       console.error('Error loading issues:', error);
+    }
+  };
+
+  const loadSessions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/knowledge/${project.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSessions(data);
+      }
+    } catch (error) {
+      console.error('Error loading sessions:', error);
     }
   };
 
@@ -240,6 +255,33 @@ const Overview = ({ project, setProject }) => {
     return checklistItems.filter(item => item.status === 'Not Started').length;
   };
 
+  // Status color helper
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Completed':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'In Progress':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'Cancelled':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Completed':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'In Progress':
+        return <Clock className="w-4 h-4" />;
+      case 'Cancelled':
+        return <AlertCircle className="w-4 h-4" />;
+      default:
+        return <Calendar className="w-4 h-4" />;
+    }
+  };
+
   // Dynamic phases based on checklist data and custom phase names
   const phases = [
     {
@@ -273,19 +315,101 @@ const Overview = ({ project, setProject }) => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-blue-900">Welcome to the Handover Management System</h3>
-            <p className="text-sm text-blue-800 mt-1">
-              This system manages software project handovers from R&D to the Automation Department.
-              All data is automatically saved as you type. Complete each section in order for best results.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Next Incoming Event */}
+      {showNextEvent && (() => {
+        const now = new Date();
+        const upcomingSessions = sessions
+          .filter(s => new Date(s.scheduled_date) >= now && s.status !== 'Cancelled')
+          .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
+
+        const nextSession = upcomingSessions[0];
+
+        if (nextSession) {
+          const sessionDate = new Date(nextSession.scheduled_date);
+          const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
+
+          return (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-4 relative">
+              {/* Close Button */}
+              <button
+                onClick={() => setShowNextEvent(false)}
+                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white hover:bg-opacity-60 rounded-full transition-colors"
+                title="Dismiss"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-start justify-between pr-8">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Next Incoming Event</h3>
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-3">{nextSession.session_topic}</h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">Date</div>
+                        <div className="font-semibold">
+                          {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">Time & Duration</div>
+                        <div className="font-semibold">
+                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
+                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
+                          {nextSession.duration && <span>{nextSession.duration} h</span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {nextSession.attendees && (
+                      <div className="flex items-start gap-2 text-gray-700">
+                        <Users className="w-4 h-4 text-blue-600 mt-1" />
+                        <div>
+                          <div className="text-xs text-gray-500 mb-1">Attendees</div>
+                          <div className="font-semibold">
+                            {nextSession.attendees.split(',').map((attendee, index) => (
+                              <div key={index}>{attendee.trim()}</div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {nextSession.notes && (
+                    <div className="mt-3 text-sm text-gray-600 bg-white bg-opacity-60 p-3 rounded">
+                      {nextSession.notes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="ml-4 text-center">
+                  <div className="bg-blue-600 text-white rounded-lg px-4 py-3 min-w-[80px]">
+                    <div className="text-3xl font-bold">{daysUntil}</div>
+                    <div className="text-xs uppercase tracking-wide">
+                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
+                    {getStatusIcon(nextSession.status)}
+                    {nextSession.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       {/* Project Information and Quick Stats Side-by-Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -808,20 +932,6 @@ const Overview = ({ project, setProject }) => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Important Notice */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-yellow-900">Important</h3>
-            <p className="text-sm text-yellow-800 mt-1">
-              Complete each worksheet in order. Use the Dashboard tab to monitor overall progress
-              and identify any issues requiring attention. All changes are saved automatically.
-            </p>
-          </div>
         </div>
       </div>
     </div>

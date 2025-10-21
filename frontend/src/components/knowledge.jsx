@@ -350,7 +350,7 @@ const Knowledge = ({ projectId }) => {
             {daySessions.map(session => (
               <div
                 key={session.id}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs p-2 rounded cursor-pointer hover:from-blue-100 hover:to-indigo-100 transition-colors"
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs p-2 rounded hover:from-blue-100 hover:to-indigo-100 transition-colors cursor-pointer"
                 onClick={() => openEditModal(session)}
               >
                 <div className="font-semibold text-gray-900 truncate mb-1">{session.session_topic}</div>
@@ -1119,19 +1119,32 @@ const Knowledge = ({ projectId }) => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-between items-center mt-6">
               <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  setSessionToDelete(editingSession);
+                  setShowDeleteModal(true);
+                  setShowEditModal(false);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
               >
-                Cancel
+                <Trash2 className="w-4 h-4" />
+                Delete Session
               </button>
-              <button
-                onClick={handleUpdateSession}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateSession}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>

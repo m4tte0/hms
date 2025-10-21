@@ -271,7 +271,7 @@ const Checklist = ({ projectId }) => {
   const handleUpdateItem = async (itemId, updates) => {
     try {
       console.log(`💾 Updating item ${itemId}:`, updates);
-      
+
       const response = await fetch(`${API_BASE_URL}/checklist/${projectId}/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -282,17 +282,159 @@ const Checklist = ({ projectId }) => {
         throw new Error(`HTTP ${response.status}`);
       }
 
+      const updatedItem = items.find(item => item.id === itemId);
+      const newItemData = { ...updatedItem, ...updates };
+
       setItems(items.map(item =>
-        item.id === itemId ? { ...item, ...updates } : item
+        item.id === itemId ? newItemData : item
       ));
+
+      // Auto-sync with Knowledge Transfer Sessions
+      if (newItemData.phase === 'Phase 2' && 'verification_date' in updates) {
+        console.log('🔍 Verification date update detected:', {
+          value: updates.verification_date,
+          type: typeof updates.verification_date,
+          length: updates.verification_date?.length,
+          isEmpty: !updates.verification_date,
+          itemRequirement: newItemData.requirement
+        });
+
+        // Check if date is truly set (not null, not empty string, not undefined)
+        const hasValidDate = updates.verification_date &&
+                            typeof updates.verification_date === 'string' &&
+                            updates.verification_date.trim() !== '';
+
+        console.log('📊 Valid date check:', hasValidDate);
+
+        if (hasValidDate) {
+          // Date is set - create/update knowledge session
+          console.log('➕ Creating/updating knowledge session');
+          await syncWithKnowledgeSession(newItemData);
+        } else {
+          // Date is cleared (null, empty string, or whitespace) - delete knowledge session
+          console.log('➖ Deleting knowledge session');
+          await deleteKnowledgeSession(newItemData);
+        }
+      }
 
       setSaveStatus('Saved');
       setTimeout(() => setSaveStatus(''), 2000);
-      
+
     } catch (error) {
       console.error('❌ Error updating item:', error);
       setSaveStatus('Error saving');
       setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const syncWithKnowledgeSession = async (checklistItem) => {
+    try {
+      console.log(`📅 Auto-syncing checklist item with knowledge session:`, checklistItem.requirement);
+
+      // Check if a knowledge session already exists for this item
+      const sessionsResponse = await fetch(`${API_BASE_URL}/knowledge/${projectId}`);
+      if (!sessionsResponse.ok) {
+        console.error('⚠️ Failed to load sessions');
+        return;
+      }
+
+      const sessions = await sessionsResponse.json();
+      console.log(`📋 Found ${sessions.length} total sessions for sync check`);
+
+      const existingSession = sessions.find(s => s.session_topic === checklistItem.requirement);
+
+      const sessionData = {
+        session_topic: checklistItem.requirement,
+        scheduled_date: checklistItem.verification_date,
+        start_time: '',
+        duration: '2',
+        attendees: checklistItem.verified_by || '',
+        status: checklistItem.status === 'Complete' ? 'Completed' : 'Scheduled',
+        effectiveness_rating: null,
+        notes: checklistItem.notes || ''
+      };
+
+      if (existingSession) {
+        console.log(`🔄 Updating existing session ID: ${existingSession.id}`);
+        // Update existing session
+        const updateResponse = await fetch(`${API_BASE_URL}/knowledge/${projectId}/${existingSession.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionData)
+        });
+
+        if (updateResponse.ok) {
+          const result = await updateResponse.json();
+          console.log('✅ Knowledge session updated successfully:', result);
+        } else {
+          console.error(`❌ Update failed with status: ${updateResponse.status}`);
+          const errorText = await updateResponse.text();
+          console.error('Error details:', errorText);
+        }
+      } else {
+        console.log(`➕ Creating new session for: ${checklistItem.requirement}`);
+        // Create new session
+        const createResponse = await fetch(`${API_BASE_URL}/knowledge/${projectId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionData)
+        });
+
+        if (createResponse.ok) {
+          const result = await createResponse.json();
+          console.log('✅ Knowledge session created successfully:', result);
+        } else {
+          console.error(`❌ Create failed with status: ${createResponse.status}`);
+          const errorText = await createResponse.text();
+          console.error('Error details:', errorText);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error syncing with knowledge session:', error);
+      // Don't fail the main update if sync fails
+    }
+  };
+
+  const deleteKnowledgeSession = async (checklistItem) => {
+    try {
+      console.log(`🗑️ Deleting knowledge session for cleared date:`, checklistItem.requirement);
+
+      // Find the knowledge session that matches this checklist item
+      const sessionsResponse = await fetch(`${API_BASE_URL}/knowledge/${projectId}`);
+      if (!sessionsResponse.ok) {
+        console.log('⚠️ Failed to load sessions');
+        return;
+      }
+
+      const sessions = await sessionsResponse.json();
+      console.log(`📋 Found ${sessions.length} total sessions`);
+
+      const existingSession = sessions.find(s => s.session_topic === checklistItem.requirement);
+
+      if (existingSession) {
+        console.log(`🎯 Found session to delete:`, {
+          id: existingSession.id,
+          topic: existingSession.session_topic,
+          date: existingSession.scheduled_date
+        });
+
+        // Delete the session
+        const deleteResponse = await fetch(`${API_BASE_URL}/knowledge/${projectId}/${existingSession.id}`, {
+          method: 'DELETE'
+        });
+
+        if (deleteResponse.ok) {
+          console.log('✅ Knowledge session deleted successfully');
+        } else {
+          console.error(`❌ Delete failed with status: ${deleteResponse.status}`);
+        }
+      } else {
+        console.log('ℹ️ No knowledge session found matching requirement:', checklistItem.requirement);
+        console.log('📝 Available session topics:', sessions.map(s => s.session_topic));
+      }
+    } catch (error) {
+      console.error('❌ Error deleting knowledge session:', error);
+      // Don't fail the main update if delete fails
     }
   };
 
