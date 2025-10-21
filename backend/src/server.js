@@ -117,6 +117,138 @@ app.delete('/api/projects/:id', async (req, res) => {
   }
 });
 
+// Get comprehensive project report
+app.get('/api/projects/:id/report', async (req, res) => {
+  try {
+    const projectId = req.params.id;
+
+    // Fetch all related data in parallel for better performance
+    const [
+      project,
+      checklistItems,
+      knowledgeSessions,
+      assessmentScores,
+      issues,
+      teamContacts,
+      attachments,
+      phaseNames
+    ] = await Promise.all([
+      db.getAsync('SELECT * FROM projects WHERE id = ?', [projectId]),
+      db.allAsync('SELECT * FROM checklist_items WHERE project_id = ? ORDER BY phase, category, id', [projectId]),
+      db.allAsync('SELECT * FROM knowledge_sessions WHERE project_id = ? ORDER BY scheduled_date', [projectId]),
+      db.allAsync('SELECT * FROM assessment_scores WHERE project_id = ? ORDER BY phase, category, criteria', [projectId]),
+      db.allAsync('SELECT * FROM issues WHERE project_id = ? ORDER BY priority, date_reported DESC', [projectId]),
+      db.allAsync('SELECT * FROM team_contacts WHERE project_id = ? ORDER BY department, role', [projectId]),
+      db.allAsync('SELECT id, file_name, original_name, file_size, mime_type, description, uploaded_by, uploaded_at FROM attachments WHERE project_id = ? ORDER BY uploaded_at DESC', [projectId]),
+      db.allAsync('SELECT * FROM phase_names WHERE project_id = ? ORDER BY phase_id', [projectId])
+    ]);
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Calculate statistics
+    const totalChecklistItems = checklistItems.length;
+    const completedChecklistItems = checklistItems.filter(item => item.status === 'Complete').length;
+    const inProgressChecklistItems = checklistItems.filter(item => item.status === 'In Progress').length;
+    const notStartedChecklistItems = checklistItems.filter(item => item.status === 'Not Started').length;
+
+    const completionPercentage = totalChecklistItems > 0
+      ? Math.round((completedChecklistItems / totalChecklistItems) * 100)
+      : 0;
+
+    // Group checklist by phase and category
+    const checklistByPhase = {};
+    checklistItems.forEach(item => {
+      if (!checklistByPhase[item.phase]) {
+        checklistByPhase[item.phase] = {};
+      }
+      if (!checklistByPhase[item.phase][item.category]) {
+        checklistByPhase[item.phase][item.category] = [];
+      }
+      checklistByPhase[item.phase][item.category].push(item);
+    });
+
+    // Group assessments by phase
+    const assessmentsByPhase = {};
+    assessmentScores.forEach(score => {
+      if (!assessmentsByPhase[score.phase]) {
+        assessmentsByPhase[score.phase] = [];
+      }
+      assessmentsByPhase[score.phase].push(score);
+    });
+
+    // Calculate phase completion percentages
+    const phaseStats = {};
+    Object.keys(checklistByPhase).forEach(phase => {
+      const phaseItems = checklistItems.filter(item => item.phase === phase);
+      const phaseCompleted = phaseItems.filter(item => item.status === 'Complete').length;
+      phaseStats[phase] = {
+        total: phaseItems.length,
+        completed: phaseCompleted,
+        inProgress: phaseItems.filter(item => item.status === 'In Progress').length,
+        notStarted: phaseItems.filter(item => item.status === 'Not Started').length,
+        percentage: phaseItems.length > 0 ? Math.round((phaseCompleted / phaseItems.length) * 100) : 0
+      };
+    });
+
+    // Calculate days remaining
+    let daysRemaining = null;
+    if (project.target_date) {
+      const targetDate = new Date(project.target_date);
+      const today = new Date();
+      const timeDiff = targetDate.getTime() - today.getTime();
+      daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+
+    // Aggregate report data
+    const report = {
+      project: {
+        ...project,
+        daysRemaining,
+        completionPercentage
+      },
+      statistics: {
+        checklist: {
+          total: totalChecklistItems,
+          completed: completedChecklistItems,
+          inProgress: inProgressChecklistItems,
+          notStarted: notStartedChecklistItems,
+          completionPercentage
+        },
+        phases: phaseStats,
+        knowledge: {
+          total: knowledgeSessions.length,
+          completed: knowledgeSessions.filter(s => s.status === 'Completed').length,
+          scheduled: knowledgeSessions.filter(s => s.status === 'Scheduled').length
+        },
+        issues: {
+          total: issues.length,
+          open: issues.filter(i => i.status === 'Open').length,
+          inProgress: issues.filter(i => i.status === 'In Progress').length,
+          resolved: issues.filter(i => i.status === 'Resolved').length
+        },
+        attachments: {
+          total: attachments.length,
+          totalSize: attachments.reduce((sum, a) => sum + (a.file_size || 0), 0)
+        }
+      },
+      teamContacts,
+      checklistByPhase,
+      assessmentsByPhase,
+      knowledgeSessions,
+      issues,
+      attachments,
+      phaseNames
+    };
+
+    res.json(report);
+  } catch (error) {
+    console.error('Error generating project report:', error);
+    res.status(500).json({ error: 'Failed to generate project report' });
+  }
+});
+
 // ==================== CHECKLIST ROUTES ====================
 
 // Get checklist items for project

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText, CheckCircle, BarChart3, Clock, Users, Paperclip,
-  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle
+  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
@@ -9,6 +9,7 @@ import Assessment from './components/Assessment';
 import Tracking from './components/Tracking';
 import Knowledge from './components/Knowledge';
 import Attachments from './components/Attachments';
+import StatusReport from './components/StatusReport';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -26,6 +27,9 @@ function App() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Report modal state
+  const [showReport, setShowReport] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -494,6 +498,17 @@ function App() {
 
               {currentProject && (
                 <button
+                  onClick={() => setShowReport(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  title="Generate status report"
+                >
+                  <FileBarChart className="w-4 h-4" />
+                  Generate Report
+                </button>
+              )}
+
+              {currentProject && (
+                <button
                   onClick={() => handleDeleteClick(currentProject)}
                   className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
                   title="Delete current project"
@@ -707,6 +722,14 @@ function App() {
           </div>
         </main>
       </div>
+
+      {/* Status Report Modal */}
+      {showReport && currentProject && (
+        <StatusReport
+          projectId={currentProject.id}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   );
 }
