@@ -249,6 +249,15 @@ function initializeDatabase() {
       }
     });
 
+    // Add compiled_by column to checklist_items if it doesn't exist
+    db.run(`
+      ALTER TABLE checklist_items ADD COLUMN compiled_by TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding compiled_by column:', err.message);
+      }
+    });
+
     // Create indexes for better performance
     db.run('CREATE INDEX IF NOT EXISTS idx_project_handover_id ON projects(handover_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_checklist_project ON checklist_items(project_id)');
