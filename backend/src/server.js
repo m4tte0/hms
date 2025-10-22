@@ -9,7 +9,7 @@ const fs = require('fs');
 const db = require('./config/database');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -154,7 +154,7 @@ app.post('/api/checklist/:projectId', async (req, res) => {
 // Update checklist item
 app.put('/api/checklist/:projectId/:itemId', async (req, res) => {
   try {
-    const { phase, category, requirement, status, verification_date, verified_by, compiled_by, notes } = req.body;
+    const { phase, category, requirement, status, verification_date, verified_by, notes } = req.body;
 
     console.log(`💾 Updating checklist item ${req.params.itemId}:`, req.body);
 
@@ -166,11 +166,10 @@ app.put('/api/checklist/:projectId/:itemId', async (req, res) => {
        status = COALESCE(?, status),
        verification_date = COALESCE(?, verification_date),
        verified_by = COALESCE(?, verified_by),
-       compiled_by = COALESCE(?, compiled_by),
        notes = COALESCE(?, notes),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ? AND project_id = ?`,
-      [phase, category, requirement, status, verification_date, verified_by, compiled_by, notes, req.params.itemId, req.params.projectId]
+      [phase, category, requirement, status, verification_date, verified_by, notes, req.params.itemId, req.params.projectId]
     );
 
     res.json({ message: 'Checklist item updated' });
@@ -652,7 +651,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`📊 API available at http://localhost:${PORT}/api`);
   console.log(`💾 Database: ${process.env.DATABASE_PATH || './database/handover.db'}`);
