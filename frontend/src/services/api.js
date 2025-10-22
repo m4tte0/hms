@@ -34,14 +34,16 @@ api.interceptors.response.use(
 
 export const projectsAPI = {
   getAll: () => api.get('/projects'),
-  
+
   getById: (id) => api.get(`/projects/${id}`),
-  
+
   create: (projectData) => api.post('/projects', projectData),
-  
+
   update: (id, projectData) => api.put(`/projects/${id}`, projectData),
-  
+
   delete: (id) => api.delete(`/projects/${id}`),
+
+  getReport: (id) => api.get(`/projects/${id}/report`),
 };
 
 // ==================== CHECKLIST API ====================
