@@ -516,21 +516,71 @@ app.post('/api/issues/:projectId', async (req, res) => {
   try {
     const {
       issue_id, date_reported, reporter, priority,
-      description, assigned_to, target_resolution
+      description, assigned_to, target_resolution, status
     } = req.body;
 
     const result = await db.runAsync(
       `INSERT INTO issues (project_id, issue_id, date_reported, reporter,
-       priority, description, assigned_to, target_resolution)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       priority, description, assigned_to, target_resolution, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [req.params.projectId, issue_id, date_reported, reporter, priority,
-       description, assigned_to, target_resolution]
+       description, assigned_to, target_resolution, status || 'Open']
     );
 
     res.status(201).json({ id: result.id, message: 'Issue created' });
   } catch (error) {
     console.error('Error creating issue:', error);
     res.status(500).json({ error: 'Failed to create issue' });
+  }
+});
+
+// Update issue
+app.put('/api/issues/:projectId/:issueId', async (req, res) => {
+  try {
+    const {
+      issue_id, date_reported, reporter, priority,
+      description, assigned_to, target_resolution, status
+    } = req.body;
+
+    console.log(`💾 Updating issue ${req.params.issueId}:`, req.body);
+
+    await db.runAsync(
+      `UPDATE issues SET
+       issue_id = COALESCE(?, issue_id),
+       date_reported = COALESCE(?, date_reported),
+       reporter = COALESCE(?, reporter),
+       priority = COALESCE(?, priority),
+       description = COALESCE(?, description),
+       assigned_to = COALESCE(?, assigned_to),
+       target_resolution = COALESCE(?, target_resolution),
+       status = COALESCE(?, status),
+       updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND project_id = ?`,
+      [issue_id, date_reported, reporter, priority, description, assigned_to,
+       target_resolution, status, req.params.issueId, req.params.projectId]
+    );
+
+    res.json({ message: 'Issue updated' });
+  } catch (error) {
+    console.error('Error updating issue:', error);
+    res.status(500).json({ error: 'Failed to update issue' });
+  }
+});
+
+// Delete issue
+app.delete('/api/issues/:projectId/:issueId', async (req, res) => {
+  try {
+    console.log(`🗑️ Deleting issue ${req.params.issueId} from project ${req.params.projectId}`);
+
+    await db.runAsync(
+      'DELETE FROM issues WHERE id = ? AND project_id = ?',
+      [req.params.issueId, req.params.projectId]
+    );
+
+    res.json({ message: 'Issue deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting issue:', error);
+    res.status(500).json({ error: 'Failed to delete issue' });
   }
 });
 

@@ -9,6 +9,7 @@ import Assessment from './components/Assessment';
 import Tracking from './components/Tracking';
 import Knowledge from './components/Knowledge';
 import Attachments from './components/Attachments';
+import Issues from './components/Issues';
 import StatusReport from './components/StatusReport';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
     { id: 'assessment', label: 'Assessment', icon: BarChart3 },
     { id: 'tracking', label: 'Tracking', icon: Clock },
     { id: 'knowledge', label: 'Knowledge', icon: Users },
+    { id: 'issues', label: 'Issues', icon: AlertTriangle },
     { id: 'attachments', label: 'Attachments', icon: Paperclip },
   ];
 
@@ -707,6 +709,8 @@ function App() {
               <Tracking projectId={currentProject.id} />
             ) : activeTab === 'knowledge' ? (
               <Knowledge projectId={currentProject.id} />
+            ) : activeTab === 'issues' ? (
+              <Issues projectId={currentProject.id} />
             ) : activeTab === 'attachments' ? (
               <Attachments projectId={currentProject.id} />
             ) : (
