@@ -152,190 +152,213 @@ const StatusReport = ({ projectId, onClose }) => {
             <p className="text-sm text-gray-500 mt-2">Generated on {formatDate(new Date().toISOString())}</p>
           </div>
 
-          {/* SECTION 1: Project Overview */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              1. Project Overview
+          {/* COMPACT HEADER: Sections 1-4 Combined */}
+          <section className="mb-6 page-break-inside-avoid">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Project Summary
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-600">Handover ID</p>
-                <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Project Name</p>
-                <p className="text-lg font-semibold">{project.project_name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Status</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(project.status)}`}>
-                  {project.status || 'Active'}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Current Phase</p>
-                <p className="text-lg font-semibold">{project.current_phase || 'Phase 1'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Start Date</p>
-                <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Target Date</p>
-                <p className="text-lg font-semibold">{formatDate(project.target_date)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Days Remaining</p>
-                <p className={`text-lg font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-yellow-600' : 'text-green-600'}`}>
-                  {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Overall Completion</p>
-                <div className="flex items-center space-x-2">
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
-                    <div
-                      className="bg-green-500 h-4 rounded-full transition-all"
-                      style={{ width: `${project.completionPercentage}%` }}
-                    ></div>
+
+            {/* Two-column layout for compact display */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+              {/* Left Column: Project Details & Leadership */}
+              <div className="space-y-3">
+                {/* Project Information */}
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-2">Project Information</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">ID:</span>
+                      <span className="ml-1 font-semibold">{project.handover_id || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Status:</span>
+                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                        {project.status || 'Active'}
+                      </span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-gray-600">Name:</span>
+                      <span className="ml-1 font-semibold">{project.project_name || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Phase:</span>
+                      <span className="ml-1 font-medium">{project.current_phase || 'Phase 1'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Score:</span>
+                      <span className="ml-1 font-semibold text-green-700">{project.project_score || 0}</span>
+                    </div>
                   </div>
-                  <span className="text-lg font-semibold">{project.completionPercentage}%</span>
+                </div>
+
+                {/* Timeline & Progress */}
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Timeline & Progress</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Start:</span>
+                      <span className="font-medium">{formatDate(project.start_date)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Target:</span>
+                      <span className="font-medium">{formatDate(project.target_date)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Days Left:</span>
+                      <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-600">Completion:</span>
+                        <span className="font-semibold text-green-700">{project.completionPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                          className="bg-green-600 h-2.5 rounded-full transition-all"
+                          style={{ width: `${project.completionPercentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project Metrics */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Project Metrics</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-600">Priority:</span>
+                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(project.business_priority)}`}>
+                        {project.business_priority || 'Not set'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Complexity:</span>
+                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(project.complexity_level)}`}>
+                        {project.complexity_level || 'Not set'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Leadership */}
+                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
+                  <h4 className="text-sm font-semibold text-indigo-900 mb-2">Project Leadership</h4>
+                  <div className="space-y-1 text-sm">
+                    <div>
+                      <span className="text-gray-600">R&D Lead:</span>
+                      <span className="ml-1 font-medium">{project.rd_lead || 'Not assigned'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Automation Lead:</span>
+                      <span className="ml-1 font-medium">{project.automation_lead || 'Not assigned'}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Right Column: Statistics Grid */}
+              <div>
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Progress Statistics</h4>
+                  <div className="grid grid-cols-2 gap-3">
+
+                    {/* Checklist Items */}
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg border border-green-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-600 mb-1">Checklist Items</p>
+                          <p className="text-2xl font-bold text-green-700 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
+                          <p className="text-xs text-gray-600 mt-1">{statistics.checklist.completionPercentage}% Complete</p>
+                        </div>
+                        <CheckCircle className="w-8 h-8 text-green-600 opacity-40" />
+                      </div>
+                    </div>
+
+                    {/* Knowledge Sessions */}
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-600 mb-1">Knowledge Sessions</p>
+                          <p className="text-2xl font-bold text-blue-700 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
+                          <p className="text-xs text-gray-600 mt-1">Completed</p>
+                        </div>
+                        <Users className="w-8 h-8 text-blue-600 opacity-40" />
+                      </div>
+                    </div>
+
+                    {/* Open Issues */}
+                    <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-3 rounded-lg border border-yellow-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-600 mb-1">Open Issues</p>
+                          <p className="text-2xl font-bold text-yellow-700 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
+                          <p className="text-xs text-gray-600 mt-1">of {statistics.issues.total} total</p>
+                        </div>
+                        <AlertTriangle className="w-8 h-8 text-yellow-600 opacity-40" />
+                      </div>
+                    </div>
+
+                    {/* Attachments */}
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-600 mb-1">Attachments</p>
+                          <p className="text-2xl font-bold text-purple-700 leading-none">{statistics.attachments.total}</p>
+                          <p className="text-xs text-gray-600 mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
+                        </div>
+                        <FileText className="w-8 h-8 text-purple-600 opacity-40" />
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </section>
 
-          {/* SECTION 2: Project Leadership */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              2. Project Leadership
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">R&D Lead</p>
-                <p className="text-lg font-semibold">{project.rd_lead || 'Not assigned'}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Automation Lead</p>
-                <p className="text-lg font-semibold">{project.automation_lead || 'Not assigned'}</p>
-              </div>
-            </div>
-
-            {teamContacts.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-lg font-semibold mb-2 flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
-                  Team Composition
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border border-gray-200">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Department</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Role</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Email</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Phone</th>
+          {/* Team Composition - Moved here for better organization */}
+          {teamContacts.length > 0 && (
+            <section className="mb-6 page-break-inside-avoid">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Team Composition
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Department</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Role</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Name</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Email</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Phone</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teamContacts.map((contact, idx) => (
+                      <tr key={idx} className="border-t border-gray-200">
+                        <td className="px-3 py-2">{contact.department}</td>
+                        <td className="px-3 py-2">{contact.role}</td>
+                        <td className="px-3 py-2 font-medium">{contact.name}</td>
+                        <td className="px-3 py-2">{contact.email}</td>
+                        <td className="px-3 py-2">{contact.phone}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {teamContacts.map((contact, idx) => (
-                        <tr key={idx} className="border-t border-gray-200">
-                          <td className="px-4 py-2 text-sm">{contact.department}</td>
-                          <td className="px-4 py-2 text-sm">{contact.role}</td>
-                          <td className="px-4 py-2 text-sm font-medium">{contact.name}</td>
-                          <td className="px-4 py-2 text-sm">{contact.email}</td>
-                          <td className="px-4 py-2 text-sm">{contact.phone}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </section>
+            </section>
+          )}
 
-          {/* SECTION 3: Project Metrics */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              3. Project Metrics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Business Priority</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(project.business_priority)}`}>
-                  {project.business_priority || 'Not set'}
-                </span>
-              </div>
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Complexity Level</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(project.complexity_level)}`}>
-                  {project.complexity_level || 'Not set'}
-                </span>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Project Score</p>
-                <p className="text-2xl font-bold text-green-700">{project.project_score || 0}</p>
-              </div>
-            </div>
-          </section>
-
-          {/* SECTION 4: Statistics Summary */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              4. Progress Statistics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Checklist Items</p>
-                    <p className="text-3xl font-bold text-green-700">{statistics.checklist.completed}/{statistics.checklist.total}</p>
-                    <p className="text-xs text-gray-600">{statistics.checklist.completionPercentage}% Complete</p>
-                  </div>
-                  <CheckCircle className="w-12 h-12 text-green-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Knowledge Sessions</p>
-                    <p className="text-3xl font-bold text-blue-700">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
-                    <p className="text-xs text-gray-600">Completed</p>
-                  </div>
-                  <Users className="w-12 h-12 text-blue-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Open Issues</p>
-                    <p className="text-3xl font-bold text-yellow-700">{statistics.issues.open + statistics.issues.inProgress}</p>
-                    <p className="text-xs text-gray-600">Out of {statistics.issues.total}</p>
-                  </div>
-                  <AlertTriangle className="w-12 h-12 text-yellow-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Attachments</p>
-                    <p className="text-3xl font-bold text-purple-700">{statistics.attachments.total}</p>
-                    <p className="text-xs text-gray-600">{formatFileSize(statistics.attachments.totalSize)}</p>
-                  </div>
-                  <FileText className="w-12 h-12 text-purple-600 opacity-50" />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* SECTION 5: Phase Breakdown */}
-          <section className="mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              5. Phase Progress Breakdown
+          {/* SECTION 2: Phase Breakdown */}
+          <section className="mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Phase Progress Breakdown
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
               <div className="space-y-4">
@@ -380,10 +403,10 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 6: Checklist Details */}
-          <section className="mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              6. Checklist Status Details
+          {/* SECTION 3: Checklist Details */}
+          <section className="mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Checklist Status Details
             </h3>
             {Object.keys(checklistByPhase).length > 0 ? (
               <div className="space-y-6">
@@ -434,11 +457,11 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 7: Assessment Summary */}
+          {/* SECTION 4: Assessment Summary */}
           {Object.keys(assessmentsByPhase).length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                7. Assessment Summary
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Assessment Summary
               </h3>
               <div className="space-y-4">
                 {Object.entries(assessmentsByPhase).map(([phase, scores]) => {
@@ -482,11 +505,11 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 8: Knowledge Transfer Sessions */}
+          {/* SECTION 5: Knowledge Transfer Sessions */}
           {knowledgeSessions.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                8. Knowledge Transfer Sessions
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Knowledge Transfer Sessions
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -523,11 +546,11 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 9: Issues & Risks */}
+          {/* SECTION 6: Issues & Risks */}
           {issues.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                9. Issues & Risks
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Issues & Risks
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -566,11 +589,11 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 10: Attachments */}
+          {/* SECTION 7: Attachments */}
           {attachments.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                10. Attachments & Documentation
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Attachments & Documentation
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
