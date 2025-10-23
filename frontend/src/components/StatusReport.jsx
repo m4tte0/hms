@@ -145,11 +145,60 @@ const StatusReport = ({ projectId, onClose }) => {
 
         {/* Report Content */}
         <div ref={reportRef} className="report-content flex-1 overflow-auto p-8 print:p-4">
-          {/* Print Header */}
-          <div className="hidden print:block mb-8 border-b-2 pb-4">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Handover Management System</h1>
-            <h2 className="text-2xl text-gray-600">Status Report</h2>
-            <p className="text-sm text-gray-500 mt-2">Generated on {formatDate(new Date().toISOString())}</p>
+          {/* Frontispiece - Cover Page for Print */}
+          <div className="hidden print:flex print:flex-col print:justify-center print:items-center print:min-h-screen print:page-break-after-always text-center">
+            {/* Top spacing */}
+            <div className="flex-1"></div>
+
+            {/* Main content */}
+            <div className="flex-1 flex flex-col justify-center">
+              {/* Document Type */}
+              <div className="mb-8">
+                <div className="inline-block px-6 py-2 border-2 border-slate-300 rounded-lg">
+                  <p className="text-sm uppercase tracking-widest text-slate-600 font-semibold">
+                    Handover Management System
+                  </p>
+                </div>
+              </div>
+
+              {/* Project Title */}
+              <h1 className="text-5xl font-bold text-slate-800 mb-4 leading-tight">
+                {project.project_name || 'Handover Project'}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-xl text-slate-600 mb-12">
+                Status Report
+              </p>
+
+              {/* Divider */}
+              <div className="w-32 h-1 bg-slate-600 mx-auto mb-12"></div>
+
+              {/* Metadata */}
+              <div className="space-y-4 text-slate-700">
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Project ID</p>
+                  <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Handover Start Date</p>
+                  <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Prepared By</p>
+                  <p className="text-lg font-semibold">{project.automation_lead || project.rd_lead || 'Project Team'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom section */}
+            <div className="flex-1 flex flex-col justify-end pb-12">
+              <p className="text-sm text-slate-500">
+                Generated on {formatDate(new Date().toISOString())}
+              </p>
+            </div>
           </div>
 
           {/* COMPACT HEADER: Sections 1-4 Combined */}
@@ -724,6 +773,32 @@ const StatusReport = ({ projectId, onClose }) => {
           /* Hide modal overlay and non-printable elements */
           .print\\:hidden {
             display: none !important;
+          }
+
+          /* Frontispiece - full page cover */
+          .print\\:page-break-after-always {
+            page-break-after: always !important;
+            break-after: always !important;
+          }
+
+          .print\\:min-h-screen {
+            min-height: 100vh !important;
+          }
+
+          .print\\:flex {
+            display: flex !important;
+          }
+
+          .print\\:flex-col {
+            flex-direction: column !important;
+          }
+
+          .print\\:justify-center {
+            justify-content: center !important;
+          }
+
+          .print\\:items-center {
+            align-items: center !important;
           }
 
           /* Avoid page breaks inside elements */
