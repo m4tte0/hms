@@ -357,7 +357,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
           {/* Knowledge Transfer Calendar - Sessions Timeline */}
           {knowledgeSessions.length > 0 && (
-            <section className="mb-6 page-break-inside-avoid">
+            <section className="mb-6">
               <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Calendar className="w-5 h-5 mr-2" />
                 Knowledge Transfer Calendar
@@ -368,7 +368,7 @@ const StatusReport = ({ projectId, onClose }) => {
                   .map((session, idx) => (
                     <div
                       key={idx}
-                      className="bg-white border-l-4 border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                      className="bg-white border-l-4 border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-shadow page-break-inside-avoid"
                     >
                       <div className="p-4">
                         <div className="flex items-start justify-between">
@@ -427,7 +427,7 @@ const StatusReport = ({ projectId, onClose }) => {
               </div>
 
               {/* Summary Stats */}
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                   <p className="text-xs text-gray-600 mb-1">Total Sessions</p>
                   <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
