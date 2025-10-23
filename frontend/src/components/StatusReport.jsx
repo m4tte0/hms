@@ -154,7 +154,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
           {/* COMPACT HEADER: Sections 1-4 Combined */}
           <section className="mb-6 page-break-inside-avoid">
-            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-slate-600 pb-2">
               Project Summary
             </h3>
 
@@ -164,60 +164,68 @@ const StatusReport = ({ projectId, onClose }) => {
               {/* Left Column: Project Details & Leadership */}
               <div className="space-y-3">
                 {/* Project Information */}
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-2">Project Information</h4>
+                <div className="bg-white p-3 rounded-lg border-l-4 border-slate-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                    Project Information
+                  </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-gray-600">ID:</span>
-                      <span className="ml-1 font-semibold">{project.handover_id || 'N/A'}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">ID</span>
+                      <p className="font-semibold text-gray-900">{project.handover_id || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Status:</span>
-                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
-                        {project.status || 'Active'}
-                      </span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Status</span>
+                      <div className="mt-0.5">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                          {project.status || 'Active'}
+                        </span>
+                      </div>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-gray-600">Name:</span>
-                      <span className="ml-1 font-semibold">{project.project_name || 'N/A'}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Project Name</span>
+                      <p className="font-semibold text-gray-900">{project.project_name || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Phase:</span>
-                      <span className="ml-1 font-medium">{project.current_phase || 'Phase 1'}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Phase</span>
+                      <p className="font-medium text-gray-900">{project.current_phase || 'Phase 1'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Score:</span>
-                      <span className="ml-1 font-semibold text-green-700">{project.project_score || 0}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Score</span>
+                      <p className="font-semibold text-slate-700">{project.project_score || 0}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Timeline & Progress */}
-                <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
-                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Timeline & Progress</h4>
+                <div className="bg-white p-3 rounded-lg border-l-4 border-blue-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
+                    Timeline & Progress
+                  </h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Start:</span>
-                      <span className="font-medium">{formatDate(project.start_date)}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Start Date</span>
+                      <span className="font-medium text-gray-900">{formatDate(project.start_date)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Target:</span>
-                      <span className="font-medium">{formatDate(project.target_date)}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Target Date</span>
+                      <span className="font-medium text-gray-900">{formatDate(project.target_date)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Days Left:</span>
-                      <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-yellow-600' : 'text-green-600'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Days Remaining</span>
+                      <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
                         {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
                       </span>
                     </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-600">Completion:</span>
-                        <span className="font-semibold text-green-700">{project.completionPercentage}%</span>
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="flex justify-between mb-1.5">
+                        <span className="text-gray-500 text-xs uppercase tracking-wide">Completion</span>
+                        <span className="font-bold text-blue-700">{project.completionPercentage}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-green-600 h-2.5 rounded-full transition-all"
+                          className="bg-blue-600 h-2 rounded-full transition-all"
                           style={{ width: `${project.completionPercentage}%` }}
                         ></div>
                       </div>
@@ -226,18 +234,21 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
 
                 {/* Project Metrics */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Project Metrics</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-white p-3 rounded-lg border-l-4 border-amber-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-amber-600 rounded-full mr-2"></div>
+                    Project Metrics
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-600">Priority:</span>
-                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(project.business_priority)}`}>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Priority</span>
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
                         {project.business_priority || 'Not set'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Complexity:</span>
-                      <span className={`ml-1 px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(project.complexity_level)}`}>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Complexity</span>
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
                         {project.complexity_level || 'Not set'}
                       </span>
                     </div>
@@ -245,16 +256,19 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
 
                 {/* Leadership */}
-                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
-                  <h4 className="text-sm font-semibold text-indigo-900 mb-2">Project Leadership</h4>
-                  <div className="space-y-1 text-sm">
+                <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-2"></div>
+                    Project Leadership
+                  </h4>
+                  <div className="space-y-2 text-sm">
                     <div>
-                      <span className="text-gray-600">R&D Lead:</span>
-                      <span className="ml-1 font-medium">{project.rd_lead || 'Not assigned'}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block">R&D Lead</span>
+                      <p className="font-medium text-gray-900">{project.rd_lead || 'Not assigned'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Automation Lead:</span>
-                      <span className="ml-1 font-medium">{project.automation_lead || 'Not assigned'}</span>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block">Automation Lead</span>
+                      <p className="font-medium text-gray-900">{project.automation_lead || 'Not assigned'}</p>
                     </div>
                   </div>
                 </div>
@@ -262,55 +276,58 @@ const StatusReport = ({ projectId, onClose }) => {
 
               {/* Right Column: Statistics Grid */}
               <div>
-                <div className="bg-white border-2 border-gray-200 rounded-lg p-3">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Progress Statistics</h4>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                    Progress Statistics
+                  </h4>
                   <div className="grid grid-cols-2 gap-3">
 
                     {/* Checklist Items */}
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg border border-green-200">
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-600 mb-1">Checklist Items</p>
-                          <p className="text-2xl font-bold text-green-700 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
-                          <p className="text-xs text-gray-600 mt-1">{statistics.checklist.completionPercentage}% Complete</p>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Checklist</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
+                          <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Done</p>
                         </div>
-                        <CheckCircle className="w-8 h-8 text-green-600 opacity-40" />
+                        <CheckCircle className="w-7 h-7 text-emerald-500 opacity-30" />
                       </div>
                     </div>
 
                     {/* Knowledge Sessions */}
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-blue-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-600 mb-1">Knowledge Sessions</p>
-                          <p className="text-2xl font-bold text-blue-700 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
-                          <p className="text-xs text-gray-600 mt-1">Completed</p>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Sessions</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
+                          <p className="text-xs text-blue-600 font-medium mt-1">Completed</p>
                         </div>
-                        <Users className="w-8 h-8 text-blue-600 opacity-40" />
+                        <Users className="w-7 h-7 text-blue-500 opacity-30" />
                       </div>
                     </div>
 
                     {/* Open Issues */}
-                    <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-3 rounded-lg border border-yellow-200">
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-600 mb-1">Open Issues</p>
-                          <p className="text-2xl font-bold text-yellow-700 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
-                          <p className="text-xs text-gray-600 mt-1">of {statistics.issues.total} total</p>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Issues</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
+                          <p className="text-xs text-amber-600 font-medium mt-1">of {statistics.issues.total} total</p>
                         </div>
-                        <AlertTriangle className="w-8 h-8 text-yellow-600 opacity-40" />
+                        <AlertTriangle className="w-7 h-7 text-amber-500 opacity-30" />
                       </div>
                     </div>
 
                     {/* Attachments */}
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-slate-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-600 mb-1">Attachments</p>
-                          <p className="text-2xl font-bold text-purple-700 leading-none">{statistics.attachments.total}</p>
-                          <p className="text-xs text-gray-600 mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Files</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
+                          <p className="text-xs text-slate-600 font-medium mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
                         </div>
-                        <FileText className="w-8 h-8 text-purple-600 opacity-40" />
+                        <FileText className="w-7 h-7 text-slate-500 opacity-30" />
                       </div>
                     </div>
 
