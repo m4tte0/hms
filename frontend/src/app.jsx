@@ -392,7 +392,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50 overflow-hidden">
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -500,22 +500,22 @@ function App() {
 
               {currentProject && (
                 <button
+                  onClick={() => handleDeleteClick(currentProject)}
+                  className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
+                  title="Delete current project"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
+
+              {currentProject && (
+                <button
                   onClick={() => setShowReport(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   title="Generate status report"
                 >
                   <FileBarChart className="w-4 h-4" />
                   Generate Report
-                </button>
-              )}
-
-              {currentProject && (
-                <button
-                  onClick={() => handleDeleteClick(currentProject)}
-                  className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                  title="Delete current project"
-                >
-                  <Trash2 className="w-5 h-5" />
                 </button>
               )}
 
@@ -531,12 +531,12 @@ function App() {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex h-[calc(100vh-73px)]">
         {/* Project Sidebar */}
         <aside
           className={`${
             showProjectList ? 'translate-x-0' : '-translate-x-full'
-          } fixed lg:relative lg:translate-x-0 w-80 bg-white border-r border-gray-200 h-screen overflow-y-auto transition-transform duration-300 z-40`}
+          } fixed lg:relative lg:translate-x-0 w-80 bg-white border-r border-gray-200 h-full overflow-y-auto transition-transform duration-300 z-40`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
@@ -649,7 +649,7 @@ function App() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden">
           {/* Tab Navigation */}
           <div className="bg-white border-b border-gray-200">
             <div className="overflow-x-auto">
@@ -676,7 +676,7 @@ function App() {
           </div>
 
           {/* Content Area */}
-          <div className="p-6 overflow-y-auto" style={{ height: 'calc(100vh - 180px)' }}>
+          <div className="p-6 overflow-y-auto flex-1">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader className="w-8 h-8 text-blue-600 animate-spin" />
