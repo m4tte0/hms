@@ -28,6 +28,7 @@ const StatusReport = ({ projectId, onClose }) => {
   };
 
   const handlePrint = () => {
+    // Trigger browser print dialog
     window.print();
   };
 
@@ -143,198 +144,380 @@ const StatusReport = ({ projectId, onClose }) => {
         </div>
 
         {/* Report Content */}
-        <div ref={reportRef} className="flex-1 overflow-auto p-8 print:p-4">
-          {/* Print Header */}
-          <div className="hidden print:block mb-8 border-b-2 pb-4">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Handover Management System</h1>
-            <h2 className="text-2xl text-gray-600">Status Report</h2>
-            <p className="text-sm text-gray-500 mt-2">Generated on {formatDate(new Date().toISOString())}</p>
+        <div ref={reportRef} className="report-content flex-1 overflow-auto p-8 print:p-4">
+          {/* Frontispiece - Cover Page for Print */}
+          <div className="hidden print:flex print:flex-col print:justify-center print:items-center print:min-h-screen print:page-break-after-always text-center">
+            {/* Top spacing */}
+            <div className="flex-1"></div>
+
+            {/* Main content */}
+            <div className="flex-1 flex flex-col justify-center">
+              {/* Document Type */}
+              <div className="mb-8">
+                <div className="inline-block px-6 py-2 border-2 border-slate-300 rounded-lg">
+                  <p className="text-sm uppercase tracking-widest text-slate-600 font-semibold">
+                    Handover Management System
+                  </p>
+                </div>
+              </div>
+
+              {/* Project Title */}
+              <h1 className="text-5xl font-bold text-slate-800 mb-4 leading-tight">
+                {project.project_name || 'Handover Project'}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-xl text-slate-600 mb-12">
+                Status Report
+              </p>
+
+              {/* Divider */}
+              <div className="w-32 h-1 bg-slate-600 mx-auto mb-12"></div>
+
+              {/* Metadata */}
+              <div className="space-y-4 text-slate-700">
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Project ID</p>
+                  <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Handover Start Date</p>
+                  <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Prepared By</p>
+                  <p className="text-lg font-semibold">{project.automation_lead || project.rd_lead || 'Project Team'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom section */}
+            <div className="flex-1 flex flex-col justify-end pb-12">
+              <p className="text-sm text-slate-500">
+                Generated on {formatDate(new Date().toISOString())}
+              </p>
+            </div>
           </div>
 
-          {/* SECTION 1: Project Overview */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              1. Project Overview
+          {/* COMPACT HEADER: Sections 1-4 Combined */}
+          <section className="mb-6 page-break-inside-avoid">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-slate-600 pb-2">
+              Project Summary
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-600">Handover ID</p>
-                <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Project Name</p>
-                <p className="text-lg font-semibold">{project.project_name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Status</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(project.status)}`}>
-                  {project.status || 'Active'}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Current Phase</p>
-                <p className="text-lg font-semibold">{project.current_phase || 'Phase 1'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Start Date</p>
-                <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Target Date</p>
-                <p className="text-lg font-semibold">{formatDate(project.target_date)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Days Remaining</p>
-                <p className={`text-lg font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-yellow-600' : 'text-green-600'}`}>
-                  {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Overall Completion</p>
-                <div className="flex items-center space-x-2">
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
-                    <div
-                      className="bg-green-500 h-4 rounded-full transition-all"
-                      style={{ width: `${project.completionPercentage}%` }}
-                    ></div>
+
+            {/* Two-column layout for compact display */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+              {/* Left Column: Project Details & Leadership */}
+              <div className="space-y-3">
+                {/* Project Information */}
+                <div className="bg-white p-3 rounded-lg border-l-4 border-slate-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                    Project Information
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">ID</span>
+                      <p className="font-semibold text-gray-900">{project.handover_id || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Status</span>
+                      <div className="mt-0.5">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                          {project.status || 'Active'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Project Name</span>
+                      <p className="font-semibold text-gray-900">{project.project_name || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Phase</span>
+                      <p className="font-medium text-gray-900">{project.current_phase || 'Phase 1'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Score</span>
+                      <p className="font-semibold text-slate-700">{project.project_score || 0}</p>
+                    </div>
                   </div>
-                  <span className="text-lg font-semibold">{project.completionPercentage}%</span>
+                </div>
+
+                {/* Timeline & Progress */}
+                <div className="bg-white p-3 rounded-lg border-l-4 border-blue-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
+                    Timeline & Progress
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Start Date</span>
+                      <span className="font-medium text-gray-900">{formatDate(project.start_date)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Target Date</span>
+                      <span className="font-medium text-gray-900">{formatDate(project.target_date)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs uppercase tracking-wide">Days Remaining</span>
+                      <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                        {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="flex justify-between mb-1.5">
+                        <span className="text-gray-500 text-xs uppercase tracking-wide">Completion</span>
+                        <span className="font-bold text-blue-700">{project.completionPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${project.completionPercentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project Metrics */}
+                <div className="bg-white p-3 rounded-lg border-l-4 border-amber-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-amber-600 rounded-full mr-2"></div>
+                    Project Metrics
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Priority</span>
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
+                        {project.business_priority || 'Not set'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Complexity</span>
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
+                        {project.complexity_level || 'Not set'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Leadership */}
+                <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-2"></div>
+                    Project Leadership
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block">R&D Lead</span>
+                      <p className="font-medium text-gray-900">{project.rd_lead || 'Not assigned'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-xs uppercase tracking-wide block">Automation Lead</span>
+                      <p className="font-medium text-gray-900">{project.automation_lead || 'Not assigned'}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Right Column: Statistics Grid */}
+              <div>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                    Progress Statistics
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+
+                    {/* Checklist Items */}
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-500 shadow-sm">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Checklist</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
+                          <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Done</p>
+                        </div>
+                        <CheckCircle className="w-7 h-7 text-emerald-500 opacity-30" />
+                      </div>
+                    </div>
+
+                    {/* Knowledge Sessions */}
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-blue-500 shadow-sm">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Sessions</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
+                          <p className="text-xs text-blue-600 font-medium mt-1">Completed</p>
+                        </div>
+                        <Users className="w-7 h-7 text-blue-500 opacity-30" />
+                      </div>
+                    </div>
+
+                    {/* Open Issues */}
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Issues</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
+                          <p className="text-xs text-amber-600 font-medium mt-1">of {statistics.issues.total} total</p>
+                        </div>
+                        <AlertTriangle className="w-7 h-7 text-amber-500 opacity-30" />
+                      </div>
+                    </div>
+
+                    {/* Attachments */}
+                    <div className="bg-white p-3 rounded-lg border-l-4 border-slate-500 shadow-sm">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Files</p>
+                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
+                          <p className="text-xs text-slate-600 font-medium mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
+                        </div>
+                        <FileText className="w-7 h-7 text-slate-500 opacity-30" />
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </section>
 
-          {/* SECTION 2: Project Leadership */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              2. Project Leadership
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">R&D Lead</p>
-                <p className="text-lg font-semibold">{project.rd_lead || 'Not assigned'}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Automation Lead</p>
-                <p className="text-lg font-semibold">{project.automation_lead || 'Not assigned'}</p>
-              </div>
-            </div>
-
-            {teamContacts.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-lg font-semibold mb-2 flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
-                  Team Composition
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border border-gray-200">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Department</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Role</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Email</th>
-                        <th className="px-4 py-2 text-left text-sm font-semibold">Phone</th>
+          {/* Team Composition - Moved here for better organization */}
+          {teamContacts.length > 0 && (
+            <section className="mb-6 page-break-inside-avoid">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Team Composition
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Department</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Role</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Name</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Email</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Phone</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teamContacts.map((contact, idx) => (
+                      <tr key={idx} className="border-t border-gray-200">
+                        <td className="px-3 py-2">{contact.department}</td>
+                        <td className="px-3 py-2">{contact.role}</td>
+                        <td className="px-3 py-2 font-medium">{contact.name}</td>
+                        <td className="px-3 py-2">{contact.email}</td>
+                        <td className="px-3 py-2">{contact.phone}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {teamContacts.map((contact, idx) => (
-                        <tr key={idx} className="border-t border-gray-200">
-                          <td className="px-4 py-2 text-sm">{contact.department}</td>
-                          <td className="px-4 py-2 text-sm">{contact.role}</td>
-                          <td className="px-4 py-2 text-sm font-medium">{contact.name}</td>
-                          <td className="px-4 py-2 text-sm">{contact.email}</td>
-                          <td className="px-4 py-2 text-sm">{contact.phone}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* Knowledge Transfer Calendar - Sessions Timeline */}
+          {knowledgeSessions.length > 0 && (
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Knowledge Transfer Calendar
+              </h3>
+              <div className="space-y-3">
+                {knowledgeSessions
+                  .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                  .map((session, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white border-l-4 border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-shadow page-break-inside-avoid"
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm font-semibold min-w-[120px] text-center">
+                                {formatDate(session.scheduled_date)}
+                              </div>
+                              {session.start_time && (
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <Clock className="w-4 h-4 mr-1" />
+                                  {session.start_time}
+                                  {session.duration && ` (${session.duration})`}
+                                </div>
+                              )}
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
+                                {session.status || 'Scheduled'}
+                              </span>
+                            </div>
+
+                            <h4 className="text-base font-semibold text-gray-900 mb-2">
+                              {session.session_topic}
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                              {session.attendees && (
+                                <div className="flex items-start">
+                                  <Users className="w-4 h-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700">{session.attendees}</span>
+                                </div>
+                              )}
+
+                              {session.effectiveness_rating && (
+                                <div className="flex items-center">
+                                  <TrendingUp className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" />
+                                  <span className="text-gray-700">
+                                    Effectiveness:
+                                    <span className="ml-1 font-semibold text-green-600">
+                                      {session.effectiveness_rating}/5
+                                    </span>
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {session.notes && (
+                              <div className="mt-2 pt-2 border-t border-gray-100">
+                                <p className="text-sm text-gray-600 italic">{session.notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Summary Stats */}
+              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Total Sessions</p>
+                  <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Completed</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    {knowledgeSessions.filter(s => s.status === 'Completed').length}
+                  </p>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Scheduled</p>
+                  <p className="text-2xl font-bold text-yellow-700">
+                    {knowledgeSessions.filter(s => s.status === 'Scheduled').length}
+                  </p>
                 </div>
               </div>
-            )}
-          </section>
+            </section>
+          )}
 
-          {/* SECTION 3: Project Metrics */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              3. Project Metrics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Business Priority</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(project.business_priority)}`}>
-                  {project.business_priority || 'Not set'}
-                </span>
-              </div>
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Complexity Level</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(project.complexity_level)}`}>
-                  {project.complexity_level || 'Not set'}
-                </span>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Project Score</p>
-                <p className="text-2xl font-bold text-green-700">{project.project_score || 0}</p>
-              </div>
-            </div>
-          </section>
-
-          {/* SECTION 4: Statistics Summary */}
-          <section className="mb-8 page-break-inside-avoid">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              4. Progress Statistics
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Checklist Items</p>
-                    <p className="text-3xl font-bold text-green-700">{statistics.checklist.completed}/{statistics.checklist.total}</p>
-                    <p className="text-xs text-gray-600">{statistics.checklist.completionPercentage}% Complete</p>
-                  </div>
-                  <CheckCircle className="w-12 h-12 text-green-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Knowledge Sessions</p>
-                    <p className="text-3xl font-bold text-blue-700">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
-                    <p className="text-xs text-gray-600">Completed</p>
-                  </div>
-                  <Users className="w-12 h-12 text-blue-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Open Issues</p>
-                    <p className="text-3xl font-bold text-yellow-700">{statistics.issues.open + statistics.issues.inProgress}</p>
-                    <p className="text-xs text-gray-600">Out of {statistics.issues.total}</p>
-                  </div>
-                  <AlertTriangle className="w-12 h-12 text-yellow-600 opacity-50" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Attachments</p>
-                    <p className="text-3xl font-bold text-purple-700">{statistics.attachments.total}</p>
-                    <p className="text-xs text-gray-600">{formatFileSize(statistics.attachments.totalSize)}</p>
-                  </div>
-                  <FileText className="w-12 h-12 text-purple-600 opacity-50" />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* SECTION 5: Phase Breakdown */}
-          <section className="mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              5. Phase Progress Breakdown
+          {/* SECTION 2: Phase Breakdown */}
+          <section className="mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Phase Progress Breakdown
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
               <div className="space-y-4">
@@ -379,10 +562,10 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 6: Checklist Details */}
-          <section className="mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-              6. Checklist Status Details
+          {/* SECTION 3: Checklist Details */}
+          <section className="mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Checklist Status Details
             </h3>
             {Object.keys(checklistByPhase).length > 0 ? (
               <div className="space-y-6">
@@ -433,11 +616,11 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 7: Assessment Summary */}
+          {/* SECTION 4: Assessment Summary */}
           {Object.keys(assessmentsByPhase).length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                7. Assessment Summary
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Assessment Summary
               </h3>
               <div className="space-y-4">
                 {Object.entries(assessmentsByPhase).map(([phase, scores]) => {
@@ -481,52 +664,11 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 8: Knowledge Transfer Sessions */}
-          {knowledgeSessions.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                8. Knowledge Transfer Sessions
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Topic</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Date</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Duration</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Attendees</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Status</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {knowledgeSessions.map((session, idx) => (
-                      <tr key={idx} className="border-t border-gray-200">
-                        <td className="px-3 py-2">{session.session_topic}</td>
-                        <td className="px-3 py-2">{formatDate(session.scheduled_date)}</td>
-                        <td className="px-3 py-2">{session.duration || '-'}</td>
-                        <td className="px-3 py-2 text-xs">{session.attendees || '-'}</td>
-                        <td className="px-3 py-2">
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
-                            {session.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2">
-                          {session.effectiveness_rating ? `${session.effectiveness_rating}/5` : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* SECTION 9: Issues & Risks */}
+          {/* SECTION 5: Issues & Risks */}
           {issues.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                9. Issues & Risks
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Issues & Risks
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -565,11 +707,11 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 10: Attachments */}
+          {/* SECTION 6: Attachments */}
           {attachments.length > 0 && (
-            <section className="mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-500 pb-2">
-                10. Attachments & Documentation
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+                Attachments & Documentation
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -608,17 +750,144 @@ const StatusReport = ({ projectId, onClose }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @media print {
+          /* Hide everything except report content */
+          body * {
+            visibility: hidden;
+          }
+
+          /* Show only the report content */
+          .report-content, .report-content * {
+            visibility: visible;
+          }
+
+          /* Position report at top of page */
+          .report-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+
+          /* Hide modal overlay and non-printable elements */
+          .print\\:hidden {
+            display: none !important;
+          }
+
+          /* Frontispiece - full page cover */
+          .print\\:page-break-after-always {
+            page-break-after: always !important;
+            break-after: always !important;
+          }
+
+          .print\\:min-h-screen {
+            min-height: 100vh !important;
+          }
+
+          .print\\:flex {
+            display: flex !important;
+          }
+
+          .print\\:flex-col {
+            flex-direction: column !important;
+          }
+
+          .print\\:justify-center {
+            justify-content: center !important;
+          }
+
+          .print\\:items-center {
+            align-items: center !important;
+          }
+
+          /* Avoid page breaks inside elements */
           .page-break-inside-avoid {
             page-break-inside: avoid;
+            break-inside: avoid;
           }
+
+          /* Prevent section headers from being orphaned at bottom of page */
+          h3, h4 {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
+          /* Keep section headers with their first content */
+          section > h3 {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
+          /* Avoid breaking sections right after header */
+          section {
+            page-break-inside: auto;
+          }
+
+          /* Keep first element after any header with the header */
+          h3 + *, h4 + * {
+            page-break-before: avoid;
+            break-before: avoid;
+          }
+
+          /* Prevent orphaned table headers */
+          thead, caption {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
+          /* Preserve colors when printing */
           body {
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
+
+          /* Remove backgrounds from modal */
+          .fixed {
+            position: static !important;
+            background: white !important;
+          }
+
+          /* Full width for print */
+          .max-w-6xl {
+            max-width: 100% !important;
+          }
+
+          /* Remove shadows and borders from container */
+          .shadow-2xl {
+            box-shadow: none !important;
+          }
+
+          .rounded-lg {
+            border-radius: 0 !important;
+          }
+
+          /* Optimize spacing for print */
+          .p-8 {
+            padding: 1rem !important;
+          }
+
+          /* Ensure tables fit on page */
+          table {
+            page-break-inside: auto;
+          }
+
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          /* Better page margins */
+          @page {
+            margin: 1cm;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
