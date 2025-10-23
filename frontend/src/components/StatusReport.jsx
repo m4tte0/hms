@@ -28,6 +28,7 @@ const StatusReport = ({ projectId, onClose }) => {
   };
 
   const handlePrint = () => {
+    // Trigger browser print dialog
     window.print();
   };
 
@@ -143,7 +144,7 @@ const StatusReport = ({ projectId, onClose }) => {
         </div>
 
         {/* Report Content */}
-        <div ref={reportRef} className="flex-1 overflow-auto p-8 print:p-4">
+        <div ref={reportRef} className="report-content flex-1 overflow-auto p-8 print:p-4">
           {/* Print Header */}
           <div className="hidden print:block mb-8 border-b-2 pb-4">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Handover Management System</h1>
@@ -608,17 +609,89 @@ const StatusReport = ({ projectId, onClose }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @media print {
+          /* Hide everything except report content */
+          body * {
+            visibility: hidden;
+          }
+
+          /* Show only the report content */
+          .report-content, .report-content * {
+            visibility: visible;
+          }
+
+          /* Position report at top of page */
+          .report-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+
+          /* Hide modal overlay and non-printable elements */
+          .print\\:hidden {
+            display: none !important;
+          }
+
+          /* Avoid page breaks inside elements */
           .page-break-inside-avoid {
             page-break-inside: avoid;
+            break-inside: avoid;
           }
+
+          /* Preserve colors when printing */
           body {
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
+
+          /* Remove backgrounds from modal */
+          .fixed {
+            position: static !important;
+            background: white !important;
+          }
+
+          /* Full width for print */
+          .max-w-6xl {
+            max-width: 100% !important;
+          }
+
+          /* Remove shadows and borders from container */
+          .shadow-2xl {
+            box-shadow: none !important;
+          }
+
+          .rounded-lg {
+            border-radius: 0 !important;
+          }
+
+          /* Optimize spacing for print */
+          .p-8 {
+            padding: 1rem !important;
+          }
+
+          /* Ensure tables fit on page */
+          table {
+            page-break-inside: auto;
+          }
+
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          /* Better page margins */
+          @page {
+            margin: 1cm;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
