@@ -355,6 +355,99 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
+          {/* Knowledge Transfer Calendar - Sessions Timeline */}
+          {knowledgeSessions.length > 0 && (
+            <section className="mb-6 page-break-inside-avoid">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+                <Calendar className="w-5 h-5 mr-2" />
+                Knowledge Transfer Calendar
+              </h3>
+              <div className="space-y-3">
+                {knowledgeSessions
+                  .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                  .map((session, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white border-l-4 border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm font-semibold min-w-[120px] text-center">
+                                {formatDate(session.scheduled_date)}
+                              </div>
+                              {session.start_time && (
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <Clock className="w-4 h-4 mr-1" />
+                                  {session.start_time}
+                                  {session.duration && ` (${session.duration})`}
+                                </div>
+                              )}
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
+                                {session.status || 'Scheduled'}
+                              </span>
+                            </div>
+
+                            <h4 className="text-base font-semibold text-gray-900 mb-2">
+                              {session.session_topic}
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                              {session.attendees && (
+                                <div className="flex items-start">
+                                  <Users className="w-4 h-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700">{session.attendees}</span>
+                                </div>
+                              )}
+
+                              {session.effectiveness_rating && (
+                                <div className="flex items-center">
+                                  <TrendingUp className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" />
+                                  <span className="text-gray-700">
+                                    Effectiveness:
+                                    <span className="ml-1 font-semibold text-green-600">
+                                      {session.effectiveness_rating}/5
+                                    </span>
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {session.notes && (
+                              <div className="mt-2 pt-2 border-t border-gray-100">
+                                <p className="text-sm text-gray-600 italic">{session.notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Summary Stats */}
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Total Sessions</p>
+                  <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Completed</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    {knowledgeSessions.filter(s => s.status === 'Completed').length}
+                  </p>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-600 mb-1">Scheduled</p>
+                  <p className="text-2xl font-bold text-yellow-700">
+                    {knowledgeSessions.filter(s => s.status === 'Scheduled').length}
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* SECTION 2: Phase Breakdown */}
           <section className="mb-6">
             <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
@@ -505,48 +598,7 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 5: Knowledge Transfer Sessions */}
-          {knowledgeSessions.length > 0 && (
-            <section className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
-                Knowledge Transfer Sessions
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Topic</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Date</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Duration</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Attendees</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Status</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {knowledgeSessions.map((session, idx) => (
-                      <tr key={idx} className="border-t border-gray-200">
-                        <td className="px-3 py-2">{session.session_topic}</td>
-                        <td className="px-3 py-2">{formatDate(session.scheduled_date)}</td>
-                        <td className="px-3 py-2">{session.duration || '-'}</td>
-                        <td className="px-3 py-2 text-xs">{session.attendees || '-'}</td>
-                        <td className="px-3 py-2">
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
-                            {session.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2">
-                          {session.effectiveness_rating ? `${session.effectiveness_rating}/5` : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* SECTION 6: Issues & Risks */}
+          {/* SECTION 5: Issues & Risks */}
           {issues.length > 0 && (
             <section className="mb-6">
               <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
@@ -589,7 +641,7 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 7: Attachments */}
+          {/* SECTION 6: Attachments */}
           {attachments.length > 0 && (
             <section className="mb-6">
               <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
