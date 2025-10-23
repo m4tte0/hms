@@ -715,6 +715,35 @@ const StatusReport = ({ projectId, onClose }) => {
             break-inside: avoid;
           }
 
+          /* Prevent section headers from being orphaned at bottom of page */
+          h3, h4 {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
+          /* Keep section headers with their first content */
+          section > h3 {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
+          /* Avoid breaking sections right after header */
+          section {
+            page-break-inside: auto;
+          }
+
+          /* Keep first element after any header with the header */
+          h3 + *, h4 + * {
+            page-break-before: avoid;
+            break-before: avoid;
+          }
+
+          /* Prevent orphaned table headers */
+          thead, caption {
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+
           /* Preserve colors when printing */
           body {
             print-color-adjust: exact;
