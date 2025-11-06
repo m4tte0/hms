@@ -1,122 +1,46 @@
-// frontend/src/services/api.js
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// L'URL del backend viene letto UNA SOLA VOLTA dalla variabile d'ambiente.
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-const api = axios.create({
+// Viene creata un'istanza di Axios che sarÃ  usata in tutta l'app.
+const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
-// Request interceptor for logging
-api.interceptors.request.use(
-  (config) => {
-    console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
-  }
-);
-
-// ==================== PROJECTS API ====================
-
+// --- API per i Progetti ---
 export const projectsAPI = {
-  getAll: () => api.get('/projects'),
-  
-  getById: (id) => api.get(`/projects/${id}`),
-  
-  create: (projectData) => api.post('/projects', projectData),
-  
-  update: (id, projectData) => api.put(`/projects/${id}`, projectData),
-  
-  delete: (id) => api.delete(`/projects/${id}`),
+  getAll: () => apiClient.get('/projects'),
+  getOne: (id) => apiClient.get(`/projects/${id}`),
+  create: (projectData) => apiClient.post('/projects', projectData),
+  update: (id, projectData) => apiClient.put(`/projects/${id}`, projectData),
+  delete: (id) => apiClient.delete(`/projects/${id}`),
 };
 
-// ==================== CHECKLIST API ====================
-
+// --- API per la Checklist ---
 export const checklistAPI = {
-  getItems: (projectId) => api.get(`/checklist/${projectId}`),
-  
-  addItem: (projectId, itemData) => api.post(`/checklist/${projectId}`, itemData),
-  
-  updateItem: (projectId, itemId, itemData) => 
-    api.put(`/checklist/${projectId}/${itemId}`, itemData),
-  
-  deleteItem: (projectId, itemId) => 
-    api.delete(`/checklist/${projectId}/${itemId}`),
+  getAll: (projectId) => apiClient.get(`/checklist/${projectId}`),
+  // Aggiungi qui altri metodi se necessario (create, update, delete)
 };
 
-// ==================== KNOWLEDGE TRANSFER API ====================
-
-export const knowledgeAPI = {
-  getSessions: (projectId) => api.get(`/knowledge/${projectId}`),
-  
-  createSession: (projectId, sessionData) => 
-    api.post(`/knowledge/${projectId}`, sessionData),
-  
-  updateSession: (projectId, sessionId, sessionData) => 
-    api.put(`/knowledge/${projectId}/${sessionId}`, sessionData),
-  
-  deleteSession: (projectId, sessionId) => 
-    api.delete(`/knowledge/${projectId}/${sessionId}`),
-};
-
-// ==================== ASSESSMENT API ====================
-
-export const assessmentAPI = {
-  getScores: (projectId) => api.get(`/assessment/${projectId}`),
-  
-  saveScore: (projectId, scoreData) => 
-    api.post(`/assessment/${projectId}`, scoreData),
-  
-  calculateReadiness: (projectId) => 
-    api.post(`/assessment/${projectId}/calculate`),
-};
-
-// ==================== ISSUES API ====================
-
+// --- API per gli Issues ---
 export const issuesAPI = {
-  getIssues: (projectId) => api.get(`/issues/${projectId}`),
-
-  createIssue: (projectId, issueData) =>
-    api.post(`/issues/${projectId}`, issueData),
-
-  updateIssue: (projectId, issueId, issueData) =>
-    api.put(`/issues/${projectId}/${issueId}`, issueData),
-
-  deleteIssue: (projectId, issueId) =>
-    api.delete(`/issues/${projectId}/${issueId}`),
+  getAll: (projectId) => apiClient.get(`/issues/${projectId}`),
 };
 
-// ==================== TEAM CONTACTS API ====================
+// --- API per i Nomi delle Fasi ---
+export const phaseNamesAPI = {
+  get: (projectId) => apiClient.get(`/phase-names/${projectId}`),
+  save: (projectId, phases) => apiClient.post(`/phase-names/${projectId}`, { phases }),
+};
 
+// --- API per i Contatti del Team ---
 export const teamContactsAPI = {
-  getContacts: (projectId) => api.get(`/team-contacts/${projectId}`),
-
-  addContact: (projectId, contactData) =>
-    api.post(`/team-contacts/${projectId}`, contactData),
-
-  updateContact: (projectId, contactId, contactData) =>
-    api.put(`/team-contacts/${projectId}/${contactId}`, contactData),
-
-  deleteContact: (projectId, contactId) =>
-    api.delete(`/team-contacts/${projectId}/${contactId}`),
+  getContacts: (projectId) => apiClient.get(`/team-contacts/${projectId}`),
+  addContact: (projectId, contactData) => apiClient.post(`/team-contacts/${projectId}`, contactData),
+  updateContact: (projectId, contactId, contactData) => apiClient.put(`/team-contacts/${projectId}/${contactId}`, contactData),
+  deleteContact: (projectId, contactId) => apiClient.delete(`/team-contacts/${projectId}/${contactId}`),
 };
 
-// ==================== UTILITY FUNCTIONS ====================
-
-export const healthCheck = () => api.get('/health');
-
-export default api;
+// Esportiamo il client di default per usi generici, se necessario.
+export default apiClient;
