@@ -23,7 +23,6 @@ const Checklist = ({ projectId }) => {
   const [newItemCategory, setNewItemCategory] = useState('');
   const [collapsedPhases, setCollapsedPhases] = useState({});
   const [collapsedCategories, setCollapsedCategories] = useState({});
-  const [teamContacts, setTeamContacts] = useState([]);
   
   // Phase configuration - can be customized per project
   const [phases, setPhases] = useState([
@@ -89,7 +88,6 @@ const Checklist = ({ projectId }) => {
       loadChecklistItems();
       loadPhaseNames();
       loadCollapseState();
-      loadTeamContacts();
     }
   }, [projectId]);
 
@@ -225,23 +223,6 @@ const Checklist = ({ projectId }) => {
     } catch (error) {
       console.error('❌ Error saving phase names:', error);
       throw error;
-    }
-  };
-
-  const loadTeamContacts = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/team-contacts/${projectId}`);
-
-      if (!response.ok) {
-        console.log('No team contacts found');
-        return;
-      }
-
-      const contacts = await response.json();
-      setTeamContacts(contacts);
-      console.log('✅ Loaded team contacts:', contacts.length);
-    } catch (error) {
-      console.error('❌ Error loading team contacts:', error);
     }
   };
 
@@ -1448,26 +1429,17 @@ const Checklist = ({ projectId }) => {
 
                                     <div>
                                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                                        Signed By
+                                        Verified By
                                       </label>
                                       <select
                                         value={item.verified_by || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verified_by: e.target.value })}
                                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
                                       >
-                                        <option value="">Select signer...</option>
-                                        <optgroup label="Verifiers">
-                                          <option value="Matteo Hon Fucci">Matteo Hon Fucci (Automation Manager)</option>
-                                          <option value="Stefano Corbelli">Stefano Corbelli (Technical Director)</option>
-                                          <option value="Ivan De Zanet">Ivan De Zanet (R&D Manager)</option>
-                                        </optgroup>
-                                        <optgroup label="Compilers">
-                                          {teamContacts.map(contact => (
-                                            <option key={contact.id} value={contact.name}>
-                                              {contact.name} ({contact.role})
-                                            </option>
-                                          ))}
-                                        </optgroup>
+                                        <option value="">Select verifier...</option>
+                                        <option value="Matteo Hon Fucci">Matteo Hon Fucci (Automation Manager)</option>
+                                        <option value="Stefano Corbelli">Stefano Corbelli (Technical Director)</option>
+                                        <option value="Ivan De Zanet">Ivan De Zanet (R&D Manager)</option>
                                       </select>
                                     </div>
 

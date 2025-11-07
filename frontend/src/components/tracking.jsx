@@ -125,27 +125,17 @@ const Tracking = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Timeline Summary */}
       {timeline && (
-        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-          {/* Section Header */}
-          <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-slate-100" />
-                </div>
-                <h2 className="text-xl font-bold text-white">Project Timeline</h2>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-600 px-4 py-2 rounded-lg">
-                <Clock className="w-5 h-5 text-slate-100" />
-                <span className="text-white font-semibold">{timeline.remainingDays} days remaining</span>
-              </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Project Timeline</h2>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Clock className="w-4 h-4" />
+              <span>{timeline.remainingDays} days remaining</span>
             </div>
           </div>
-
-          <div className="p-6 bg-slate-50">
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-blue-50 rounded-lg p-4">
@@ -222,28 +212,20 @@ const Tracking = ({ projectId }) => {
               </div>
             </div>
           </div>
-          </div>
         </div>
       )}
 
       {/* Gantt Chart */}
-      <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-        {/* Section Header */}
-        <div className="bg-gradient-to-r from-blue-700 to-blue-600 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-blue-100" />
-              </div>
-              <h2 className="text-xl font-bold text-white">Gantt Chart</h2>
-            </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Gantt Chart</h2>
           <div className="flex gap-2">
             <button
               onClick={() => setGanttView('phase')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 ganttView === 'phase'
-                  ? 'bg-white text-blue-700 shadow-md'
-                  : 'bg-blue-600 text-white hover:bg-blue-500'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               By Phase
@@ -252,17 +234,14 @@ const Tracking = ({ projectId }) => {
               onClick={() => setGanttView('category')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 ganttView === 'category'
-                  ? 'bg-white text-blue-700 shadow-md'
-                  : 'bg-blue-600 text-white hover:bg-blue-500'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               By Category
             </button>
           </div>
-          </div>
         </div>
-
-        <div className="p-6 bg-blue-50">
 
         {ganttView === 'phase' ? (
           // Phase View
@@ -272,7 +251,7 @@ const Tracking = ({ projectId }) => {
               const phaseItems = checklistItems.filter(item => item.phase === phase.id);
 
               return (
-                <div key={phase.id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                <div key={phase.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${
@@ -358,7 +337,7 @@ const Tracking = ({ projectId }) => {
                       );
 
                       return (
-                        <div key={category} className="bg-white border border-gray-300 rounded-lg p-3 shadow-sm">
+                        <div key={category} className="border border-gray-200 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="text-sm font-medium text-gray-900">{category}</h4>
                             <div className="flex items-center gap-3">
@@ -384,22 +363,11 @@ const Tracking = ({ projectId }) => {
             })}
           </div>
         )}
-        </div>
       </div>
 
       {/* Phase Milestones */}
-      <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-        {/* Section Header */}
-        <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-emerald-100" />
-            </div>
-            <h2 className="text-xl font-bold text-white">Phase Milestones</h2>
-          </div>
-        </div>
-
-        <div className="p-6 bg-emerald-50">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Milestones</h2>
 
         <div className="space-y-4">
           {phases.map((phase, index) => {
@@ -449,7 +417,6 @@ const Tracking = ({ projectId }) => {
               </div>
             );
           })}
-        </div>
         </div>
       </div>
     </div>
