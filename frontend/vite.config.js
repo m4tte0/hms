@@ -10,10 +10,10 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 5173,
+      host: '0.0.0.0', // Allow remote access from network
       proxy: {
         '/api': {
-          // Usa la variabile d'ambiente per il target del proxy
-          target: env.VITE_API_URL.replace('/api', ''),
+          target: 'http://localhost:3001',
           changeOrigin: true,
         },
       },
