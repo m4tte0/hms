@@ -192,15 +192,6 @@ const Overview = ({ project, setProject }) => {
   const getInProgressTasksCount = () => checklistItems.filter(item => item.status === 'In Progress').length;
   const getNotStartedTasksCount = () => checklistItems.filter(item => item.status === 'Not Started').length;
 
-<<<<<<< HEAD
-  const getInProgressTasksCount = () => {
-    return checklistItems.filter(item => item.status === 'In Progress').length;
-  };
-
-  const getNotStartedTasksCount = () => {
-    return checklistItems.filter(item => item.status === 'Not Started').length;
-  };
-
   // Status color helper
   const getStatusColor = (status) => {
     switch (status) {
@@ -229,8 +220,6 @@ const Overview = ({ project, setProject }) => {
   };
 
   // Dynamic phases based on checklist data and custom phase names
-=======
->>>>>>> fork/master
   const phases = [
     { id: 'Phase 1', name: phaseNames['Phase 1'], duration: '2-4 weeks', status: calculatePhaseStatus('Phase 1'), progress: calculatePhaseProgress('Phase 1'), activities: 'Prerequisites completion, documentation review, initial assessment', criteria: 'All technical and documentation requirements met' },
     { id: 'Phase 2', name: phaseNames['Phase 2'], duration: '2-6 weeks', status: calculatePhaseStatus('Phase 2'), progress: calculatePhaseProgress('Phase 2'), activities: 'Training sessions, hands-on activities, shadow support', criteria: 'Team demonstrates competency in system operation' },
@@ -239,7 +228,6 @@ const Overview = ({ project, setProject }) => {
 
   return (
     <div className="space-y-6">
-<<<<<<< HEAD
       {/* Next Incoming Event */}
       {showNextEvent && (() => {
         const now = new Date();
@@ -337,17 +325,6 @@ const Overview = ({ project, setProject }) => {
       })()}
 
       {/* Project Information and Quick Stats Side-by-Side */}
-=======
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-blue-900">Welcome to the Handover Management System</h3>
-            <p className="text-sm text-blue-800 mt-1">This system manages software project handovers from R&D to the Automation Department. All data is automatically saved as you type. Complete each section in order for best results.</p>
-          </div>
-        </div>
-      </div>
->>>>>>> fork/master
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Project Information</h2>
@@ -610,18 +587,7 @@ const Overview = ({ project, setProject }) => {
           ))}
         </div>
       </div>
-<<<<<<< HEAD
-=======
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-yellow-900">Important</h3>
-            <p className="text-sm text-yellow-800 mt-1">Complete each worksheet in order. Use the Dashboard tab to monitor overall progress and identify any issues requiring attention. All changes are saved automatically.</p>
-          </div>
-        </div>
-      </div>
->>>>>>> fork/master
+
     </div>
   );
 };
