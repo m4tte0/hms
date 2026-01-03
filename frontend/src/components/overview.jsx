@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { teamContactsAPI, checklistAPI, issuesAPI, phaseNamesAPI } from '../services/api';
 
 const Overview = ({ project, setProject }) => {
@@ -11,6 +11,13 @@ const Overview = ({ project, setProject }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
   const [showNextEvent, setShowNextEvent] = useState(true);
+  const [showProjectDetails, setShowProjectDetails] = useState(() => {
+    if (project?.id) {
+      const saved = sessionStorage.getItem(`showProjectDetails_${project.id}`);
+      return saved !== null ? JSON.parse(saved) : true;
+    }
+    return true;
+  });
   const [phaseNames, setPhaseNames] = useState({
     'Phase 1': 'Phase 1: Pre-Handover Assessment',
     'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
@@ -19,6 +26,25 @@ const Overview = ({ project, setProject }) => {
   const [newContact, setNewContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
   const [editContact, setEditContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
   const [saving, setSaving] = useState(false);
+
+  const descriptionRef = useRef(null);
+  const contextUsageRef = useRef(null);
+  const previousProjectId = useRef(project?.id);
+
+  // Save collapsed state to sessionStorage for current project
+  useEffect(() => {
+    if (project?.id) {
+      sessionStorage.setItem(`showProjectDetails_${project.id}`, JSON.stringify(showProjectDetails));
+    }
+  }, [showProjectDetails, project?.id]);
+
+  // Reset to expanded when switching to a different project
+  useEffect(() => {
+    if (project?.id && previousProjectId.current !== project?.id) {
+      setShowProjectDetails(true);
+      previousProjectId.current = project?.id;
+    }
+  }, [project?.id]);
 
   useEffect(() => {
     if (project?.id) {
@@ -76,6 +102,7 @@ const Overview = ({ project, setProject }) => {
 
   const loadSessions = async () => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const response = await fetch(`${API_BASE_URL}/knowledge/${project.id}`);
       if (response.ok) {
         const data = await response.json();
@@ -163,6 +190,24 @@ const Overview = ({ project, setProject }) => {
     }
     setProject(updatedProject);
   };
+
+  const handleTextareaResize = (elementOrEvent) => {
+    const element = elementOrEvent.target || elementOrEvent;
+    if (element) {
+      element.style.height = 'auto';
+      element.style.height = element.scrollHeight + 'px';
+    }
+  };
+
+  // Auto-resize textareas when component loads or project data changes
+  useEffect(() => {
+    if (descriptionRef.current) {
+      handleTextareaResize(descriptionRef.current);
+    }
+    if (contextUsageRef.current) {
+      handleTextareaResize(contextUsageRef.current);
+    }
+  }, [project?.description, project?.context_usage, showProjectDetails]);
 
   const calculatePhaseStatus = (phaseId) => {
     const phaseItems = checklistItems.filter(item => item.phase === phaseId);
@@ -323,6 +368,80 @@ const Overview = ({ project, setProject }) => {
         }
         return null;
       })()}
+
+      {/* Project Details Section */}
+      <div className="bg-gradient-to-br from-white to-primary-50 rounded shadow-md border-2 border-primary-200 overflow-hidden">
+        <div
+          className="flex items-center justify-between cursor-pointer px-4 py-3 bg-gradient-to-r from-primary-100 to-primary-200 hover:from-primary-200 hover:to-primary-300 transition-colors border-b-2 border-primary-300"
+          onClick={() => setShowProjectDetails(!showProjectDetails)}
+        >
+          <h2 className="text-base font-semibold text-secondary-900">Project Details</h2>
+          {showProjectDetails ? (
+            <ChevronUp className="w-5 h-5 text-secondary-700" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-secondary-700" />
+          )}
+        </div>
+
+        {showProjectDetails && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+            <div>
+              <label className="block text-xs font-semibold text-secondary-900 mb-1">Machine Family</label>
+              <input
+                type="text"
+                value={project.machine_family || ''}
+                onChange={(e) => handleChange('machine_family', e.target.value)}
+                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Enter machine family"
+              />
+            </div>
+            <div>
+              <div className="block text-xs font-semibold text-secondary-900 mb-1 invisible">Deliverable</div>
+              <label className="flex items-center gap-2 cursor-pointer px-2.5 py-1.5">
+                <input
+                  type="checkbox"
+                  checked={project.deliverable || false}
+                  onChange={(e) => handleChange('deliverable', e.target.checked)}
+                  className="w-4 h-4 text-primary-600 border-primary-400 rounded focus:ring-2 focus:ring-primary-500"
+                />
+                <span className="text-sm font-medium text-secondary-900">Deliverable (Voce a Listino)</span>
+              </label>
+            </div>
+            <div className="lg:col-span-2">
+              <label className="block text-xs font-semibold text-secondary-900 mb-1">Description</label>
+              <textarea
+                ref={descriptionRef}
+                value={project.description || ''}
+                onChange={(e) => {
+                  handleChange('description', e.target.value);
+                  handleTextareaResize(e);
+                }}
+                onInput={handleTextareaResize}
+                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                placeholder="Provide a detailed description of the project"
+                rows="2"
+                style={{ minHeight: '60px' }}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <label className="block text-xs font-semibold text-secondary-900 mb-1">Context and Usage</label>
+              <textarea
+                ref={contextUsageRef}
+                value={project.context_usage || ''}
+                onChange={(e) => {
+                  handleChange('context_usage', e.target.value);
+                  handleTextareaResize(e);
+                }}
+                onInput={handleTextareaResize}
+                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                placeholder="Describe the context and usage scenarios for this project"
+                rows="2"
+                style={{ minHeight: '60px' }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Project Information and Quick Stats Side-by-Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -54,14 +54,17 @@ app.post('/api/projects', async (req, res) => {
   try {
     const {
       handover_id, project_name, rd_lead, automation_lead,
-      start_date, target_date, business_priority
+      start_date, target_date, business_priority, machine_family,
+      description, context_usage, deliverable
     } = req.body;
 
     const result = await db.runAsync(
-      `INSERT INTO projects (handover_id, project_name, rd_lead, automation_lead, 
-       start_date, target_date, business_priority) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [handover_id, project_name, rd_lead, automation_lead, start_date, target_date, business_priority]
+      `INSERT INTO projects (handover_id, project_name, rd_lead, automation_lead,
+       start_date, target_date, business_priority, machine_family, description,
+       context_usage, deliverable)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [handover_id, project_name, rd_lead, automation_lead, start_date, target_date,
+       business_priority, machine_family, description, context_usage, deliverable]
     );
 
     res.status(201).json({ id: result.id, message: 'Project created successfully' });
@@ -77,7 +80,8 @@ app.put('/api/projects/:id', async (req, res) => {
     const {
       handover_id, project_name, rd_lead, automation_lead,
       start_date, target_date, business_priority, complexity_level,
-      project_score, status, current_phase
+      project_score, status, current_phase, machine_family, description,
+      context_usage, deliverable
     } = req.body;
 
     await db.runAsync(
@@ -93,10 +97,15 @@ app.put('/api/projects/:id', async (req, res) => {
        project_score = COALESCE(?, project_score),
        status = COALESCE(?, status),
        current_phase = COALESCE(?, current_phase),
+       machine_family = COALESCE(?, machine_family),
+       description = COALESCE(?, description),
+       context_usage = COALESCE(?, context_usage),
+       deliverable = COALESCE(?, deliverable),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [handover_id, project_name, rd_lead, automation_lead, start_date, target_date,
-       business_priority, complexity_level, project_score, status, current_phase, req.params.id]
+       business_priority, complexity_level, project_score, status, current_phase,
+       machine_family, description, context_usage, deliverable, req.params.id]
     );
 
     res.json({ message: 'Project updated successfully' });

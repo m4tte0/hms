@@ -157,6 +157,10 @@ function App() {
         project_score: currentProject.project_score,
         status: currentProject.status,
         current_phase: currentProject.current_phase,
+        machine_family: currentProject.machine_family,
+        description: currentProject.description,
+        context_usage: currentProject.context_usage,
+        deliverable: currentProject.deliverable,
       };
       await projectsAPI.update(currentProject.id, saveData);
       const now = new Date();
@@ -185,6 +189,10 @@ function App() {
       project_score: 0,
       status: 'active',
       current_phase: 'Phase 1',
+      machine_family: '',
+      description: '',
+      context_usage: '',
+      deliverable: 0,
     };
     try {
       const response = await projectsAPI.create(newProject);
