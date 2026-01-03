@@ -252,29 +252,29 @@ function App() {
     switch (saveStatus) {
       case 'saving':
         return (
-          <div className="flex items-center gap-1.5 text-white text-xs bg-primary-600 px-3 py-1.5 rounded shadow-sm">
-            <Loader className="w-3.5 h-3.5 animate-spin" />
+          <div className="flex items-center gap-1.5 text-primary-700 text-xs bg-primary-100 px-2 py-1 rounded">
+            <Loader className="w-3 h-3 animate-spin" />
             <span>Saving...</span>
           </div>
         );
       case 'saved':
         return (
-          <div className="flex items-center gap-1.5 text-white text-xs bg-success-600 px-3 py-1.5 rounded shadow-sm">
-            <CheckCircle className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-success-700 text-xs bg-success-100 px-2 py-1 rounded">
+            <CheckCircle className="w-3 h-3" />
             <span>Saved {lastSaved ? `${lastSaved.toLocaleTimeString()}` : ''}</span>
           </div>
         );
       case 'error':
         return (
-          <div className="flex items-center gap-1.5 text-white text-xs bg-danger-600 px-3 py-1.5 rounded shadow-sm">
-            <AlertCircle className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-danger-700 text-xs bg-danger-100 px-2 py-1 rounded">
+            <AlertCircle className="w-3 h-3" />
             <span>Error saving</span>
           </div>
         );
       case 'Project deleted':
         return (
-          <div className="flex items-center gap-1.5 text-white text-xs bg-warning-600 px-3 py-1.5 rounded shadow-sm">
-            <CheckCircle className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-warning-700 text-xs bg-warning-100 px-2 py-1 rounded">
+            <CheckCircle className="w-3 h-3" />
             <span>Project deleted</span>
           </div>
         );
@@ -332,7 +332,11 @@ function App() {
             </button>
             <div className="text-center">
               <h1 className="text-xl font-bold text-white">Handover Management System</h1>
-              {currentProject && <p className="text-sm text-primary-100 mt-0.5">{currentProject.project_name} ({currentProject.handover_id})</p>}
+              {currentProject && (
+                <p className="text-sm text-primary-100 mt-0.5">
+                  {currentProject.project_name} <span className="text-xs">({currentProject.handover_id})</span>
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -343,11 +347,11 @@ function App() {
         <aside
           className={`${
             showProjectList ? 'translate-x-0' : '-translate-x-full'
-          } fixed lg:relative lg:translate-x-0 w-72 bg-gradient-to-b from-secondary-100 to-secondary-200 border-r-2 border-secondary-300 h-full transition-transform duration-300 z-40 shadow-xl flex flex-col`}
+          } fixed lg:relative lg:translate-x-0 w-72 bg-gradient-to-b from-secondary-200 to-secondary-300 border-r-2 border-secondary-400 h-full transition-transform duration-300 z-40 shadow-xl flex flex-col`}
         >
           {/* Projects List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-3">
-            <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-secondary-400">
+            <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-secondary-500">
               <h2 className="text-sm font-semibold text-secondary-900">Projects ({projects.length})</h2>
               <button onClick={() => setShowProjectList(false)} className="lg:hidden p-1 hover:bg-secondary-100 rounded"><X className="w-4 h-4" /></button>
             </div>
@@ -358,34 +362,50 @@ function App() {
             <div className="space-y-1.5">
               {filteredProjects.map((project) => {
                 const progress = projectsProgress[project.id] || { percentage: 0, completedItems: 0, totalItems: 0, currentPhase: 'Phase 1' };
+                const isSelected = currentProject?.id === project.id;
+
                 return (
                   <div key={project.id} className={`group relative rounded transition-all ${
-                      currentProject?.id === project.id
+                      isSelected
                         ? 'bg-white border-2 border-primary-600 shadow-lg'
-                        : 'bg-white hover:bg-primary-50 border border-secondary-300 hover:border-primary-400 hover:shadow-md'
+                        : 'bg-secondary-50 hover:bg-white border-2 border-secondary-300 hover:border-primary-400 hover:shadow-sm'
                     }`}>
-                    <button onClick={() => handleProjectSelect(project)} className="w-full text-left p-2 pr-8">
-                      <div className="font-medium text-sm text-secondary-900 truncate mb-0.5">{project.project_name}</div>
-                      <div className="text-xs text-secondary-500 truncate mb-1.5">{project.handover_id}</div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-xs font-medium text-primary-600">{progress.currentPhase}</div>
-                        <div className="text-xs font-semibold text-secondary-700">{progress.percentage}%</div>
+                    <button onClick={() => handleProjectSelect(project)} className={`w-full text-left pr-8 ${isSelected ? 'p-2' : 'p-1.5'}`}>
+                      <div className={`font-medium text-sm text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'}`}>
+                        {project.project_name}
                       </div>
-                      <div className="w-full bg-secondary-200 rounded-full h-1 mb-1.5">
-                        <div className={`h-1 rounded-full transition-all duration-500 ${
-                            progress.percentage >= 100 ? 'bg-success-500' :
-                            progress.percentage >= 75 ? 'bg-primary-500' :
-                            progress.percentage >= 50 ? 'bg-warning-500' :
-                            progress.percentage >= 25 ? 'bg-warning-600' :
-                            'bg-danger-500'
-                          }`} style={{ width: `${progress.percentage}%` }} />
+                      <div className={`text-xs text-secondary-500 truncate ${isSelected ? 'mb-1.5' : 'mb-0'}`}>
+                        {project.handover_id}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-secondary-400">{progress.completedItems}/{progress.totalItems} tasks</div>
-                        <div className="text-xs text-secondary-400">{project.business_priority}</div>
-                      </div>
+
+                      {isSelected ? (
+                        <>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs font-medium text-primary-600">{progress.currentPhase}</div>
+                            <div className="text-xs font-semibold text-secondary-700">{progress.percentage}%</div>
+                          </div>
+                          <div className="w-full bg-secondary-200 rounded-full h-1 mb-1.5">
+                            <div className={`h-1 rounded-full transition-all duration-500 ${
+                                progress.percentage >= 100 ? 'bg-success-500' :
+                                progress.percentage >= 75 ? 'bg-primary-500' :
+                                progress.percentage >= 50 ? 'bg-warning-500' :
+                                progress.percentage >= 25 ? 'bg-warning-600' :
+                                'bg-danger-500'
+                              }`} style={{ width: `${progress.percentage}%` }} />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs text-secondary-400">{progress.completedItems}/{progress.totalItems} tasks</div>
+                            <div className="text-xs text-secondary-400">{project.business_priority}</div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-between text-xs text-secondary-400">
+                          <span>{progress.currentPhase} • {progress.percentage}%</span>
+                          <span>{progress.completedItems}/{progress.totalItems}</span>
+                        </div>
+                      )}
                     </button>
-                    <button onClick={(e) => handleDeleteClick(project, e)} className="absolute right-1.5 top-2 p-1 opacity-0 group-hover:opacity-100 hover:bg-danger-100 text-danger-600 rounded transition-all" title="Delete project">
+                    <button onClick={(e) => handleDeleteClick(project, e)} className={`absolute right-1.5 p-1 opacity-0 group-hover:opacity-100 hover:bg-danger-100 text-danger-600 rounded transition-all ${isSelected ? 'top-2' : 'top-1'}`} title="Delete project">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -401,9 +421,9 @@ function App() {
           </div>
 
           {/* Bottom Controls - Fixed */}
-          <div className="border-t-2 border-secondary-400 bg-secondary-200 p-3 space-y-2">
+          <div className="border-t-2 border-secondary-500 bg-secondary-300 p-3 space-y-2">
             {/* Save Status */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center h-6">
               {getSaveStatusDisplay()}
             </div>
 
