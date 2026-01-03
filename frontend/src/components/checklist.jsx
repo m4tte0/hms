@@ -801,11 +801,11 @@ const Checklist = ({ projectId }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Complete':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-success-100 text-success-800 border-success-300';
       case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-warning-100 text-warning-800 border-warning-300';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-secondary-100 text-secondary-800 border-secondary-300';
     }
   };
 
@@ -871,41 +871,41 @@ const Checklist = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Delete Item Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="bg-white rounded shadow-xl max-w-md w-full p-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-10 h-10 rounded-full bg-danger-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Checklist Item?</h3>
-                <p className="text-sm text-gray-500">This action cannot be undone</p>
+                <h3 className="text-base font-semibold text-secondary-900">Delete Checklist Item?</h3>
+                <p className="text-xs text-secondary-500">This action cannot be undone</p>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
-              <p className="font-semibold text-gray-900">{itemToDelete?.requirement}</p>
-              <p className="text-sm text-gray-600 mt-1">
+            <div className="bg-secondary-50 rounded p-3 mb-3">
+              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
+              <p className="font-semibold text-sm text-secondary-900">{itemToDelete?.requirement}</p>
+              <p className="text-xs text-secondary-600 mt-1">
                 Phase: {itemToDelete?.phase} | Category: {itemToDelete?.category}
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleDeleteCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Delete
               </button>
             </div>
@@ -916,42 +916,42 @@ const Checklist = ({ projectId }) => {
       {/* Delete Category Confirmation Modal */}
       {showDeleteCategoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="bg-white rounded shadow-xl max-w-md w-full p-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-10 h-10 rounded-full bg-danger-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Entire Category?</h3>
-                <p className="text-sm text-gray-500">This will delete all items in this category</p>
+                <h3 className="text-base font-semibold text-secondary-900">Delete Entire Category?</h3>
+                <p className="text-xs text-secondary-500">This will delete all items in this category</p>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
-              <p className="font-semibold text-gray-900">{categoryToDelete?.category}</p>
-              <p className="text-sm text-gray-600 mt-1">
+            <div className="bg-secondary-50 rounded p-3 mb-3">
+              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
+              <p className="font-semibold text-sm text-secondary-900">{categoryToDelete?.category}</p>
+              <p className="text-xs text-secondary-600 mt-1">
                 Phase: {categoryToDelete?.phase}
               </p>
-              <p className="text-sm text-red-600 mt-2 font-medium">
+              <p className="text-xs text-danger-600 mt-1.5 font-medium">
                 {items.filter(item =>
                   item.phase === categoryToDelete?.phase && item.category === categoryToDelete?.category
                 ).length} item(s) will be deleted
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleDeleteCategoryCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteCategoryConfirm}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Delete Category
               </button>
             </div>
@@ -962,26 +962,26 @@ const Checklist = ({ projectId }) => {
       {/* Add Category Modal */}
       {showAddCategoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-blue-600" />
+          <div className="bg-white rounded shadow-xl max-w-md w-full p-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Add New Category</h3>
-                <p className="text-sm text-gray-500">Create a new category in {phases.find(p => p.id === newCategoryPhase)?.name}</p>
+                <h3 className="text-base font-semibold text-secondary-900">Add New Category</h3>
+                <p className="text-xs text-secondary-500">Create a new category in {phases.find(p => p.id === newCategoryPhase)?.name}</p>
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-secondary-700 mb-1.5">
                 Category Name
               </label>
               <input
                 type="text"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter category name..."
                 autoFocus
                 onKeyDown={(e) => {
@@ -989,23 +989,23 @@ const Checklist = ({ projectId }) => {
                   if (e.key === 'Escape') handleAddCategoryCancel();
                 }}
               />
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-secondary-500 mt-1">
                 A default item will be created in this category
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleAddCategoryCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddCategoryConfirm}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-3 py-1.5 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center justify-center gap-1.5"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
                 Add Category
               </button>
             </div>
@@ -1108,24 +1108,24 @@ const Checklist = ({ projectId }) => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
-            <div className="text-2xl font-bold text-green-600">
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="text-center p-2.5 bg-success-50 rounded border border-success-200">
+            <div className="text-xl font-bold text-success-600">
               {items.filter(i => i.status === 'Complete').length}
             </div>
-            <div className="text-sm text-gray-600">Complete</div>
+            <div className="text-xs text-secondary-600">Complete</div>
           </div>
-          <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-            <div className="text-2xl font-bold text-yellow-600">
+          <div className="text-center p-2.5 bg-warning-50 rounded border border-warning-200">
+            <div className="text-xl font-bold text-warning-600">
               {items.filter(i => i.status === 'In Progress').length}
             </div>
-            <div className="text-sm text-gray-600">In Progress</div>
+            <div className="text-xs text-secondary-600">In Progress</div>
           </div>
-          <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-gray-600">
+          <div className="text-center p-2.5 bg-secondary-50 rounded border border-secondary-200">
+            <div className="text-xl font-bold text-secondary-600">
               {items.filter(i => i.status === 'Not Started').length}
             </div>
-            <div className="text-sm text-gray-600">Not Started</div>
+            <div className="text-xs text-secondary-600">Not Started</div>
           </div>
         </div>
       </div>
@@ -1139,22 +1139,22 @@ const Checklist = ({ projectId }) => {
         if (!groupedItems[phaseInfo.id]) return null;
 
         return (
-          <div key={phaseInfo.id} className="bg-white rounded-lg shadow-md border-2 border-gray-200 overflow-hidden">
+          <div key={phaseInfo.id} className="bg-white rounded shadow-sm border border-secondary-200 overflow-hidden">
             {/* Phase Header */}
             <div
-              className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer group`}
+              className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-3 cursor-pointer group`}
               onClick={() => togglePhase(phaseInfo.id)}
             >
-              <div className="flex items-center justify-between text-gray-900">
+              <div className="flex items-center justify-between text-secondary-900">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {editingPhaseId === phaseInfo.id ? (
-                      <div className="flex items-center gap-2 flex-1" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-1.5 flex-1" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="text"
                           value={editingPhaseText}
                           onChange={(e) => setEditingPhaseText(e.target.value)}
-                          className="flex-1 px-4 py-2 text-gray-900 border-2 border-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                          className="flex-1 px-3 py-1.5 text-sm text-secondary-900 border-2 border-white rounded focus:outline-none focus:ring-2 focus:ring-white"
                           autoFocus
                           placeholder="Enter phase name..."
                           onKeyDown={(e) => {
@@ -1164,42 +1164,42 @@ const Checklist = ({ projectId }) => {
                         />
                         <button
                           onClick={() => handleSaveEditPhase(phaseInfo.id)}
-                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-1.5 bg-secondary-800 bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
                           title="Save"
                         >
-                          <Save className="w-5 h-5" />
+                          <Save className="w-4 h-4" />
                         </button>
                         <button
                           onClick={handleCancelEditPhase}
-                          className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                          className="p-1.5 bg-secondary-800 bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     ) : (
                       <>
-                        <h2 className="text-xl font-bold">{phaseInfo.name}</h2>
+                        <h2 className="text-base font-bold">{phaseInfo.name}</h2>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleStartEditPhase(phaseInfo.id);
                           }}
-                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-gray-800 hover:bg-opacity-20 rounded-lg transition-all"
+                          className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-secondary-800 hover:bg-opacity-20 rounded transition-all"
                           title="Edit phase name"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         {isPhaseCollapsed ? (
-                          <ChevronDown className="w-5 h-5" />
+                          <ChevronDown className="w-4 h-4" />
                         ) : (
-                          <ChevronUp className="w-5 h-5" />
+                          <ChevronUp className="w-4 h-4" />
                         )}
                       </>
                     )}
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
-                    <p className="text-sm mt-1 text-gray-700">
+                    <p className="text-xs mt-0.5 text-secondary-700">
                       {phaseItems.filter(i => i.status === 'Complete').length} of {phaseItems.length} completed
                     </p>
                   )}

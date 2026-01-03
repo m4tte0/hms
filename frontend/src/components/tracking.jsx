@@ -130,8 +130,8 @@ const Tracking = ({ projectId }) => {
       {timeline && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Project Timeline</h2>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <h2 className="text-lg font-semibold text-secondary-900">Project Timeline</h2>
+            <div className="flex items-center gap-2 text-sm text-secondary-600">
               <Clock className="w-4 h-4" />
               <span>{timeline.remainingDays} days remaining</span>
             </div>
@@ -139,20 +139,20 @@ const Tracking = ({ projectId }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Start Date</div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-sm text-secondary-600 mb-1">Start Date</div>
+              <div className="text-lg font-semibold text-secondary-900">
                 {timeline.start.toLocaleDateString()}
               </div>
             </div>
             <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Target Date</div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-sm text-secondary-600 mb-1">Target Date</div>
+              <div className="text-lg font-semibold text-secondary-900">
                 {timeline.end.toLocaleDateString()}
               </div>
             </div>
             <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-sm text-gray-600 mb-1">Total Duration</div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-sm text-secondary-600 mb-1">Total Duration</div>
+              <div className="text-lg font-semibold text-secondary-900">
                 {timeline.totalDays} days
               </div>
             </div>
@@ -161,7 +161,7 @@ const Tracking = ({ projectId }) => {
           {/* Time Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Time Progress</span>
+              <span className="text-secondary-600">Time Progress</span>
               <span className="font-semibold text-blue-600">{timeline.timeProgress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
@@ -170,7 +170,7 @@ const Tracking = ({ projectId }) => {
                 style={{ width: `${timeline.timeProgress}%` }}
               />
             </div>
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs text-secondary-500">
               <span>{timeline.elapsedDays} days elapsed</span>
               <span>{timeline.remainingDays} days remaining</span>
             </div>
@@ -179,7 +179,7 @@ const Tracking = ({ projectId }) => {
           {/* Work Progress vs Time Progress */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-gray-600">Work Progress</span>
+              <span className="text-secondary-600">Work Progress</span>
               <span className="font-semibold text-green-600">{overallProgress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
@@ -218,14 +218,14 @@ const Tracking = ({ projectId }) => {
       {/* Gantt Chart */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Gantt Chart</h2>
+          <h2 className="text-lg font-semibold text-secondary-900">Gantt Chart</h2>
           <div className="flex gap-2">
             <button
               onClick={() => setGanttView('phase')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 ganttView === 'phase'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-secondary-600 hover:bg-gray-200'
               }`}
             >
               By Phase
@@ -235,7 +235,7 @@ const Tracking = ({ projectId }) => {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 ganttView === 'category'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-secondary-600 hover:bg-gray-200'
               }`}
             >
               By Category
@@ -259,10 +259,10 @@ const Tracking = ({ projectId }) => {
                         phase.color === 'yellow' ? 'bg-yellow-500' :
                         'bg-green-500'
                       }`} />
-                      <h3 className="font-semibold text-gray-900">{phase.name}</h3>
+                      <h3 className="font-semibold text-secondary-900">{phase.name}</h3>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-secondary-600">
                         {phaseItems.filter(i => i.status === 'Complete').length}/{phaseItems.length} tasks
                       </span>
                       <span className="text-sm font-semibold text-blue-600">{progress}%</span>
@@ -300,8 +300,8 @@ const Tracking = ({ projectId }) => {
                       </div>
                     </div>
                     <div className="bg-gray-50 rounded p-2">
-                      <div className="font-medium text-gray-700">Not Started</div>
-                      <div className="text-gray-900 font-bold">
+                      <div className="font-medium text-secondary-700">Not Started</div>
+                      <div className="text-secondary-900 font-bold">
                         {phaseItems.filter(i => i.status === 'Not Started').length}
                       </div>
                     </div>
@@ -326,7 +326,7 @@ const Tracking = ({ projectId }) => {
                       phase.color === 'yellow' ? 'bg-yellow-500' :
                       'bg-green-500'
                     }`} />
-                    <h3 className="font-semibold text-gray-900">{phase.name}</h3>
+                    <h3 className="font-semibold text-secondary-900">{phase.name}</h3>
                   </div>
 
                   <div className="space-y-2 pl-6">
@@ -339,9 +339,9 @@ const Tracking = ({ projectId }) => {
                       return (
                         <div key={category} className="border border-gray-200 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium text-gray-900">{category}</h4>
+                            <h4 className="text-sm font-medium text-secondary-900">{category}</h4>
                             <div className="flex items-center gap-3">
-                              <span className="text-xs text-gray-600">
+                              <span className="text-xs text-secondary-600">
                                 {categoryItems.filter(i => i.status === 'Complete').length}/{categoryItems.length}
                               </span>
                               <span className="text-xs font-semibold text-blue-600">{progress}%</span>
@@ -367,7 +367,7 @@ const Tracking = ({ projectId }) => {
 
       {/* Phase Milestones */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Milestones</h2>
+        <h2 className="text-lg font-semibold text-secondary-900 mb-4">Phase Milestones</h2>
 
         <div className="space-y-4">
           {phases.map((phase, index) => {
@@ -382,7 +382,7 @@ const Tracking = ({ projectId }) => {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
                     isComplete ? 'bg-green-500 text-white' :
                     isInProgress ? 'bg-blue-500 text-white' :
-                    'bg-gray-300 text-gray-600'
+                    'bg-gray-300 text-secondary-600'
                   }`}>
                     {isComplete ? '✓' : index + 1}
                   </div>
@@ -396,17 +396,17 @@ const Tracking = ({ projectId }) => {
                 {/* Phase Info */}
                 <div className="flex-1 pb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">{phase.name}</h3>
+                    <h3 className="font-medium text-secondary-900">{phase.name}</h3>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       isComplete ? 'bg-green-100 text-green-800' :
                       isInProgress ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-gray-100 text-secondary-800'
                     }`}>
                       {isComplete ? 'Completed' : isInProgress ? 'In Progress' : 'Pending'}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-secondary-600">
                     <span>{progress}% complete</span>
                     <span>•</span>
                     <span>

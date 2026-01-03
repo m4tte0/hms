@@ -59,11 +59,11 @@ const StatusReport = ({ projectId, onClose }) => {
         return 'text-blue-600 bg-blue-50';
       case 'not started':
       case 'open':
-        return 'text-gray-600 bg-gray-50';
+        return 'text-secondary-600 bg-gray-50';
       case 'scheduled':
         return 'text-yellow-600 bg-yellow-50';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'text-secondary-600 bg-gray-50';
     }
   };
 
@@ -80,7 +80,7 @@ const StatusReport = ({ projectId, onClose }) => {
       case 'low':
         return 'text-green-600 bg-green-50';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'text-secondary-600 bg-gray-50';
     }
   };
 
@@ -203,7 +203,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
           {/* COMPACT HEADER: Sections 1-4 Combined */}
           <section className="mb-6 page-break-inside-avoid">
-            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-slate-600 pb-2">
+            <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-slate-600 pb-2">
               Project Summary
             </h3>
 
@@ -220,11 +220,11 @@ const StatusReport = ({ projectId, onClose }) => {
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">ID</span>
-                      <p className="font-semibold text-gray-900">{project.handover_id || 'N/A'}</p>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">ID</span>
+                      <p className="font-semibold text-secondary-900">{project.handover_id || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Status</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Status</span>
                       <div className="mt-0.5">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
                           {project.status || 'Active'}
@@ -232,15 +232,15 @@ const StatusReport = ({ projectId, onClose }) => {
                       </div>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Project Name</span>
-                      <p className="font-semibold text-gray-900">{project.project_name || 'N/A'}</p>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Project Name</span>
+                      <p className="font-semibold text-secondary-900">{project.project_name || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Phase</span>
-                      <p className="font-medium text-gray-900">{project.current_phase || 'Phase 1'}</p>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Phase</span>
+                      <p className="font-medium text-secondary-900">{project.current_phase || 'Phase 1'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Score</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Score</span>
                       <p className="font-semibold text-slate-700">{project.project_score || 0}</p>
                     </div>
                   </div>
@@ -254,22 +254,22 @@ const StatusReport = ({ projectId, onClose }) => {
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Start Date</span>
-                      <span className="font-medium text-gray-900">{formatDate(project.start_date)}</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Start Date</span>
+                      <span className="font-medium text-secondary-900">{formatDate(project.start_date)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Target Date</span>
-                      <span className="font-medium text-gray-900">{formatDate(project.target_date)}</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Target Date</span>
+                      <span className="font-medium text-secondary-900">{formatDate(project.target_date)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 text-xs uppercase tracking-wide">Days Remaining</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Days Remaining</span>
                       <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
                         {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
                       </span>
                     </div>
                     <div className="pt-2 border-t border-gray-100">
                       <div className="flex justify-between mb-1.5">
-                        <span className="text-gray-500 text-xs uppercase tracking-wide">Completion</span>
+                        <span className="text-secondary-500 text-xs uppercase tracking-wide">Completion</span>
                         <span className="font-bold text-blue-700">{project.completionPercentage}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -290,13 +290,13 @@ const StatusReport = ({ projectId, onClose }) => {
                   </h4>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Priority</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Priority</span>
                       <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
                         {project.business_priority || 'Not set'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide block mb-1">Complexity</span>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Complexity</span>
                       <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
                         {project.complexity_level || 'Not set'}
                       </span>
@@ -312,12 +312,12 @@ const StatusReport = ({ projectId, onClose }) => {
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide block">R&D Lead</span>
-                      <p className="font-medium text-gray-900">{project.rd_lead || 'Not assigned'}</p>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">R&D Lead</span>
+                      <p className="font-medium text-secondary-900">{project.rd_lead || 'Not assigned'}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500 text-xs uppercase tracking-wide block">Automation Lead</span>
-                      <p className="font-medium text-gray-900">{project.automation_lead || 'Not assigned'}</p>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Automation Lead</span>
+                      <p className="font-medium text-secondary-900">{project.automation_lead || 'Not assigned'}</p>
                     </div>
                   </div>
                 </div>
@@ -336,7 +336,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Checklist</p>
+                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Checklist</p>
                           <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
                           <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Done</p>
                         </div>
@@ -348,7 +348,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-white p-3 rounded-lg border-l-4 border-blue-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Sessions</p>
+                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Sessions</p>
                           <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
                           <p className="text-xs text-blue-600 font-medium mt-1">Completed</p>
                         </div>
@@ -360,7 +360,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Issues</p>
+                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Issues</p>
                           <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
                           <p className="text-xs text-amber-600 font-medium mt-1">of {statistics.issues.total} total</p>
                         </div>
@@ -372,7 +372,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-white p-3 rounded-lg border-l-4 border-slate-500 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Files</p>
+                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Files</p>
                           <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
                           <p className="text-xs text-slate-600 font-medium mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
                         </div>
@@ -390,7 +390,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* Team Composition - Moved here for better organization */}
           {teamContacts.length > 0 && (
             <section className="mb-6 page-break-inside-avoid">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Users className="w-5 h-5 mr-2" />
                 Team Composition
               </h3>
@@ -424,7 +424,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* Knowledge Transfer Calendar - Sessions Timeline */}
           {knowledgeSessions.length > 0 && (
             <section className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Calendar className="w-5 h-5 mr-2" />
                 Knowledge Transfer Calendar
               </h3>
@@ -444,7 +444,7 @@ const StatusReport = ({ projectId, onClose }) => {
                                 {formatDate(session.scheduled_date)}
                               </div>
                               {session.start_time && (
-                                <div className="flex items-center text-sm text-gray-600">
+                                <div className="flex items-center text-sm text-secondary-600">
                                   <Clock className="w-4 h-4 mr-1" />
                                   {session.start_time}
                                   {session.duration && ` (${session.duration})`}
@@ -455,22 +455,22 @@ const StatusReport = ({ projectId, onClose }) => {
                               </span>
                             </div>
 
-                            <h4 className="text-base font-semibold text-gray-900 mb-2">
+                            <h4 className="text-base font-semibold text-secondary-900 mb-2">
                               {session.session_topic}
                             </h4>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                               {session.attendees && (
                                 <div className="flex items-start">
-                                  <Users className="w-4 h-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-gray-700">{session.attendees}</span>
+                                  <Users className="w-4 h-4 mr-2 text-secondary-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-secondary-700">{session.attendees}</span>
                                 </div>
                               )}
 
                               {session.effectiveness_rating && (
                                 <div className="flex items-center">
-                                  <TrendingUp className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" />
-                                  <span className="text-gray-700">
+                                  <TrendingUp className="w-4 h-4 mr-2 text-secondary-500 flex-shrink-0" />
+                                  <span className="text-secondary-700">
                                     Effectiveness:
                                     <span className="ml-1 font-semibold text-green-600">
                                       {session.effectiveness_rating}/5
@@ -482,7 +482,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
                             {session.notes && (
                               <div className="mt-2 pt-2 border-t border-gray-100">
-                                <p className="text-sm text-gray-600 italic">{session.notes}</p>
+                                <p className="text-sm text-secondary-600 italic">{session.notes}</p>
                               </div>
                             )}
                           </div>
@@ -495,17 +495,17 @@ const StatusReport = ({ projectId, onClose }) => {
               {/* Summary Stats */}
               <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-600 mb-1">Total Sessions</p>
+                  <p className="text-xs text-secondary-600 mb-1">Total Sessions</p>
                   <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
                 </div>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-600 mb-1">Completed</p>
+                  <p className="text-xs text-secondary-600 mb-1">Completed</p>
                   <p className="text-2xl font-bold text-green-700">
                     {knowledgeSessions.filter(s => s.status === 'Completed').length}
                   </p>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-600 mb-1">Scheduled</p>
+                  <p className="text-xs text-secondary-600 mb-1">Scheduled</p>
                   <p className="text-2xl font-bold text-yellow-700">
                     {knowledgeSessions.filter(s => s.status === 'Scheduled').length}
                   </p>
@@ -516,7 +516,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
           {/* SECTION 2: Phase Breakdown */}
           <section className="mb-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+            <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
               Phase Progress Breakdown
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
@@ -537,7 +537,7 @@ const StatusReport = ({ projectId, onClose }) => {
                       </div>
                       <div className="grid grid-cols-4 gap-2 text-center text-sm">
                         <div>
-                          <p className="text-gray-600">Total</p>
+                          <p className="text-secondary-600">Total</p>
                           <p className="font-semibold">{stats.total}</p>
                         </div>
                         <div>
@@ -549,7 +549,7 @@ const StatusReport = ({ projectId, onClose }) => {
                           <p className="font-semibold">{stats.inProgress}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Not Started</p>
+                          <p className="text-secondary-600">Not Started</p>
                           <p className="font-semibold">{stats.notStarted}</p>
                         </div>
                       </div>
@@ -558,13 +558,13 @@ const StatusReport = ({ projectId, onClose }) => {
                 })}
               </div>
             ) : (
-              <p className="text-gray-500 italic">No phase data available</p>
+              <p className="text-secondary-500 italic">No phase data available</p>
             )}
           </section>
 
           {/* SECTION 3: Checklist Details */}
           <section className="mb-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+            <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
               Checklist Status Details
             </h3>
             {Object.keys(checklistByPhase).length > 0 ? (
@@ -573,10 +573,10 @@ const StatusReport = ({ projectId, onClose }) => {
                   const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
                   return (
                     <div key={phase} className="page-break-inside-avoid">
-                      <h4 className="text-xl font-semibold mb-3 text-gray-700">{phaseName}</h4>
+                      <h4 className="text-xl font-semibold mb-3 text-secondary-700">{phaseName}</h4>
                       {Object.entries(categories).map(([category, items]) => (
                         <div key={category} className="mb-4 ml-4">
-                          <h5 className="text-lg font-medium mb-2 text-gray-600">{category}</h5>
+                          <h5 className="text-lg font-medium mb-2 text-secondary-600">{category}</h5>
                           <div className="overflow-x-auto">
                             <table className="min-w-full bg-white border border-gray-200 text-sm">
                               <thead className="bg-gray-50">
@@ -612,14 +612,14 @@ const StatusReport = ({ projectId, onClose }) => {
                 })}
               </div>
             ) : (
-              <p className="text-gray-500 italic">No checklist items available</p>
+              <p className="text-secondary-500 italic">No checklist items available</p>
             )}
           </section>
 
           {/* SECTION 4: Assessment Summary */}
           {Object.keys(assessmentsByPhase).length > 0 && (
             <section className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Assessment Summary
               </h3>
               <div className="space-y-4">
@@ -667,7 +667,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* SECTION 5: Issues & Risks */}
           {issues.length > 0 && (
             <section className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Issues & Risks
               </h3>
               <div className="overflow-x-auto">
@@ -710,7 +710,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* SECTION 6: Attachments */}
           {attachments.length > 0 && (
             <section className="mb-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-blue-500 pb-2">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Attachments & Documentation
               </h3>
               <div className="overflow-x-auto">
@@ -743,7 +743,7 @@ const StatusReport = ({ projectId, onClose }) => {
           )}
 
           {/* Report Footer */}
-          <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-500">
+          <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-secondary-500">
             <p>End of Handover Status Report</p>
             <p className="mt-2">Generated by Handover Management System on {formatDate(new Date().toISOString())}</p>
           </div>

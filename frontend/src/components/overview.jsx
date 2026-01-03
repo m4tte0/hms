@@ -196,13 +196,13 @@ const Overview = ({ project, setProject }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Completed':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-success-100 text-success-800 border-success-300';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-primary-100 text-primary-800 border-primary-300';
       case 'Cancelled':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-danger-100 text-danger-800 border-danger-300';
       default:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-warning-100 text-warning-800 border-warning-300';
     }
   };
 
@@ -227,7 +227,7 @@ const Overview = ({ project, setProject }) => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Next Incoming Event */}
       {showNextEvent && (() => {
         const now = new Date();
@@ -242,53 +242,53 @@ const Overview = ({ project, setProject }) => {
           const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
 
           return (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-4 relative">
+            <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded shadow-sm border border-primary-200 p-3 relative">
               {/* Close Button */}
               <button
                 onClick={() => setShowNextEvent(false)}
-                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white hover:bg-opacity-60 rounded-full transition-colors"
+                className="absolute top-2 right-2 p-1 text-secondary-400 hover:text-secondary-600 hover:bg-white hover:bg-opacity-60 rounded-full transition-colors"
                 title="Dismiss"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
-              <div className="flex items-start justify-between pr-8">
+              <div className="flex items-start justify-between pr-6">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Next Incoming Event</h3>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Calendar className="w-4 h-4 text-primary-600" />
+                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">{nextSession.session_topic}</h2>
+                  <h2 className="text-base font-bold text-secondary-900 mb-2">{nextSession.session_topic}</h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <Calendar className="w-4 h-4 text-blue-600" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="flex items-center gap-1.5 text-secondary-700">
+                      <Calendar className="w-3.5 h-3.5 text-primary-600" />
                       <div>
-                        <div className="text-xs text-gray-500">Date</div>
-                        <div className="font-semibold">
+                        <div className="text-xs text-secondary-500">Date</div>
+                        <div className="text-sm font-semibold">
                           {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <Clock className="w-4 h-4 text-blue-600" />
+                    <div className="flex items-center gap-1.5 text-secondary-700">
+                      <Clock className="w-3.5 h-3.5 text-primary-600" />
                       <div>
-                        <div className="text-xs text-gray-500">Time & Duration</div>
-                        <div className="font-semibold">
-                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
-                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
+                        <div className="text-xs text-secondary-500">Time & Duration</div>
+                        <div className="text-sm font-semibold">
+                          {nextSession.start_time && <span className="text-primary-600">{nextSession.start_time}</span>}
+                          {nextSession.start_time && nextSession.duration && <span className="text-secondary-400 mx-1">•</span>}
                           {nextSession.duration && <span>{nextSession.duration} h</span>}
                         </div>
                       </div>
                     </div>
 
                     {nextSession.attendees && (
-                      <div className="flex items-start gap-2 text-gray-700">
-                        <Users className="w-4 h-4 text-blue-600 mt-1" />
+                      <div className="flex items-start gap-1.5 text-secondary-700">
+                        <Users className="w-3.5 h-3.5 text-primary-600 mt-0.5" />
                         <div>
-                          <div className="text-xs text-gray-500 mb-1">Attendees</div>
-                          <div className="font-semibold">
+                          <div className="text-xs text-secondary-500 mb-0.5">Attendees</div>
+                          <div className="text-sm font-semibold">
                             {nextSession.attendees.split(',').map((attendee, index) => (
                               <div key={index}>{attendee.trim()}</div>
                             ))}
@@ -299,20 +299,20 @@ const Overview = ({ project, setProject }) => {
                   </div>
 
                   {nextSession.notes && (
-                    <div className="mt-3 text-sm text-gray-600 bg-white bg-opacity-60 p-3 rounded">
+                    <div className="mt-2 text-xs text-secondary-600 bg-white bg-opacity-60 p-2 rounded">
                       {nextSession.notes}
                     </div>
                   )}
                 </div>
 
-                <div className="ml-4 text-center">
-                  <div className="bg-blue-600 text-white rounded-lg px-4 py-3 min-w-[80px]">
-                    <div className="text-3xl font-bold">{daysUntil}</div>
+                <div className="ml-3 text-center">
+                  <div className="bg-primary-600 text-white rounded px-3 py-2 min-w-[60px]">
+                    <div className="text-2xl font-bold">{daysUntil}</div>
                     <div className="text-xs uppercase tracking-wide">
                       {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
                     </div>
                   </div>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
+                  <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium border mt-2 ${getStatusColor(nextSession.status)}`}>
                     {getStatusIcon(nextSession.status)}
                     {nextSession.status}
                   </span>
@@ -325,127 +325,127 @@ const Overview = ({ project, setProject }) => {
       })()}
 
       {/* Project Information and Quick Stats Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Project Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
+          <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Project Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Project Name <span className="text-red-500">*</span></label>
-              <input type="text" value={project.project_name || ''} onChange={(e) => handleChange('project_name', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter project name" />
+              <label className="block text-xs font-medium text-secondary-700 mb-1">Project Name <span className="text-danger-500">*</span></label>
+              <input type="text" value={project.project_name || ''} onChange={(e) => handleChange('project_name', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter project name" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Handover ID <span className="text-red-500">*</span></label>
-              <input type="text" value={project.handover_id || ''} onChange={(e) => handleChange('handover_id', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="HTD-YYYY-XXX" />
+              <label className="block text-xs font-medium text-secondary-700 mb-1">Handover ID <span className="text-danger-500">*</span></label>
+              <input type="text" value={project.handover_id || ''} onChange={(e) => handleChange('handover_id', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="HTD-YYYY-XXX" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">R&D Project Lead</label>
-              <select value={project.rd_lead || ''} onChange={(e) => handleChange('rd_lead', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-secondary-700 mb-1">R&D Project Lead</label>
+              <select value={project.rd_lead || ''} onChange={(e) => handleChange('rd_lead', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select R&D Team Member</option>
                 {teamContacts.filter(contact => contact.department === 'R&D').map(contact => (<option key={contact.id} value={`${contact.name} (${contact.email || contact.role})`}>{contact.name} - {contact.role}</option>))}
               </select>
-              {teamContacts.filter(c => c.department === 'R&D').length === 0 && <p className="text-xs text-amber-600 mt-1">No R&D team members added. Add members in Team Composition below.</p>}
+              {teamContacts.filter(c => c.department === 'R&D').length === 0 && <p className="text-xs text-warning-600 mt-0.5">No R&D team members added.</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Automation Team Lead</label>
-              <select value={project.automation_lead || ''} onChange={(e) => handleChange('automation_lead', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-secondary-700 mb-1">Automation Team Lead</label>
+              <select value={project.automation_lead || ''} onChange={(e) => handleChange('automation_lead', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select Automation Team Member</option>
                 {teamContacts.filter(contact => contact.department === 'Automation').map(contact => (<option key={contact.id} value={`${contact.name} (${contact.email || contact.role})`}>{contact.name} - {contact.role}</option>))}
               </select>
-              {teamContacts.filter(c => c.department === 'Automation').length === 0 && <p className="text-xs text-amber-600 mt-1">No Automation team members added. Add members in Team Composition below.</p>}
+              {teamContacts.filter(c => c.department === 'Automation').length === 0 && <p className="text-xs text-warning-600 mt-0.5">No Automation team members added.</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-              <input type="date" value={project.start_date || ''} onChange={(e) => handleChange('start_date', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-xs font-medium text-secondary-700 mb-1">Start Date</label>
+              <input type="date" value={project.start_date || ''} onChange={(e) => handleChange('start_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Target Completion Date</label>
-              <input type="date" value={project.target_date || ''} onChange={(e) => handleChange('target_date', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-xs font-medium text-secondary-700 mb-1">Target Completion Date</label>
+              <input type="date" value={project.target_date || ''} onChange={(e) => handleChange('target_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">Project Metrics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mt-4 pt-3 border-t border-secondary-200">
+            <h3 className="text-xs font-semibold text-secondary-700 mb-3">Project Metrics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project Priority</label>
-                <select value={project.business_priority || 'Media'} onChange={(e) => handleChange('business_priority', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label className="block text-xs font-medium text-secondary-700 mb-1">Project Priority</label>
+                <select value={project.business_priority || 'Media'} onChange={(e) => handleChange('business_priority', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="Alta">Alta</option>
                   <option value="Media">Media</option>
                   <option value="Bassa">Bassa</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Complexity Level</label>
-                <select value={project.complexity_level || 'Media'} onChange={(e) => handleChange('complexity_level', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label className="block text-xs font-medium text-secondary-700 mb-1">Complexity Level</label>
+                <select value={project.complexity_level || 'Media'} onChange={(e) => handleChange('complexity_level', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="Alta">Alta</option>
                   <option value="Media">Media</option>
                   <option value="Bassa">Bassa</option>
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project Score</label>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 bg-gray-50 px-3 py-2 border border-gray-300 rounded-md text-gray-700 font-semibold">{project.project_score || 0} / 15</div>
+                <label className="block text-xs font-medium text-secondary-700 mb-1">Project Score</label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 bg-secondary-50 px-2.5 py-1.5 border border-secondary-300 rounded text-sm text-secondary-700 font-semibold">{project.project_score || 0} / 15</div>
                   <div className="flex-1">
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className={`h-3 rounded-full transition-all duration-500 ${
-                        (project.project_score || 0) >= 12 ? 'bg-red-500' :
-                        (project.project_score || 0) >= 9 ? 'bg-orange-500' :
-                        (project.project_score || 0) >= 6 ? 'bg-yellow-500' :
-                        'bg-green-500'
+                    <div className="w-full bg-secondary-200 rounded-full h-2">
+                      <div className={`h-2 rounded-full transition-all duration-500 ${
+                        (project.project_score || 0) >= 12 ? 'bg-danger-500' :
+                        (project.project_score || 0) >= 9 ? 'bg-warning-500' :
+                        (project.project_score || 0) >= 6 ? 'bg-warning-600' :
+                        'bg-success-500'
                       }`} style={{ width: `${((project.project_score || 0) / 15) * 100}%` }} />
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Calculated from Priority (weight: 2) and Complexity (weight: 3)</p>
+                <p className="text-xs text-secondary-500 mt-0.5">Calculated from Priority (weight: 2) and Complexity (weight: 3)</p>
               </div>
             </div>
           </div>
         </div>
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{calculateOverallProgress()}%</div>
-              <div className="text-sm text-gray-600">Overall Progress</div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-primary-600 mb-0.5">{calculateOverallProgress()}%</div>
+              <div className="text-xs text-secondary-600">Overall Progress</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-green-600 mb-1">{getCompletedTasksCount()}</div>
-              <div className="text-sm text-gray-600">Tasks Completed</div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-success-600 mb-0.5">{getCompletedTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Tasks Completed</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-yellow-600 mb-1">{getInProgressTasksCount()}</div>
-              <div className="text-sm text-gray-600">Tasks In Progress</div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-warning-600 mb-0.5">{getInProgressTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Tasks In Progress</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="text-2xl font-bold text-gray-600 mb-1">{getNotStartedTasksCount()}</div>
-              <div className="text-sm text-gray-600">Not Started</div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-secondary-600 mb-0.5">{getNotStartedTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Not Started</div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-gray-700" />
-                <h3 className="text-base font-semibold text-gray-900">Team Composition</h3>
+          <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-secondary-700" />
+                <h3 className="text-sm font-semibold text-secondary-900">Team Composition</h3>
               </div>
-              <button onClick={() => setShowAddForm(!showAddForm)} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-                {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              <button onClick={() => setShowAddForm(!showAddForm)} className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-600 text-white text-xs rounded hover:bg-primary-700 transition-colors">
+                {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                 {showAddForm ? 'Cancel' : 'Add Member'}
               </button>
             </div>
             {showAddForm && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 className="font-semibold text-blue-900 mb-3">Add New Team Member</h4>
-                <div className="grid grid-cols-1 gap-3">
+              <div className="bg-primary-50 border border-primary-200 rounded p-3 mb-3">
+                <h4 className="text-sm font-semibold text-primary-900 mb-2">Add New Team Member</h4>
+                <div className="grid grid-cols-1 gap-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
-                    <input type="text" value={newContact.name} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" />
+                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Name <span className="text-danger-500">*</span></label>
+                    <input type="text" value={newContact.name} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Role <span className="text-red-500">*</span></label>
-                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, role: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Project Lead" />
+                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Role <span className="text-danger-500">*</span></label>
+                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Project Lead" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Department <span className="text-red-500">*</span></label>
-                    <select value={newContact.department} onChange={(e) => setNewContact({ ...newContact, department: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Department <span className="text-danger-500">*</span></label>
+                    <select value={newContact.department} onChange={(e) => setNewContact({ ...newContact, department: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                       <option value="">Select Department</option>
                       <option value="R&D">R&D</option>
                       <option value="Automation">Automation</option>
@@ -455,31 +455,31 @@ const Overview = ({ project, setProject }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="john.doe@company.com" />
+                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Email</label>
+                    <input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="john.doe@company.com" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input type="tel" value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="+1-555-0123" />
+                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Phone</label>
+                    <input type="tel" value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="+1-555-0123" />
                   </div>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  <button onClick={handleAddContact} disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Adding...' : 'Add Team Member'}</button>
-                  <button onClick={() => { setShowAddForm(false); setNewContact({ name: '', role: '', department: '', email: '', phone: '' }); }} className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">Cancel</button>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={handleAddContact} disabled={saving} className="px-3 py-1.5 text-sm bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Adding...' : 'Add Team Member'}</button>
+                  <button onClick={() => { setShowAddForm(false); setNewContact({ name: '', role: '', department: '', email: '', phone: '' }); }} className="px-3 py-1.5 text-sm bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors">Cancel</button>
                 </div>
               </div>
             )}
             {loading ? (
-              <div className="text-sm text-gray-500 py-4">Loading team members...</div>
+              <div className="text-xs text-secondary-500 py-3">Loading team members...</div>
             ) : teamContacts.length === 0 ? (
-              <div className="text-sm text-gray-500 py-4">No team members added yet. Click "Add Member" to get started.</div>
+              <div className="text-xs text-secondary-500 py-3">No team members added yet. Click "Add Member" to get started.</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {teamContacts.map((contact) => (
-                  <div key={contact.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 relative group">
+                  <div key={contact.id} className="bg-secondary-50 rounded p-3 border border-secondary-200 relative group">
                     {editingContact === contact.id ? (
                       <div>
-                        <h4 className="font-semibold text-gray-900 mb-3">Edit Team Member</h4>
+                        <h4 className="text-sm font-semibold text-secondary-900 mb-2">Edit Team Member</h4>
                         <div className="space-y-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
@@ -516,18 +516,18 @@ const Overview = ({ project, setProject }) => {
                       </div>
                     ) : (
                       <>
-                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100">
-                          <button onClick={() => handleEditClick(contact)} className="p-1.5 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="Edit team member"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => handleDeleteContact(contact.id)} className="p-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="Remove team member"><Trash2 className="w-4 h-4" /></button>
+                        <div className="absolute top-1.5 right-1.5 flex gap-0.5 opacity-0 group-hover:opacity-100">
+                          <button onClick={() => handleEditClick(contact)} className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-colors" title="Edit team member"><Edit className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteContact(contact.id)} className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-colors" title="Remove team member"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                         <div className="flex items-start justify-between">
-                          <div className="flex-1 pr-8">
-                            <h4 className="font-semibold text-gray-900">{contact.name}</h4>
-                            <p className="text-sm text-gray-600 mt-1">{contact.role}</p>
-                            <div className="mt-2 space-y-1">
-                              <p className="text-sm text-gray-500"><span className="font-medium">Department:</span> {contact.department}</p>
-                              {contact.email && <p className="text-sm text-blue-600"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
-                              {contact.phone && <p className="text-sm text-gray-500">{contact.phone}</p>}
+                          <div className="flex-1 pr-6">
+                            <h4 className="text-sm font-semibold text-secondary-900">{contact.name}</h4>
+                            <p className="text-xs text-secondary-600 mt-0.5">{contact.role}</p>
+                            <div className="mt-1.5 space-y-0.5">
+                              <p className="text-xs text-secondary-500"><span className="font-medium">Department:</span> {contact.department}</p>
+                              {contact.email && <p className="text-xs text-primary-600"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
+                              {contact.phone && <p className="text-xs text-secondary-500">{contact.phone}</p>}
                             </div>
                           </div>
                         </div>
@@ -540,45 +540,45 @@ const Overview = ({ project, setProject }) => {
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Handover Process Overview</h2>
-        <div className="space-y-3">
+      <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
+        <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Handover Process Overview</h2>
+        <div className="space-y-2">
           {phases.map((phase, index) => (
-            <div key={index} className={`p-4 rounded-lg border-2 transition-all ${
-                phase.status === 'complete' ? 'bg-green-50 border-green-200' :
-                phase.status === 'progress' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'
+            <div key={index} className={`p-3 rounded border transition-all ${
+                phase.status === 'complete' ? 'bg-success-50 border-success-200' :
+                phase.status === 'progress' ? 'bg-warning-50 border-warning-200' : 'bg-secondary-50 border-secondary-200'
               }`}>
-              <div className="flex items-start gap-4">
-                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    phase.status === 'complete' ? 'bg-green-500 text-white' :
-                    phase.status === 'progress' ? 'bg-yellow-500 text-white' : 'bg-gray-300 text-gray-600'
+              <div className="flex items-start gap-3">
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    phase.status === 'complete' ? 'bg-success-500 text-white' :
+                    phase.status === 'progress' ? 'bg-warning-500 text-white' : 'bg-secondary-300 text-secondary-600'
                   }`}>
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900">{phase.name}</h3>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-blue-600">{phase.progress}%</span>
-                      <span className="text-sm text-gray-500">{phase.duration}</span>
-                      {phase.status === 'complete' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                      {phase.status === 'progress' && <Clock className="w-5 h-5 text-yellow-500" />}
+                  <div className="flex items-center justify-between mb-1.5">
+                    <h3 className="text-sm font-semibold text-secondary-900">{phase.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-primary-600">{phase.progress}%</span>
+                      <span className="text-xs text-secondary-500">{phase.duration}</span>
+                      {phase.status === 'complete' && <CheckCircle className="w-4 h-4 text-success-500" />}
+                      {phase.status === 'progress' && <Clock className="w-4 h-4 text-warning-500" />}
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                    <div className={`h-2 rounded-full transition-all duration-500 ${
-                        phase.status === 'complete' ? 'bg-green-500' :
-                        phase.status === 'progress' ? 'bg-yellow-500' : 'bg-gray-400'
+                  <div className="w-full bg-secondary-200 rounded-full h-1.5 mb-2">
+                    <div className={`h-1.5 rounded-full transition-all duration-500 ${
+                        phase.status === 'complete' ? 'bg-success-500' :
+                        phase.status === 'progress' ? 'bg-warning-500' : 'bg-secondary-400'
                       }`} style={{ width: `${phase.progress}%` }} />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="font-medium text-gray-700">Key Activities:</span>
-                      <p className="text-gray-600 mt-1">{phase.activities}</p>
+                      <span className="font-medium text-secondary-700">Key Activities:</span>
+                      <p className="text-secondary-600 mt-0.5">{phase.activities}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Success Criteria:</span>
-                      <p className="text-gray-600 mt-1">{phase.criteria}</p>
+                      <span className="font-medium text-secondary-700">Success Criteria:</span>
+                      <p className="text-secondary-600 mt-0.5">{phase.criteria}</p>
                     </div>
                   </div>
                 </div>

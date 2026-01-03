@@ -720,7 +720,7 @@ const Assessment = ({ projectId }) => {
   };
 
   const getScoreColor = (score) => {
-    if (!score) return 'bg-gray-100 text-gray-600';
+    if (!score) return 'bg-gray-100 text-secondary-600';
     if (score >= 4) return 'bg-green-100 text-green-800';
     if (score >= 3) return 'bg-yellow-100 text-yellow-800';
     return 'bg-red-100 text-red-800';
@@ -830,15 +830,15 @@ const Assessment = ({ projectId }) => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Assessment Criteria?</h3>
-                <p className="text-sm text-gray-500">This action cannot be undone</p>
+                <h3 className="text-lg font-semibold text-secondary-900">Delete Assessment Criteria?</h3>
+                <p className="text-sm text-secondary-500">This action cannot be undone</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
-              <p className="font-semibold text-gray-900">{itemToDelete?.criteria}</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="font-semibold text-secondary-900">{itemToDelete?.criteria}</p>
+              <p className="text-sm text-secondary-600 mt-1">
                 Phase: {itemToDelete?.phase} | Category: {itemToDelete?.category}
               </p>
             </div>
@@ -846,7 +846,7 @@ const Assessment = ({ projectId }) => {
             <div className="flex gap-3">
               <button
                 onClick={handleDeleteCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
@@ -871,15 +871,15 @@ const Assessment = ({ projectId }) => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Entire Category?</h3>
-                <p className="text-sm text-gray-500">This will delete all items in this category</p>
+                <h3 className="text-lg font-semibold text-secondary-900">Delete Entire Category?</h3>
+                <p className="text-sm text-secondary-500">This will delete all items in this category</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
-              <p className="font-semibold text-gray-900">{categoryToDelete?.category}</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="font-semibold text-secondary-900">{categoryToDelete?.category}</p>
+              <p className="text-sm text-secondary-600 mt-1">
                 Phase: {categoryToDelete?.phase}
               </p>
               <p className="text-sm text-red-600 mt-2 font-medium">
@@ -892,7 +892,7 @@ const Assessment = ({ projectId }) => {
             <div className="flex gap-3">
               <button
                 onClick={handleDeleteCategoryCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
@@ -912,8 +912,8 @@ const Assessment = ({ projectId }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Project Readiness Assessment</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-lg font-semibold text-secondary-900">Project Readiness Assessment</h2>
+            <p className="text-sm text-secondary-600 mt-1">
               Comprehensive evaluation across all handover phases
             </p>
           </div>
@@ -938,7 +938,7 @@ const Assessment = ({ projectId }) => {
             <div className={`text-4xl font-bold ${readiness.color} mb-1`}>
               {overallScore}%
             </div>
-            <div className="text-sm text-gray-600">Overall Readiness</div>
+            <div className="text-sm text-secondary-600">Overall Readiness</div>
           </div>
 
           {phases.map(phaseInfo => {
@@ -949,12 +949,12 @@ const Assessment = ({ projectId }) => {
               <div key={phaseInfo.id} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-2">
                   <Target className="w-6 h-6 text-gray-400" />
-                  <span className="text-xs font-semibold text-gray-500">{phaseInfo.weight}% weight</span>
+                  <span className="text-xs font-semibold text-secondary-500">{phaseInfo.weight}% weight</span>
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">
+                <div className="text-3xl font-bold text-secondary-900 mb-1">
                   {phaseScore}%
                 </div>
-                <div className="text-sm text-gray-600">{phaseInfo.name.split(':')[0]}</div>
+                <div className="text-sm text-secondary-600">{phaseInfo.name.split(':')[0]}</div>
               </div>
             );
           })}
@@ -962,7 +962,7 @@ const Assessment = ({ projectId }) => {
 
         {/* Readiness Scale */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold text-gray-900 mb-3 text-sm">Readiness Level Classification:</h3>
+          <h3 className="font-semibold text-secondary-900 mb-3 text-sm">Readiness Level Classification:</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -1003,7 +1003,7 @@ const Assessment = ({ projectId }) => {
               className={`bg-gradient-to-r ${getPhaseColor(phaseInfo.color)} p-6 cursor-pointer group`}
               onClick={() => togglePhase(phaseInfo.id)}
             >
-              <div className="flex items-center justify-between text-gray-900">
+              <div className="flex items-center justify-between text-secondary-900">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     {editingPhaseId === phaseInfo.id ? (
@@ -1012,7 +1012,7 @@ const Assessment = ({ projectId }) => {
                           type="text"
                           value={editingPhaseText}
                           onChange={(e) => setEditingPhaseText(e.target.value)}
-                          className="flex-1 px-4 py-2 text-gray-900 border-2 border-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                          className="flex-1 px-4 py-2 text-secondary-900 border-2 border-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                           autoFocus
                           placeholder="Enter phase name..."
                           onKeyDown={(e) => {
@@ -1057,7 +1057,7 @@ const Assessment = ({ projectId }) => {
                     )}
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
-                    <p className="text-sm mt-1 text-gray-700">
+                    <p className="text-sm mt-1 text-secondary-700">
                       {phaseItems.filter(i => i.score !== null && i.score > 0).length} of {phaseItems.length} scored • {phaseInfo.weight}% of total
                     </p>
                   )}
@@ -1141,8 +1141,8 @@ const Assessment = ({ projectId }) => {
                               </div>
                             ) : (
                               <>
-                                <h3 className="font-semibold text-gray-900">{category}</h3>
-                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                <h3 className="font-semibold text-secondary-900">{category}</h3>
+                                <span className="text-xs text-secondary-500 bg-gray-100 px-2 py-1 rounded">
                                   {categoryWeight}% weight
                                 </span>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1172,7 +1172,7 @@ const Assessment = ({ projectId }) => {
                           </div>
                           
                           <div className="flex items-center gap-4">
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="text-sm font-medium text-secondary-600">
                               {categoryItems.filter(i => i.score !== null && i.score > 0).length}/{categoryItems.length} scored
                             </span>
                             <div className="flex items-center gap-2">
@@ -1182,7 +1182,7 @@ const Assessment = ({ projectId }) => {
                                   style={{ width: `${categoryScore}%` }}
                                 />
                               </div>
-                              <span className="text-sm font-bold text-gray-900 w-12 text-right">
+                              <span className="text-sm font-bold text-secondary-900 w-12 text-right">
                                 {categoryScore}%
                               </span>
                             </div>
@@ -1229,7 +1229,7 @@ const Assessment = ({ projectId }) => {
                                   <div className="flex items-center gap-3">
                                     {/* Criteria and Score in one line */}
                                     <div className="flex-1 flex items-center gap-3 min-w-0">
-                                      <h4 className="text-sm text-gray-900 flex-1 truncate" title={item.criteria}>
+                                      <h4 className="text-sm text-secondary-900 flex-1 truncate" title={item.criteria}>
                                         {item.criteria}
                                       </h4>
 
@@ -1285,7 +1285,7 @@ const Assessment = ({ projectId }) => {
                                   {/* Evidence/Notes - Compact */}
                                   {item.evidence && (
                                     <div className="mt-1 ml-0">
-                                      <p className="text-xs text-gray-600 italic">{item.evidence}</p>
+                                      <p className="text-xs text-secondary-600 italic">{item.evidence}</p>
                                     </div>
                                   )}
                                   {!item.evidence && (

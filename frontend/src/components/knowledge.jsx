@@ -212,13 +212,13 @@ const Knowledge = ({ projectId }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Completed':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-success-100 text-success-800 border-success-300';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-primary-100 text-primary-800 border-primary-300';
       case 'Cancelled':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-danger-100 text-danger-800 border-danger-300';
       default:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-warning-100 text-warning-800 border-warning-300';
     }
   };
 
@@ -320,7 +320,7 @@ const Knowledge = ({ projectId }) => {
 
       // Determine background color based on day type
       let bgColor = 'bg-white hover:bg-gray-50';
-      let textColor = 'text-gray-700';
+      let textColor = 'text-secondary-700';
 
       if (isToday) {
         bgColor = 'bg-blue-50 border-blue-300';
@@ -353,7 +353,7 @@ const Knowledge = ({ projectId }) => {
                 className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs p-2 rounded hover:from-blue-100 hover:to-indigo-100 transition-colors cursor-pointer"
                 onClick={() => openEditModal(session)}
               >
-                <div className="font-semibold text-gray-900 truncate mb-1">{session.session_topic}</div>
+                <div className="font-semibold text-secondary-900 truncate mb-1">{session.session_topic}</div>
                 <div className="flex items-center gap-1 text-blue-600">
                   {session.start_time && (
                     <>
@@ -362,7 +362,7 @@ const Knowledge = ({ projectId }) => {
                     </>
                   )}
                   {session.start_time && session.duration && <span className="text-gray-400">•</span>}
-                  {session.duration && <span className="text-gray-700">{session.duration} h</span>}
+                  {session.duration && <span className="text-secondary-700">{session.duration} h</span>}
                 </div>
               </div>
             ))}
@@ -398,10 +398,10 @@ const Knowledge = ({ projectId }) => {
     }
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded shadow-sm border border-gray-200 p-6">
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-secondary-900">
             {monthNames[month]} {year}
           </h2>
           <div className="flex items-center gap-2">
@@ -430,22 +430,22 @@ const Knowledge = ({ projectId }) => {
         <div className="flex items-center gap-4 mb-4 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-4 h-4 bg-blue-50 border border-blue-300 rounded"></div>
-            <span className="text-gray-600">Today</span>
+            <span className="text-secondary-600">Today</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-4 h-4 bg-orange-50 border border-gray-200 rounded"></div>
-            <span className="text-gray-600">Sunday</span>
+            <span className="text-secondary-600">Sunday</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-4 h-4 bg-red-50 border border-gray-200 rounded"></div>
-            <span className="text-gray-600">Bank Holiday</span>
+            <span className="text-secondary-600">Bank Holiday</span>
           </div>
         </div>
 
         {/* Day Names */}
         <div className="grid grid-cols-7 gap-0 mb-2">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-            <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+            <div key={day} className="text-center font-semibold text-secondary-600 text-sm py-2">
               {day}
             </div>
           ))}
@@ -465,12 +465,12 @@ const Knowledge = ({ projectId }) => {
     );
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">All Sessions</h2>
+      <div className="bg-white rounded shadow-sm border border-gray-200 p-6">
+        <h2 className="text-sm font-semibold text-secondary-900 mb-4">All Sessions</h2>
         {sortedSessions.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-secondary-500">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg font-medium">No knowledge transfer sessions scheduled yet</p>
+            <p className="text-sm font-medium">No knowledge transfer sessions scheduled yet</p>
             <p className="text-sm mt-2">Click "Add Session" to schedule your first knowledge transfer session</p>
           </div>
         ) : (
@@ -478,15 +478,15 @@ const Knowledge = ({ projectId }) => {
             {sortedSessions.map(session => (
               <div
                 key={session.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-start gap-3 mb-3">
                       <BookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-lg">{session.session_topic}</h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                        <h3 className="font-semibold text-secondary-900 text-sm">{session.session_topic}</h3>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-secondary-600">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {new Date(session.scheduled_date).toLocaleDateString()}
@@ -512,7 +512,7 @@ const Knowledge = ({ projectId }) => {
                       </span>
                       {session.effectiveness_rating && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs text-gray-600 mr-1">Effectiveness:</span>
+                          <span className="text-xs text-secondary-600 mr-1">Effectiveness:</span>
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
@@ -526,7 +526,7 @@ const Knowledge = ({ projectId }) => {
                     </div>
 
                     {session.notes && (
-                      <p className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                      <p className="mt-3 text-sm text-secondary-600 bg-gray-50 p-3 rounded">
                         {session.notes}
                       </p>
                     )}
@@ -569,22 +569,22 @@ const Knowledge = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header with Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Knowledge Transfer</h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <h1 className="text-base font-bold text-secondary-900">Knowledge Transfer</h1>
+            <p className="text-xs text-secondary-600 mt-0.5">
               Schedule and track knowledge transfer sessions between teams
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-gray-100 rounded p-1">
               <button
                 onClick={() => setViewMode('calendar')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  viewMode === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'
                 }`}
               >
                 <Calendar className="w-4 h-4 inline mr-2" />
@@ -593,7 +593,7 @@ const Knowledge = ({ projectId }) => {
               <button
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'
                 }`}
               >
                 <BookOpen className="w-4 h-4 inline mr-2" />
@@ -602,7 +602,7 @@ const Knowledge = ({ projectId }) => {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Session
@@ -612,31 +612,31 @@ const Knowledge = ({ projectId }) => {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-blue-600">{sessions.length}</div>
-          <div className="text-sm text-gray-600">Total Sessions</div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+          <div className="text-xl font-bold text-primary-600">{sessions.length}</div>
+          <div className="text-xs text-secondary-600">Total Sessions</div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-green-600">
+        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+          <div className="text-xl font-bold text-success-600">
             {sessions.filter(s => s.status === 'Completed').length}
           </div>
-          <div className="text-sm text-gray-600">Completed</div>
+          <div className="text-xs text-secondary-600">Completed</div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-yellow-600">
+        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+          <div className="text-xl font-bold text-warning-600">
             {sessions.filter(s => s.status === 'Scheduled').length}
           </div>
-          <div className="text-sm text-gray-600">Scheduled</div>
+          <div className="text-xs text-secondary-600">Scheduled</div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+          <div className="text-xl font-bold text-primary-600">
             {sessions.filter(s => s.effectiveness_rating).length > 0
               ? (sessions.filter(s => s.effectiveness_rating).reduce((acc, s) => acc + s.effectiveness_rating, 0) /
                  sessions.filter(s => s.effectiveness_rating).length).toFixed(1)
               : 'N/A'}
           </div>
-          <div className="text-sm text-gray-600">Avg Rating</div>
+          <div className="text-xs text-secondary-600">Avg Rating</div>
         </div>
       </div>
 
@@ -647,13 +647,13 @@ const Knowledge = ({ projectId }) => {
         const progressPercentage = totalSessions > 0 ? (completedSessions / totalSessions) * 100 : 0;
 
         return (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="bg-white rounded shadow-sm border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <h3 className="text-sm font-semibold text-gray-900">Knowledge Transfer Progress</h3>
+                <h3 className="text-sm font-semibold text-secondary-900">Knowledge Transfer Progress</h3>
               </div>
-              <span className="text-sm font-bold text-gray-900">
+              <span className="text-sm font-bold text-secondary-900">
                 {completedSessions} / {totalSessions} Sessions
               </span>
             </div>
@@ -669,7 +669,7 @@ const Knowledge = ({ projectId }) => {
                 )}
               </div>
               {progressPercentage <= 10 && progressPercentage > 0 && (
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-secondary-700">
                   {progressPercentage.toFixed(0)}%
                 </span>
               )}
@@ -692,30 +692,30 @@ const Knowledge = ({ projectId }) => {
           const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
 
           return (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-4">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded shadow-sm border border-blue-200 p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Next Incoming Event</h3>
+                    <h3 className="text-sm font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">{nextSession.session_topic}</h2>
+                  <h2 className="text-base font-bold text-secondary-900 mb-3">{nextSession.session_topic}</h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2 text-gray-700">
+                    <div className="flex items-center gap-2 text-secondary-700">
                       <Calendar className="w-4 h-4 text-blue-600" />
                       <div>
-                        <div className="text-xs text-gray-500">Date</div>
+                        <div className="text-xs text-secondary-500">Date</div>
                         <div className="font-semibold">
                           {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-gray-700">
+                    <div className="flex items-center gap-2 text-secondary-700">
                       <Clock className="w-4 h-4 text-blue-600" />
                       <div>
-                        <div className="text-xs text-gray-500">Time & Duration</div>
+                        <div className="text-xs text-secondary-500">Time & Duration</div>
                         <div className="font-semibold">
                           {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
                           {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
@@ -725,10 +725,10 @@ const Knowledge = ({ projectId }) => {
                     </div>
 
                     {nextSession.attendees && (
-                      <div className="flex items-start gap-2 text-gray-700">
+                      <div className="flex items-start gap-2 text-secondary-700">
                         <Users className="w-4 h-4 text-blue-600 mt-1" />
                         <div>
-                          <div className="text-xs text-gray-500 mb-1">Attendees</div>
+                          <div className="text-xs text-secondary-500 mb-1">Attendees</div>
                           <div className="font-semibold">
                             {nextSession.attendees.split(',').map((attendee, index) => (
                               <div key={index}>{attendee.trim()}</div>
@@ -740,14 +740,14 @@ const Knowledge = ({ projectId }) => {
                   </div>
 
                   {nextSession.notes && (
-                    <div className="mt-3 text-sm text-gray-600 bg-white bg-opacity-60 p-3 rounded">
+                    <div className="mt-3 text-sm text-secondary-600 bg-white bg-opacity-60 p-3 rounded">
                       {nextSession.notes}
                     </div>
                   )}
                 </div>
 
                 <div className="ml-4 text-center">
-                  <div className="bg-blue-600 text-white rounded-lg px-4 py-3 min-w-[80px]">
+                  <div className="bg-blue-600 text-white rounded px-4 py-3 min-w-[80px]">
                     <div className="text-3xl font-bold">{daysUntil}</div>
                     <div className="text-xs uppercase tracking-wide">
                       {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
@@ -771,17 +771,17 @@ const Knowledge = ({ projectId }) => {
       {/* Add Session Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+          <div className="bg-white rounded shadow-xl max-w-2xl w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Add New Session</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-sm font-semibold text-secondary-900">Add New Session</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-secondary-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Session Topic <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -795,7 +795,7 @@ const Knowledge = ({ projectId }) => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">
                     Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -806,7 +806,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Start Time</label>
                   <input
                     type="time"
                     value={newSession.start_time}
@@ -815,7 +815,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Duration</label>
                   <input
                     type="text"
                     value={newSession.duration}
@@ -827,12 +827,12 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Attendees</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-2">Attendees</label>
 
                 {/* Team Members */}
                 {teamContacts.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-gray-600 mb-1 font-medium">Team Members</div>
+                    <div className="text-xs text-secondary-600 mb-1 font-medium">Team Members</div>
                     <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
                       <div className="space-y-2">
                         {teamContacts.map(contact => (
@@ -844,8 +844,8 @@ const Knowledge = ({ projectId }) => {
                               className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                             <div className="flex-1">
-                              <div className="font-medium text-gray-900">{contact.name}</div>
-                              <div className="text-xs text-gray-500">{contact.role} • {contact.department}</div>
+                              <div className="font-medium text-secondary-900">{contact.name}</div>
+                              <div className="text-xs text-secondary-500">{contact.role} • {contact.department}</div>
                             </div>
                           </label>
                         ))}
@@ -856,7 +856,7 @@ const Knowledge = ({ projectId }) => {
 
                 {/* Custom Attendees */}
                 <div>
-                  <div className="text-xs text-gray-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="text-xs text-secondary-600 mb-1 font-medium">Add Custom Attendee</div>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -869,7 +869,7 @@ const Knowledge = ({ projectId }) => {
                     <button
                       type="button"
                       onClick={addCustomAttendee}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors text-sm font-medium"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -879,7 +879,7 @@ const Knowledge = ({ projectId }) => {
                 {/* Selected Attendees */}
                 {selectedAttendees.length > 0 && (
                   <div className="mt-3">
-                    <div className="text-xs text-gray-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="text-xs text-secondary-600 mb-2 font-medium">Selected Attendees</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedAttendees.map((attendee, index) => (
                         <span
@@ -901,7 +901,7 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Notes</label>
                 <textarea
                   value={newSession.notes}
                   onChange={(e) => setNewSession({ ...newSession, notes: e.target.value })}
@@ -915,13 +915,13 @@ const Knowledge = ({ projectId }) => {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddSession}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
                 Add Session
               </button>
@@ -933,17 +933,17 @@ const Knowledge = ({ projectId }) => {
       {/* Edit Session Modal */}
       {showEditModal && editingSession && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Edit Session</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-sm font-semibold text-secondary-900">Edit Session</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-secondary-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
                   Session Topic <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -957,7 +957,7 @@ const Knowledge = ({ projectId }) => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">
                     Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -968,7 +968,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Start Time</label>
                   <input
                     type="time"
                     value={editingSession.start_time || ''}
@@ -977,7 +977,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                  <label className="block text-sm font-medium text-secondary-700 mb-1">Duration</label>
                   <input
                     type="text"
                     value={editingSession.duration || ''}
@@ -989,12 +989,12 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Attendees</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-2">Attendees</label>
 
                 {/* Team Members */}
                 {teamContacts.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-gray-600 mb-1 font-medium">Team Members</div>
+                    <div className="text-xs text-secondary-600 mb-1 font-medium">Team Members</div>
                     <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
                       <div className="space-y-2">
                         {teamContacts.map(contact => (
@@ -1006,8 +1006,8 @@ const Knowledge = ({ projectId }) => {
                               className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                             <div className="flex-1">
-                              <div className="font-medium text-gray-900">{contact.name}</div>
-                              <div className="text-xs text-gray-500">{contact.role} • {contact.department}</div>
+                              <div className="font-medium text-secondary-900">{contact.name}</div>
+                              <div className="text-xs text-secondary-500">{contact.role} • {contact.department}</div>
                             </div>
                           </label>
                         ))}
@@ -1018,7 +1018,7 @@ const Knowledge = ({ projectId }) => {
 
                 {/* Custom Attendees */}
                 <div>
-                  <div className="text-xs text-gray-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="text-xs text-secondary-600 mb-1 font-medium">Add Custom Attendee</div>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -1031,7 +1031,7 @@ const Knowledge = ({ projectId }) => {
                     <button
                       type="button"
                       onClick={addEditCustomAttendee}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors text-sm font-medium"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -1041,7 +1041,7 @@ const Knowledge = ({ projectId }) => {
                 {/* Selected Attendees */}
                 {editSelectedAttendees.length > 0 && (
                   <div className="mt-3">
-                    <div className="text-xs text-gray-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="text-xs text-secondary-600 mb-2 font-medium">Selected Attendees</div>
                     <div className="flex flex-wrap gap-2">
                       {editSelectedAttendees.map((attendee, index) => (
                         <span
@@ -1063,7 +1063,7 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
                 <select
                   value={editingSession.status}
                   onChange={(e) => setEditingSession({ ...editingSession, status: e.target.value })}
@@ -1077,7 +1077,7 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
                   Effectiveness Rating
                 </label>
                 <div className="flex items-center gap-2">
@@ -1099,7 +1099,7 @@ const Knowledge = ({ projectId }) => {
                   {editingSession.effectiveness_rating && (
                     <button
                       onClick={() => setEditingSession({ ...editingSession, effectiveness_rating: null })}
-                      className="ml-2 text-sm text-gray-500 hover:text-gray-700"
+                      className="ml-2 text-sm text-secondary-500 hover:text-secondary-700"
                     >
                       Clear
                     </button>
@@ -1108,7 +1108,7 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Notes</label>
                 <textarea
                   value={editingSession.notes || ''}
                   onChange={(e) => setEditingSession({ ...editingSession, notes: e.target.value })}
@@ -1126,7 +1126,7 @@ const Knowledge = ({ projectId }) => {
                   setShowDeleteModal(true);
                   setShowEditModal(false);
                 }}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete Session
@@ -1134,13 +1134,13 @@ const Knowledge = ({ projectId }) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateSession}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -1153,21 +1153,21 @@ const Knowledge = ({ projectId }) => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && sessionToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="bg-white rounded shadow-xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Session?</h3>
-                <p className="text-sm text-gray-500">This action cannot be undone</p>
+                <h3 className="text-sm font-semibold text-secondary-900">Delete Session?</h3>
+                <p className="text-sm text-secondary-500">This action cannot be undone</p>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">You are about to delete:</p>
-              <p className="font-semibold text-gray-900">{sessionToDelete.session_topic}</p>
-              <p className="text-sm text-gray-600">
+            <div className="bg-gray-50 rounded p-4 mb-4">
+              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="font-semibold text-secondary-900">{sessionToDelete.session_topic}</p>
+              <p className="text-sm text-secondary-600">
                 {new Date(sessionToDelete.scheduled_date).toLocaleDateString()}
               </p>
             </div>
@@ -1175,13 +1175,13 @@ const Knowledge = ({ projectId }) => {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteSession}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
