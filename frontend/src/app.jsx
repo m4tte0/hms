@@ -166,7 +166,13 @@ function App() {
       const now = new Date();
       setLastSaved(now);
       setSaveStatus('saved');
-      setTimeout(() => loadProjects(true), 500);
+
+      // Update the projects array with the current edited project
+      // This ensures changes persist when switching between projects
+      setProjects(prev => prev.map(p =>
+        p.id === currentProject.id ? currentProject : p
+      ));
+
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (error) {
       console.error('❌ Save failed:', error);
