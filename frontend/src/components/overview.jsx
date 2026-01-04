@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { teamContactsAPI, checklistAPI, issuesAPI, phaseNamesAPI } from '../services/api';
 
 const Overview = ({ project, setProject }) => {
@@ -135,11 +135,32 @@ const Overview = ({ project, setProject }) => {
   const handleDeleteContact = async (contactId) => {
     if (!confirm('Are you sure you want to remove this team member?')) return;
     try {
+      // Check if the deleted member is a lead
+      const memberToDelete = teamContacts.find(c => c.id === contactId);
+      if (memberToDelete) {
+        const memberIdentifier = `${memberToDelete.name} (${memberToDelete.role})`;
+        if (project.rd_lead === memberIdentifier && memberToDelete.department === 'R&D') {
+          handleChange('rd_lead', '');
+        }
+        if (project.automation_lead === memberIdentifier && memberToDelete.department === 'Automation') {
+          handleChange('automation_lead', '');
+        }
+      }
+
       await teamContactsAPI.deleteContact(project.id, contactId);
       await loadTeamContacts();
     } catch (error) {
       console.error('Error deleting team contact:', error);
       alert('Failed to delete team member');
+    }
+  };
+
+  const handleSetAsLead = (contact) => {
+    const memberIdentifier = `${contact.name} (${contact.role})`;
+    if (contact.department === 'R&D') {
+      handleChange('rd_lead', memberIdentifier);
+    } else if (contact.department === 'Automation') {
+      handleChange('automation_lead', memberIdentifier);
     }
   };
 
@@ -208,6 +229,12 @@ const Overview = ({ project, setProject }) => {
       handleTextareaResize(contextUsageRef.current);
     }
   }, [project?.description, project?.context_usage, showProjectDetails]);
+
+  // Close add/edit forms when switching projects
+  useEffect(() => {
+    setShowAddForm(false);
+    setEditingContact(null);
+  }, [project?.id]);
 
   const calculatePhaseStatus = (phaseId) => {
     const phaseItems = checklistItems.filter(item => item.phase === phaseId);
@@ -458,19 +485,45 @@ const Overview = ({ project, setProject }) => {
             </div>
             <div>
               <label className="block text-xs font-medium text-secondary-700 mb-1">R&D Project Lead</label>
-              <select value={project.rd_lead || ''} onChange={(e) => handleChange('rd_lead', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="">Select R&D Team Member</option>
-                {teamContacts.filter(contact => contact.department === 'R&D').map(contact => (<option key={contact.id} value={`${contact.name} (${contact.email || contact.role})`}>{contact.name} - {contact.role}</option>))}
-              </select>
-              {teamContacts.filter(c => c.department === 'R&D').length === 0 && <p className="text-xs text-warning-600 mt-0.5">No R&D team members added.</p>}
+              {project.rd_lead ? (
+                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
+                  <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-secondary-900">
+                      {project.rd_lead.split(' (')[0]}
+                    </span>
+                    <span className="text-xs text-secondary-600">
+                      {project.rd_lead.match(/\(([^)]+)\)/)?.[1] || ''}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
+                  <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                  <span className="text-xs text-warning-700">No R&D team lead assigned</span>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-secondary-700 mb-1">Automation Team Lead</label>
-              <select value={project.automation_lead || ''} onChange={(e) => handleChange('automation_lead', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="">Select Automation Team Member</option>
-                {teamContacts.filter(contact => contact.department === 'Automation').map(contact => (<option key={contact.id} value={`${contact.name} (${contact.email || contact.role})`}>{contact.name} - {contact.role}</option>))}
-              </select>
-              {teamContacts.filter(c => c.department === 'Automation').length === 0 && <p className="text-xs text-warning-600 mt-0.5">No Automation team members added.</p>}
+              {project.automation_lead ? (
+                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
+                  <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-secondary-900">
+                      {project.automation_lead.split(' (')[0]}
+                    </span>
+                    <span className="text-xs text-secondary-600">
+                      {project.automation_lead.match(/\(([^)]+)\)/)?.[1] || ''}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
+                  <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                  <span className="text-xs text-warning-700">No Automation team lead assigned</span>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-secondary-700 mb-1">Start Date</label>
@@ -560,7 +613,7 @@ const Overview = ({ project, setProject }) => {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-secondary-700 mb-0.5">Role <span className="text-danger-500">*</span></label>
-                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Project Lead" />
+                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, role: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Project Lead" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-secondary-700 mb-0.5">Department <span className="text-danger-500">*</span></label>
@@ -568,9 +621,6 @@ const Overview = ({ project, setProject }) => {
                       <option value="">Select Department</option>
                       <option value="R&D">R&D</option>
                       <option value="Automation">Automation</option>
-                      <option value="QA">QA</option>
-                      <option value="Operations">Operations</option>
-                      <option value="Management">Management</option>
                     </select>
                   </div>
                   <div>
@@ -614,9 +664,6 @@ const Overview = ({ project, setProject }) => {
                               <option value="">Select Department</option>
                               <option value="R&D">R&D</option>
                               <option value="Automation">Automation</option>
-                              <option value="QA">QA</option>
-                              <option value="Operations">Operations</option>
-                              <option value="Management">Management</option>
                             </select>
                           </div>
                           <div>
@@ -635,21 +682,43 @@ const Overview = ({ project, setProject }) => {
                       </div>
                     ) : (
                       <>
-                        <div className="absolute top-1.5 right-1.5 flex gap-0.5 opacity-0 group-hover:opacity-100">
-                          <button onClick={() => handleEditClick(contact)} className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-colors" title="Edit team member"><Edit className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteContact(contact.id)} className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-colors" title="Remove team member"><Trash2 className="w-3.5 h-3.5" /></button>
-                        </div>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 pr-6">
-                            <h4 className="text-sm font-semibold text-secondary-900">{contact.name}</h4>
-                            <p className="text-xs text-secondary-600 mt-0.5">{contact.role}</p>
-                            <div className="mt-1.5 space-y-0.5">
-                              <p className="text-xs text-secondary-500"><span className="font-medium">Department:</span> {contact.department}</p>
-                              {contact.email && <p className="text-xs text-primary-600"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
-                              {contact.phone && <p className="text-xs text-secondary-500">{contact.phone}</p>}
-                            </div>
-                          </div>
-                        </div>
+                        {(() => {
+                          const memberIdentifier = `${contact.name} (${contact.role})`;
+                          const isRDLead = contact.department === 'R&D' && project.rd_lead === memberIdentifier;
+                          const isAutomationLead = contact.department === 'Automation' && project.automation_lead === memberIdentifier;
+                          const isLead = isRDLead || isAutomationLead;
+
+                          return (
+                            <>
+                              <div className="absolute top-1.5 right-1.5 flex gap-0.5">
+                                <button
+                                  onClick={() => handleSetAsLead(contact)}
+                                  className={`p-1 rounded transition-all ${
+                                    isLead
+                                      ? 'bg-warning-100 text-warning-600 hover:bg-warning-200 opacity-100'
+                                      : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200 opacity-0 group-hover:opacity-100'
+                                  }`}
+                                  title={isLead ? `Current ${contact.department} Lead` : `Set as ${contact.department} Lead`}
+                                >
+                                  <Star className={`w-3.5 h-3.5 ${isLead ? 'fill-warning-600' : ''}`} />
+                                </button>
+                                <button onClick={() => handleEditClick(contact)} className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-all opacity-0 group-hover:opacity-100" title="Edit team member"><Edit className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => handleDeleteContact(contact.id)} className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-all opacity-0 group-hover:opacity-100" title="Remove team member"><Trash2 className="w-3.5 h-3.5" /></button>
+                              </div>
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1 pr-6">
+                                  <h4 className="text-sm font-semibold text-secondary-900">{contact.name}</h4>
+                                  <p className="text-xs text-secondary-600 mt-0.5">{contact.role}</p>
+                                  <div className="mt-1.5 space-y-0.5">
+                                    <p className="text-xs text-secondary-500"><span className="font-medium">Department:</span> {contact.department}</p>
+                                    {contact.email && <p className="text-xs text-primary-600"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
+                                    {contact.phone && <p className="text-xs text-secondary-500">{contact.phone}</p>}
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </>
                     )}
                   </div>
