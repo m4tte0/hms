@@ -304,6 +304,45 @@ const StatusReport = ({ projectId, onClose }) => {
                   </div>
                 </div>
 
+                {/* Project Details */}
+                <div className="bg-white p-3 rounded-lg border-l-4 border-purple-600 shadow-sm">
+                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
+                    <div className="w-1.5 h-1.5 bg-purple-600 rounded-full mr-2"></div>
+                    Project Details
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Machine Family</span>
+                      <p className="font-medium text-secondary-900">{project.machine_family || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Deliverable</span>
+                      <p className="font-medium text-secondary-900">
+                        {project.deliverable ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">
+                            <CheckCircle className="w-3 h-3" />
+                            Yes (Voce a Listino)
+                          </span>
+                        ) : (
+                          <span className="text-secondary-600">No</span>
+                        )}
+                      </p>
+                    </div>
+                    {project.description && (
+                      <div>
+                        <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Description</span>
+                        <p className="text-xs text-secondary-700 leading-relaxed">{project.description}</p>
+                      </div>
+                    )}
+                    {project.context_usage && (
+                      <div>
+                        <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Context and Usage</span>
+                        <p className="text-xs text-secondary-700 leading-relaxed">{project.context_usage}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Leadership */}
                 <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-600 shadow-sm">
                   <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
