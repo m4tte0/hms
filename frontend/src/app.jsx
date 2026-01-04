@@ -68,7 +68,7 @@ function App() {
       console.log('✅ Projects loaded:', data);
 
       const sortedData = data.sort((a, b) =>
-        new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
+        new Date(a.created_at) - new Date(b.created_at)
       );
 
       setProjects(sortedData);
