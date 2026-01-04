@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp, Star } from 'lucide-react';
-import { teamContactsAPI, checklistAPI, issuesAPI, phaseNamesAPI } from '../services/api';
+import { teamContactsAPI, checklistAPI, issuesAPI, phaseNamesAPI, phaseDatesAPI } from '../services/api';
 
 const Overview = ({ project, setProject }) => {
   const [teamContacts, setTeamContacts] = useState([]);
@@ -23,6 +23,9 @@ const Overview = ({ project, setProject }) => {
     'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
     'Phase 3': 'Phase 3: Final Sign-Offs'
   });
+  const [phaseDates, setPhaseDates] = useState({});
+  const [editingPhase, setEditingPhase] = useState(null);
+  const [phaseEditData, setPhaseEditData] = useState({ startDate: '', endDate: '' });
   const [newContact, setNewContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
   const [editContact, setEditContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
   const [saving, setSaving] = useState(false);
@@ -53,6 +56,7 @@ const Overview = ({ project, setProject }) => {
       loadIssues();
       loadSessions();
       loadPhaseNamesFromStorage();
+      loadPhaseDates();
     }
   }, [project?.id]);
 
@@ -68,6 +72,48 @@ const Overview = ({ project, setProject }) => {
     } catch (error) {
       console.error('Error loading phase names:', error);
     }
+  };
+
+  const loadPhaseDates = async () => {
+    try {
+      const response = await phaseDatesAPI.get(project.id);
+      const phaseDatesData = response.data;
+      const phaseDatesMap = {};
+      phaseDatesData.forEach(pd => {
+        phaseDatesMap[pd.phase_id] = {
+          startDate: pd.start_date,
+          endDate: pd.end_date
+        };
+      });
+      setPhaseDates(phaseDatesMap);
+    } catch (error) {
+      console.error('Error loading phase dates:', error);
+    }
+  };
+
+  const handleEditPhaseClick = (phaseId) => {
+    const dates = phaseDates[phaseId] || { startDate: '', endDate: '' };
+    setPhaseEditData(dates);
+    setEditingPhase(phaseId);
+  };
+
+  const handleSavePhaseDate = async (phaseId) => {
+    try {
+      setSaving(true);
+      await phaseDatesAPI.save(project.id, phaseId, phaseEditData.startDate, phaseEditData.endDate);
+      await loadPhaseDates();
+      setEditingPhase(null);
+    } catch (error) {
+      console.error('Error saving phase dates:', error);
+      alert('Failed to save phase dates');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelPhaseEdit = () => {
+    setEditingPhase(null);
+    setPhaseEditData({ startDate: '', endDate: '' });
   };
 
   const loadTeamContacts = async () => {
@@ -263,6 +309,29 @@ const Overview = ({ project, setProject }) => {
   const getCompletedTasksCount = () => checklistItems.filter(item => item.status === 'Complete').length;
   const getInProgressTasksCount = () => checklistItems.filter(item => item.status === 'In Progress').length;
   const getNotStartedTasksCount = () => checklistItems.filter(item => item.status === 'Not Started').length;
+
+  // Timeline calculation
+  const calculateTimeline = () => {
+    if (!project?.start_date || !project?.target_date) return null;
+
+    const start = new Date(project.start_date);
+    const end = new Date(project.target_date);
+    const today = new Date();
+
+    const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    const elapsedDays = Math.ceil((today - start) / (1000 * 60 * 60 * 24));
+    const remainingDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+    const timeProgress = Math.min(100, Math.max(0, Math.round((elapsedDays / totalDays) * 100)));
+
+    return {
+      totalDays,
+      elapsedDays,
+      remainingDays,
+      timeProgress,
+      start,
+      end
+    };
+  };
 
   // Status color helper
   const getStatusColor = (status) => {
@@ -466,6 +535,188 @@ const Overview = ({ project, setProject }) => {
                 style={{ minHeight: '60px' }}
               />
             </div>
+
+            {/* Project Timeline Summary */}
+            {(() => {
+              const timeline = calculateTimeline();
+              const overallProgress = calculateOverallProgress();
+
+              if (!timeline) return null;
+
+              return (
+                <div className="lg:col-span-2">
+                  <div className="bg-white rounded border-2 border-primary-300 p-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-secondary-700" />
+                        <h3 className="text-sm font-semibold text-secondary-900">Project Timeline</h3>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-secondary-600">
+                        <span className={`font-semibold ${timeline.remainingDays < 0 ? 'text-danger-600' : timeline.remainingDays < 7 ? 'text-warning-600' : 'text-success-600'}`}>
+                          {timeline.remainingDays} days remaining
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Visual Timeline with Phase Colors */}
+                    <div className="mb-4 bg-secondary-50 rounded p-3">
+                      <div className="relative">
+                        {/* Timeline Bar with Phase Segments */}
+                        <div className="relative h-3 rounded-full overflow-hidden flex">
+                          {(() => {
+                            // Calculate phase segments based on dates
+                            const phaseSegments = [];
+                            const phaseColors = {
+                              'Phase 1': { bg: 'bg-blue-400', gradient: 'from-blue-300 to-blue-500' },
+                              'Phase 2': { bg: 'bg-yellow-400', gradient: 'from-yellow-300 to-yellow-500' },
+                              'Phase 3': { bg: 'bg-green-400', gradient: 'from-green-300 to-green-500' }
+                            };
+
+                            // Check if we have phase dates
+                            const hasPhase1 = phaseDates['Phase 1']?.startDate && phaseDates['Phase 1']?.endDate;
+                            const hasPhase2 = phaseDates['Phase 2']?.startDate && phaseDates['Phase 2']?.endDate;
+                            const hasPhase3 = phaseDates['Phase 3']?.startDate && phaseDates['Phase 3']?.endDate;
+
+                            if (hasPhase1 || hasPhase2 || hasPhase3) {
+                              // Calculate positions based on actual dates
+                              ['Phase 1', 'Phase 2', 'Phase 3'].forEach(phaseId => {
+                                if (phaseDates[phaseId]?.startDate && phaseDates[phaseId]?.endDate) {
+                                  const phaseStart = new Date(phaseDates[phaseId].startDate);
+                                  const phaseEnd = new Date(phaseDates[phaseId].endDate);
+
+                                  const startPercent = Math.max(0, Math.min(100,
+                                    ((phaseStart - timeline.start) / (timeline.end - timeline.start)) * 100
+                                  ));
+                                  const endPercent = Math.max(0, Math.min(100,
+                                    ((phaseEnd - timeline.start) / (timeline.end - timeline.start)) * 100
+                                  ));
+
+                                  phaseSegments.push({
+                                    id: phaseId,
+                                    start: startPercent,
+                                    width: endPercent - startPercent,
+                                    color: phaseColors[phaseId]
+                                  });
+                                }
+                              });
+                            } else {
+                              // Default: divide equally into 3 phases (using max durations: 4, 6, 2 weeks = 33%, 50%, 17%)
+                              phaseSegments.push(
+                                { id: 'Phase 1', start: 0, width: 33, color: phaseColors['Phase 1'] },
+                                { id: 'Phase 2', start: 33, width: 50, color: phaseColors['Phase 2'] },
+                                { id: 'Phase 3', start: 83, width: 17, color: phaseColors['Phase 3'] }
+                              );
+                            }
+
+                            // Sort segments by start position
+                            phaseSegments.sort((a, b) => a.start - b.start);
+
+                            return (
+                              <>
+                                {/* Background */}
+                                <div className="absolute inset-0 bg-secondary-200" />
+
+                                {/* Phase segments */}
+                                {phaseSegments.map((segment) => (
+                                  <div
+                                    key={segment.id}
+                                    className={`absolute h-full bg-gradient-to-r ${segment.color.gradient}`}
+                                    style={{ left: `${segment.start}%`, width: `${segment.width}%` }}
+                                  />
+                                ))}
+                              </>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Phase End Markers */}
+                        {(() => {
+                          const markers = [];
+                          ['Phase 1', 'Phase 2'].forEach((phaseId, index) => {
+                            if (phaseDates[phaseId]?.endDate) {
+                              const phaseEnd = new Date(phaseDates[phaseId].endDate);
+                              const endPercent = Math.max(0, Math.min(100,
+                                ((phaseEnd - timeline.start) / (timeline.end - timeline.start)) * 100
+                              ));
+
+                              markers.push(
+                                <div
+                                  key={phaseId}
+                                  className="absolute top-0 flex flex-col items-center pointer-events-none"
+                                  style={{ left: `${endPercent}%`, transform: 'translateX(-50%)' }}
+                                >
+                                  <div className="w-0.5 h-3 bg-secondary-700 opacity-60"></div>
+                                  <div className="w-1.5 h-1.5 bg-secondary-700 rounded-full opacity-60"></div>
+                                </div>
+                              );
+                            }
+                          });
+                          return markers;
+                        })()}
+
+                        {/* Today Marker */}
+                        <div
+                          className="absolute top-0 flex flex-col items-center z-10"
+                          style={{ left: `${timeline.timeProgress}%`, transform: 'translateX(-50%)' }}
+                        >
+                          {/* Marker line */}
+                          <div className="w-0.5 h-3 bg-danger-600"></div>
+                          {/* Marker dot */}
+                          <div className="w-3 h-3 bg-danger-600 rounded-full border-2 border-white shadow-md"></div>
+                          {/* TODAY label */}
+                          <div className="mt-1 px-2 py-0.5 bg-danger-600 text-white text-xs font-bold rounded whitespace-nowrap">
+                            TODAY
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date Labels */}
+                      <div className="flex justify-between items-center mt-8 text-xs">
+                        <div className="text-left">
+                          <div className="text-secondary-500 font-medium">Start</div>
+                          <div className="text-sm font-semibold text-secondary-900">
+                            {timeline.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                        <div className="text-center bg-success-50 px-3 py-1 rounded">
+                          <div className="text-secondary-500 font-medium">Duration</div>
+                          <div className="text-sm font-semibold text-secondary-900">
+                            {timeline.totalDays} days
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-secondary-500 font-medium">Target</div>
+                          <div className="text-sm font-semibold text-secondary-900">
+                            {timeline.end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Indicator */}
+                    <div className={`mt-3 p-2 rounded ${overallProgress >= timeline.timeProgress ? 'bg-success-50' : 'bg-warning-50'}`}>
+                      <div className="flex items-center gap-2">
+                        {overallProgress >= timeline.timeProgress ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-success-600 flex-shrink-0" />
+                            <span className="text-xs font-medium text-success-800">
+                              On Track - Work progress is ahead of schedule
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                            <span className="text-xs font-medium text-warning-800">
+                              Behind Schedule - Work progress is {timeline.timeProgress - overallProgress}% behind timeline
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
@@ -732,7 +983,7 @@ const Overview = ({ project, setProject }) => {
         <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Handover Process Overview</h2>
         <div className="space-y-2">
           {phases.map((phase, index) => (
-            <div key={index} className={`p-3 rounded border transition-all ${
+            <div key={index} className={`p-3 rounded border transition-all group ${
                 phase.status === 'complete' ? 'bg-success-50 border-success-200' :
                 phase.status === 'progress' ? 'bg-warning-50 border-warning-200' : 'bg-secondary-50 border-secondary-200'
               }`}>
@@ -744,31 +995,102 @@ const Overview = ({ project, setProject }) => {
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <h3 className="text-sm font-semibold text-secondary-900">{phase.name}</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-primary-600">{phase.progress}%</span>
-                      <span className="text-xs text-secondary-500">{phase.duration}</span>
-                      {phase.status === 'complete' && <CheckCircle className="w-4 h-4 text-success-500" />}
-                      {phase.status === 'progress' && <Clock className="w-4 h-4 text-warning-500" />}
+                  {editingPhase === phase.id ? (
+                    // Edit Mode
+                    <div className="bg-white p-3 rounded border border-primary-300">
+                      <h4 className="text-sm font-semibold text-secondary-900 mb-3">Edit Phase Dates</h4>
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <label className="block text-xs font-medium text-secondary-700 mb-1">Start Date</label>
+                          <input
+                            type="date"
+                            value={phaseEditData.startDate || ''}
+                            onChange={(e) => setPhaseEditData({ ...phaseEditData, startDate: e.target.value })}
+                            className="w-full px-2 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-secondary-700 mb-1">End Date</label>
+                          <input
+                            type="date"
+                            value={phaseEditData.endDate || ''}
+                            onChange={(e) => setPhaseEditData({ ...phaseEditData, endDate: e.target.value })}
+                            className="w-full px-2 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSavePhaseDate(phase.id)}
+                          disabled={saving}
+                          className="px-3 py-1.5 text-xs bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50"
+                        >
+                          {saving ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={handleCancelPhaseEdit}
+                          className="px-3 py-1.5 text-xs bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="w-full bg-secondary-200 rounded-full h-1.5 mb-2">
-                    <div className={`h-1.5 rounded-full transition-all duration-500 ${
-                        phase.status === 'complete' ? 'bg-success-500' :
-                        phase.status === 'progress' ? 'bg-warning-500' : 'bg-secondary-400'
-                      }`} style={{ width: `${phase.progress}%` }} />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="font-medium text-secondary-700">Key Activities:</span>
-                      <p className="text-secondary-600 mt-0.5">{phase.activities}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-secondary-700">Success Criteria:</span>
-                      <p className="text-secondary-600 mt-0.5">{phase.criteria}</p>
-                    </div>
-                  </div>
+                  ) : (
+                    // View Mode
+                    <>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-semibold text-secondary-900">{phase.name}</h3>
+                          <button
+                            onClick={() => handleEditPhaseClick(phase.id)}
+                            className="opacity-0 group-hover:opacity-100 p-1 text-primary-600 hover:bg-primary-100 rounded transition-all"
+                            title="Edit phase dates"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-primary-600">{phase.progress}%</span>
+                          {phase.status === 'complete' && <CheckCircle className="w-4 h-4 text-success-500" />}
+                          {phase.status === 'progress' && <Clock className="w-4 h-4 text-warning-500" />}
+                        </div>
+                      </div>
+
+                      {/* Phase Dates Display */}
+                      {phaseDates[phase.id] && (phaseDates[phase.id].startDate || phaseDates[phase.id].endDate) && (
+                        <div className="flex items-center gap-3 mb-2 text-xs text-secondary-600">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {phaseDates[phase.id].startDate && (
+                            <span>
+                              <span className="font-medium">Start:</span> {new Date(phaseDates[phase.id].startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                          )}
+                          {phaseDates[phase.id].endDate && (
+                            <span>
+                              <span className="font-medium">End:</span> {new Date(phaseDates[phase.id].endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="w-full bg-secondary-200 rounded-full h-1.5 mb-2">
+                        <div className={`h-1.5 rounded-full transition-all duration-500 ${
+                            phase.status === 'complete' ? 'bg-success-500' :
+                            phase.status === 'progress' ? 'bg-warning-500' : 'bg-secondary-400'
+                          }`} style={{ width: `${phase.progress}%` }} />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="font-medium text-secondary-700">Key Activities:</span>
+                          <p className="text-secondary-600 mt-0.5">{phase.activities}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-secondary-700">Success Criteria:</span>
+                          <p className="text-secondary-600 mt-0.5">{phase.criteria}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

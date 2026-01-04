@@ -639,6 +639,75 @@ app.post('/api/phase-names/:projectId', async (req, res) => {
   }
 });
 
+// ==================== PHASE DATES ROUTES ====================
+
+// Get phase dates for project
+app.get('/api/phase-dates/:projectId', async (req, res) => {
+  try {
+    const phaseDates = await db.allAsync(
+      'SELECT * FROM phase_dates WHERE project_id = ? ORDER BY phase_id',
+      [req.params.projectId]
+    );
+    res.json(phaseDates);
+  } catch (error) {
+    console.error('Error fetching phase dates:', error);
+    res.status(500).json({ error: 'Failed to fetch phase dates' });
+  }
+});
+
+// Update phase dates (upsert)
+app.post('/api/phase-dates/:projectId', async (req, res) => {
+  try {
+    const { phaseId, startDate, endDate } = req.body;
+
+    if (!phaseId) {
+      return res.status(400).json({ error: 'Phase ID is required' });
+    }
+
+    // Check if record exists
+    const existing = await db.getAsync(
+      'SELECT * FROM phase_dates WHERE project_id = ? AND phase_id = ?',
+      [req.params.projectId, phaseId]
+    );
+
+    if (existing) {
+      // Update existing
+      await db.runAsync(
+        `UPDATE phase_dates
+         SET start_date = ?, end_date = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE project_id = ? AND phase_id = ?`,
+        [startDate, endDate, req.params.projectId, phaseId]
+      );
+    } else {
+      // Insert new
+      await db.runAsync(
+        `INSERT INTO phase_dates (project_id, phase_id, start_date, end_date)
+         VALUES (?, ?, ?, ?)`,
+        [req.params.projectId, phaseId, startDate, endDate]
+      );
+    }
+
+    res.json({ message: 'Phase dates saved successfully' });
+  } catch (error) {
+    console.error('Error saving phase dates:', error);
+    res.status(500).json({ error: 'Failed to save phase dates' });
+  }
+});
+
+// Delete phase dates
+app.delete('/api/phase-dates/:projectId/:phaseId', async (req, res) => {
+  try {
+    await db.runAsync(
+      'DELETE FROM phase_dates WHERE project_id = ? AND phase_id = ?',
+      [req.params.projectId, req.params.phaseId]
+    );
+    res.json({ message: 'Phase dates deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting phase dates:', error);
+    res.status(500).json({ error: 'Failed to delete phase dates' });
+  }
+});
+
 // ==================== TEAM CONTACTS ROUTES ====================
 
 // Get team contacts for project

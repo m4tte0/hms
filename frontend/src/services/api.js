@@ -36,6 +36,14 @@ export const phaseNamesAPI = {
   save: (projectId, phases) => apiClient.post(`/phase-names/${projectId}`, { phases }),
 };
 
+// --- API per le Date delle Fasi ---
+export const phaseDatesAPI = {
+  get: (projectId) => apiClient.get(`/phase-dates/${projectId}`),
+  save: (projectId, phaseId, startDate, endDate) =>
+    apiClient.post(`/phase-dates/${projectId}`, { phaseId, startDate, endDate }),
+  delete: (projectId, phaseId) => apiClient.delete(`/phase-dates/${projectId}/${phaseId}`),
+};
+
 // --- API per i Contatti del Team ---
 export const teamContactsAPI = {
   getContacts: (projectId) => apiClient.get(`/team-contacts/${projectId}`),
