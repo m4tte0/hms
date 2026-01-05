@@ -368,7 +368,7 @@ const Overview = ({ project, setProject }) => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Next Incoming Event */}
       {showNextEvent && (() => {
         const now = new Date();
@@ -482,7 +482,7 @@ const Overview = ({ project, setProject }) => {
         {showProjectDetails && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
             <div>
-              <label className="block text-xs font-semibold text-secondary-900 mb-1">Machine Family</label>
+              <label className="block text-sm font-semibold text-secondary-900 mb-1">Machine Family</label>
               <input
                 type="text"
                 value={project.machine_family || ''}
@@ -492,7 +492,7 @@ const Overview = ({ project, setProject }) => {
               />
             </div>
             <div>
-              <div className="block text-xs font-semibold text-secondary-900 mb-1 invisible">Deliverable</div>
+              <div className="block text-sm font-semibold text-secondary-900 mb-1 invisible">Deliverable</div>
               <label className="flex items-center gap-2 cursor-pointer px-2.5 py-1.5">
                 <input
                   type="checkbox"
@@ -504,7 +504,7 @@ const Overview = ({ project, setProject }) => {
               </label>
             </div>
             <div className="lg:col-span-2">
-              <label className="block text-xs font-semibold text-secondary-900 mb-1">Description</label>
+              <label className="block text-sm font-semibold text-secondary-900 mb-1">Description</label>
               <textarea
                 ref={descriptionRef}
                 value={project.description || ''}
@@ -520,7 +520,7 @@ const Overview = ({ project, setProject }) => {
               />
             </div>
             <div className="lg:col-span-2">
-              <label className="block text-xs font-semibold text-secondary-900 mb-1">Context and Usage</label>
+              <label className="block text-sm font-semibold text-secondary-900 mb-1">Context and Usage</label>
               <textarea
                 ref={contextUsageRef}
                 value={project.context_usage || ''}
@@ -761,15 +761,15 @@ const Overview = ({ project, setProject }) => {
           <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Project Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">Project Name <span className="text-danger-500">*</span></label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name <span className="text-danger-500">*</span></label>
               <input type="text" value={project.project_name || ''} onChange={(e) => handleChange('project_name', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter project name" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">Handover ID <span className="text-danger-500">*</span></label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Handover ID <span className="text-danger-500">*</span></label>
               <input type="text" value={project.handover_id || ''} onChange={(e) => handleChange('handover_id', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="HTD-YYYY-XXX" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">R&D Project Lead</label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">R&D Project Lead</label>
               {project.rd_lead ? (
                 <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
                   <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
@@ -790,7 +790,7 @@ const Overview = ({ project, setProject }) => {
               )}
             </div>
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">Automation Team Lead</label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Automation Team Lead</label>
               {project.automation_lead ? (
                 <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
                   <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
@@ -811,19 +811,19 @@ const Overview = ({ project, setProject }) => {
               )}
             </div>
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
               <input type="date" value={project.start_date || ''} onChange={(e) => handleChange('start_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-secondary-700 mb-1">Target Completion Date</label>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Target Completion Date</label>
               <input type="date" value={project.target_date || ''} onChange={(e) => handleChange('target_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-secondary-200">
-            <h3 className="text-xs font-semibold text-secondary-700 mb-3">Project Metrics</h3>
+            <h3 className="text-sm font-semibold text-secondary-700 mb-3">Project Metrics</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-secondary-700 mb-1">Project Priority</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Priority</label>
                 <select value={project.business_priority || 'Media'} onChange={(e) => handleChange('business_priority', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="Alta">Alta</option>
                   <option value="Media">Media</option>
@@ -831,7 +831,7 @@ const Overview = ({ project, setProject }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-secondary-700 mb-1">Complexity Level</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Complexity Level</label>
                 <select value={project.complexity_level || 'Media'} onChange={(e) => handleChange('complexity_level', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="Alta">Alta</option>
                   <option value="Media">Media</option>
@@ -839,7 +839,7 @@ const Overview = ({ project, setProject }) => {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-secondary-700 mb-1">Project Score</label>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Score</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 bg-secondary-50 px-2.5 py-1.5 border border-secondary-300 rounded text-sm text-secondary-700 font-semibold">{project.project_score || 0} / 15</div>
                   <div className="flex-1">
@@ -893,15 +893,15 @@ const Overview = ({ project, setProject }) => {
                 <h4 className="text-sm font-semibold text-primary-900 mb-2">Add New Team Member</h4>
                 <div className="grid grid-cols-1 gap-2">
                   <div>
-                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Name <span className="text-danger-500">*</span></label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Name <span className="text-danger-500">*</span></label>
                     <input type="text" value={newContact.name} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Role <span className="text-danger-500">*</span></label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Role <span className="text-danger-500">*</span></label>
                     <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, role: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Project Lead" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Department <span className="text-danger-500">*</span></label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Department <span className="text-danger-500">*</span></label>
                     <select value={newContact.department} onChange={(e) => setNewContact({ ...newContact, department: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
                       <option value="">Select Department</option>
                       <option value="R&D">R&D</option>
@@ -909,11 +909,11 @@ const Overview = ({ project, setProject }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Email</label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Email</label>
                     <input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="john.doe@company.com" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-secondary-700 mb-0.5">Phone</label>
+                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Phone</label>
                     <input type="tel" value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="+1-555-0123" />
                   </div>
                 </div>
@@ -936,15 +936,15 @@ const Overview = ({ project, setProject }) => {
                         <h4 className="text-sm font-semibold text-secondary-900 mb-2">Edit Team Member</h4>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
                             <input type="text" value={editContact.name} onChange={(e) => setEditContact({ ...editContact, name: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Role <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Role <span className="text-red-500">*</span></label>
                             <input type="text" value={editContact.role} onChange={(e) => setEditContact({ ...editContact, role: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Department <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Department <span className="text-red-500">*</span></label>
                             <select value={editContact.department} onChange={(e) => setEditContact({ ...editContact, department: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                               <option value="">Select Department</option>
                               <option value="R&D">R&D</option>
@@ -952,11 +952,11 @@ const Overview = ({ project, setProject }) => {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email" value={editContact.email} onChange={(e) => setEditContact({ ...editContact, email: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                             <input type="tel" value={editContact.phone} onChange={(e) => setEditContact({ ...editContact, phone: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                         </div>
@@ -1035,7 +1035,7 @@ const Overview = ({ project, setProject }) => {
                       <h4 className="text-sm font-semibold text-secondary-900 mb-3">Edit Phase Dates</h4>
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                          <label className="block text-xs font-medium text-secondary-700 mb-1">Start Date</label>
+                          <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
                           <input
                             type="date"
                             value={phaseEditData.startDate || ''}
@@ -1044,7 +1044,7 @@ const Overview = ({ project, setProject }) => {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-secondary-700 mb-1">End Date</label>
+                          <label className="block text-sm font-medium text-secondary-700 mb-1">End Date</label>
                           <input
                             type="date"
                             value={phaseEditData.endDate || ''}

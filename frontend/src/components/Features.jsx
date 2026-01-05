@@ -18,6 +18,7 @@ const Features = ({ projectId }) => {
   const [editingCriticality, setEditingCriticality] = useState(null);
   const [editCriticalityText, setEditCriticalityText] = useState('');
   const [showAddCriticalityForm, setShowAddCriticalityForm] = useState(false);
+  const [collapsedFeatures, setCollapsedFeatures] = useState({});
 
   const [formData, setFormData] = useState({
     feature_name: '',
@@ -97,10 +98,23 @@ const Features = ({ projectId }) => {
       if (response.ok) {
         const data = await response.json();
         setFeatures(data);
+        // Initialize all features as collapsed
+        const collapsed = {};
+        data.forEach(feature => {
+          collapsed[feature.id] = true;
+        });
+        setCollapsedFeatures(collapsed);
       }
     } catch (error) {
       console.error('Error loading features:', error);
     }
+  };
+
+  const toggleFeatureCollapse = (featureId) => {
+    setCollapsedFeatures(prev => ({
+      ...prev,
+      [featureId]: !prev[featureId]
+    }));
   };
 
   const loadCriticalities = async () => {
@@ -315,7 +329,7 @@ const Features = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Descrizione Generale Box */}
       <div className="bg-gradient-to-br from-white to-primary-50 rounded shadow-md border-2 border-primary-200 overflow-hidden">
         <div
@@ -350,7 +364,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-semibold text-secondary-900">Funzioni Progettate e Collaudate</label>
+                <label className="text-sm font-semibold text-secondary-900">Funzioni Progettate e Collaudate</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(funzioniQuillRef, 'bold')}
@@ -404,7 +418,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-semibold text-secondary-900">Finalità</label>
+                <label className="text-sm font-semibold text-secondary-900">Finalità</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(finalitaQuillRef, 'bold')}
@@ -458,7 +472,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-semibold text-secondary-900">Specifiche</label>
+                <label className="text-sm font-semibold text-secondary-900">Specifiche</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(specificheQuillRef, 'bold')}
@@ -530,7 +544,7 @@ const Features = ({ projectId }) => {
         {showOsservazioni && (
           <div className="p-4 space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-secondary-900 mb-1">Osservazioni e Note</label>
+              <label className="block text-sm font-semibold text-secondary-900 mb-1">Osservazioni e Note</label>
               <textarea
                 ref={osservazioniRef}
                 value={project.osservazioni_note || ''}
@@ -549,7 +563,7 @@ const Features = ({ projectId }) => {
             {/* Criticità - Dynamic List */}
             <div className="group/section">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs font-semibold text-secondary-900">Criticità</label>
+                <label className="block text-sm font-semibold text-secondary-900">Criticità</label>
                 {!showAddCriticalityForm && (
                   <button
                     onClick={() => setShowAddCriticalityForm(true)}
@@ -691,7 +705,7 @@ const Features = ({ projectId }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-secondary-900 mb-1">Eventuali Azioni Correttive o Integrative</label>
+              <label className="block text-sm font-semibold text-secondary-900 mb-1">Eventuali Azioni Correttive o Integrative</label>
               <textarea
                 ref={azioniRef}
                 value={project.azioni_correttive || ''}
@@ -711,17 +725,20 @@ const Features = ({ projectId }) => {
       </div>
 
       {/* Features Section - Original functionality */}
-      <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-gradient-to-br from-white to-primary-50 rounded shadow-md border-2 border-primary-200 overflow-hidden group/section mb-12">
+        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-100 to-primary-200 hover:from-primary-200 hover:to-primary-300 transition-colors border-b-2 border-primary-300">
           <h2 className="text-base font-semibold text-secondary-900">Funzionalità Tecniche Dettagliate</h2>
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 px-3 py-2 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Aggiungi Funzionalità
-          </button>
+          {!showAddForm && (
+            <button
+              onClick={handleAdd}
+              className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-all opacity-0 group-hover/section:opacity-100"
+              title="Aggiungi funzionalità"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
+        <div className="p-4">
 
         {/* Add Form */}
         {showAddForm && (
@@ -810,7 +827,7 @@ const Features = ({ projectId }) => {
             {features.map((feature) => (
               <div
                 key={feature.id}
-                className="bg-white rounded shadow-sm border border-secondary-200 overflow-hidden"
+                className="bg-white rounded shadow-sm border border-secondary-200 overflow-hidden group"
               >
                 {editingFeature === feature.id ? (
                   <div className="p-4 bg-warning-50">
@@ -885,26 +902,43 @@ const Features = ({ projectId }) => {
                   <>
                     <div className="bg-gradient-to-r from-primary-100 to-primary-200 px-4 py-3 border-b border-primary-300">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-base font-semibold text-secondary-900">{feature.feature_name}</h3>
+                        <div
+                          className="flex items-center gap-2 flex-1 cursor-pointer"
+                          onClick={() => toggleFeatureCollapse(feature.id)}
+                        >
+                          <h3 className="text-base font-semibold text-secondary-900">{feature.feature_name}</h3>
+                          {collapsedFeatures[feature.id] ? (
+                            <ChevronDown className="w-5 h-5 text-secondary-700" />
+                          ) : (
+                            <ChevronUp className="w-5 h-5 text-secondary-700" />
+                          )}
+                        </div>
                         <div className="flex gap-1">
                           <button
-                            onClick={() => handleEdit(feature)}
-                            className="p-1.5 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(feature);
+                            }}
+                            className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-all opacity-0 group-hover:opacity-100"
                             title="Modifica funzionalità"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => handleDeleteFeature(feature.id)}
-                            className="p-1.5 bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteFeature(feature.id);
+                            }}
+                            className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-all opacity-0 group-hover:opacity-100"
                             title="Elimina funzionalità"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div className="p-4 space-y-4">
+                    {!collapsedFeatures[feature.id] && (
+                      <div className="p-4 space-y-4">
                       {feature.description && (
                         <div>
                           <div className="flex items-center gap-1.5 mb-2">
@@ -932,13 +966,15 @@ const Features = ({ projectId }) => {
                           <p className="text-sm text-secondary-700 whitespace-pre-wrap pl-5 font-mono bg-secondary-50 p-3 rounded">{feature.tech_specs}</p>
                         </div>
                       )}
-                    </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

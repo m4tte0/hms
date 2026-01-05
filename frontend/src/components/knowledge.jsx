@@ -569,7 +569,7 @@ const Knowledge = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Header with Actions */}
       <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
         <div className="flex items-center justify-between">

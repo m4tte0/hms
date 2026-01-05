@@ -268,7 +268,7 @@ const Issues = ({ projectId }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
