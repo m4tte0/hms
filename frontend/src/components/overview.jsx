@@ -654,6 +654,40 @@ const Overview = ({ project, setProject }) => {
                           return markers;
                         })()}
 
+                        {/* Month/Year Markers */}
+                        {(() => {
+                          const monthMarkers = [];
+                          const startDate = new Date(timeline.start);
+                          const endDate = new Date(timeline.end);
+
+                          // Start from the first day of the month after start date
+                          let currentDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+
+                          while (currentDate < endDate) {
+                            const markerPercent = ((currentDate - timeline.start) / (timeline.end - timeline.start)) * 100;
+
+                            if (markerPercent > 0 && markerPercent < 100) {
+                              monthMarkers.push(
+                                <div
+                                  key={currentDate.toISOString()}
+                                  className="absolute top-0 flex flex-col items-center pointer-events-none"
+                                  style={{ left: `${markerPercent}%`, transform: 'translateX(-50%)' }}
+                                >
+                                  <div className="w-px h-3 bg-secondary-400 opacity-40"></div>
+                                  <div className="mt-0.5 text-[9px] text-secondary-500 opacity-70 whitespace-nowrap">
+                                    {currentDate.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Move to next month
+                            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+                          }
+
+                          return monthMarkers;
+                        })()}
+
                         {/* Today Marker */}
                         <div
                           className="absolute top-0 flex flex-col items-center z-10"
