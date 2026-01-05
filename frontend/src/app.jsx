@@ -5,8 +5,10 @@ import {
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
-import Assessment from './components/Assessment';
-import Tracking from './components/Tracking';
+import Features from './components/Features';
+// Hidden components - keep imports for potential future use
+// import Assessment from './components/Assessment';
+// import Tracking from './components/Tracking';
 import Knowledge from './components/Knowledge';
 import Attachments from './components/Attachments';
 import Issues from './components/Issues';
@@ -36,12 +38,14 @@ function App() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: FileText },
+    { id: 'features', label: 'Specifiche e Finalità', icon: FileBarChart },
     { id: 'checklist', label: 'Checklist', icon: CheckCircle },
-    { id: 'assessment', label: 'Assessment', icon: BarChart3 },
-    { id: 'tracking', label: 'Tracking', icon: Clock },
-    { id: 'knowledge', label: 'Knowledge', icon: Users },
-    { id: 'issues', label: 'Issues', icon: AlertTriangle },
-    { id: 'attachments', label: 'Attachments', icon: Paperclip },
+    // Hidden tabs - keep code intact for potential future use
+    // { id: 'assessment', label: 'Assessment', icon: BarChart3 },
+    // { id: 'tracking', label: 'Tracking', icon: Clock },
+    { id: 'knowledge', label: 'Calendario', icon: Users },
+    { id: 'issues', label: 'Criticità', icon: AlertTriangle },
+    { id: 'attachments', label: 'Allegati', icon: Paperclip },
   ];
 
   useEffect(() => {
@@ -523,12 +527,15 @@ function App() {
               </div>
             ) : activeTab === 'overview' ? (
               <Overview project={currentProject} setProject={setCurrentProject} />
+            ) : activeTab === 'features' ? (
+              <Features projectId={currentProject.id} />
             ) : activeTab === 'checklist' ? (
               <Checklist projectId={currentProject.id} />
-            ) : activeTab === 'assessment' ? (
-              <Assessment projectId={currentProject.id} />
-            ) : activeTab === 'tracking' ? (
-              <Tracking projectId={currentProject.id} />
+            // Hidden tabs - keep routing for potential future use
+            // ) : activeTab === 'assessment' ? (
+            //   <Assessment projectId={currentProject.id} />
+            // ) : activeTab === 'tracking' ? (
+            //   <Tracking projectId={currentProject.id} />
             ) : activeTab === 'knowledge' ? (
               <Knowledge projectId={currentProject.id} />
             ) : activeTab === 'issues' ? (

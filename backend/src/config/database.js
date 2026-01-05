@@ -223,6 +223,32 @@ function initializeDatabase() {
       )
     `);
 
+    // Features table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS features (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        feature_name TEXT NOT NULL,
+        description TEXT,
+        purpose TEXT,
+        tech_specs TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Project criticalities table (for dynamic list)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS project_criticalities (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        criticality_text TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      )
+    `);
+
     // Add complexity_level and project_score columns if they don't exist
     db.run(`
       ALTER TABLE projects ADD COLUMN complexity_level TEXT DEFAULT 'Media'
@@ -249,6 +275,47 @@ function initializeDatabase() {
       }
     });
 
+    // Add new columns to projects table for Descrizione Generale and Osservazioni
+    db.run(`
+      ALTER TABLE projects ADD COLUMN funzioni_progettate TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding funzioni_progettate column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN finalita TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding finalita column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN specifiche_tecniche TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding specifiche_tecniche column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN osservazioni_note TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding osservazioni_note column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN azioni_correttive TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding azioni_correttive column:', err.message);
+      }
+    });
+
     // Create indexes for better performance
     db.run('CREATE INDEX IF NOT EXISTS idx_project_handover_id ON projects(handover_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_checklist_project ON checklist_items(project_id)');
@@ -257,6 +324,8 @@ function initializeDatabase() {
     db.run('CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_phase_names_project ON phase_names(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_attachments_project ON attachments(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_features_project ON features(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_criticalities_project ON project_criticalities(project_id)');
 
     console.log('Database initialized successfully');
   });

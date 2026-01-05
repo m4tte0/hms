@@ -81,7 +81,8 @@ app.put('/api/projects/:id', async (req, res) => {
       handover_id, project_name, rd_lead, automation_lead,
       start_date, target_date, business_priority, complexity_level,
       project_score, status, current_phase, machine_family, description,
-      context_usage, deliverable
+      context_usage, deliverable, funzioni_progettate, finalita,
+      specifiche_tecniche, osservazioni_note, azioni_correttive
     } = req.body;
 
     await db.runAsync(
@@ -101,11 +102,17 @@ app.put('/api/projects/:id', async (req, res) => {
        description = COALESCE(?, description),
        context_usage = COALESCE(?, context_usage),
        deliverable = COALESCE(?, deliverable),
+       funzioni_progettate = COALESCE(?, funzioni_progettate),
+       finalita = COALESCE(?, finalita),
+       specifiche_tecniche = COALESCE(?, specifiche_tecniche),
+       osservazioni_note = COALESCE(?, osservazioni_note),
+       azioni_correttive = COALESCE(?, azioni_correttive),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [handover_id, project_name, rd_lead, automation_lead, start_date, target_date,
        business_priority, complexity_level, project_score, status, current_phase,
-       machine_family, description, context_usage, deliverable, req.params.id]
+       machine_family, description, context_usage, deliverable, funzioni_progettate,
+       finalita, specifiche_tecniche, osservazioni_note, azioni_correttive, req.params.id]
     );
 
     res.json({ message: 'Project updated successfully' });
@@ -913,6 +920,144 @@ app.delete('/api/attachments/:projectId/:attachmentId', async (req, res) => {
   } catch (error) {
     console.error('❌ Error deleting attachment:', error);
     res.status(500).json({ error: 'Failed to delete attachment' });
+  }
+});
+
+// ==================== PROJECT CRITICALITIES ROUTES ====================
+
+// Get all criticalities for a project
+app.get('/api/criticalities/:projectId', async (req, res) => {
+  try {
+    const criticalities = await db.allAsync(
+      'SELECT * FROM project_criticalities WHERE project_id = ? ORDER BY created_at ASC',
+      [req.params.projectId]
+    );
+    res.json(criticalities);
+  } catch (error) {
+    console.error('Error fetching criticalities:', error);
+    res.status(500).json({ error: 'Failed to fetch criticalities' });
+  }
+});
+
+// Create new criticality
+app.post('/api/criticalities/:projectId', async (req, res) => {
+  try {
+    const { criticality_text } = req.body;
+
+    const result = await db.runAsync(
+      `INSERT INTO project_criticalities (project_id, criticality_text)
+       VALUES (?, ?)`,
+      [req.params.projectId, criticality_text]
+    );
+
+    res.status(201).json({ id: result.id, message: 'Criticality added successfully' });
+  } catch (error) {
+    console.error('Error creating criticality:', error);
+    res.status(500).json({ error: 'Failed to create criticality' });
+  }
+});
+
+// Update criticality
+app.put('/api/criticalities/:projectId/:criticalityId', async (req, res) => {
+  try {
+    const { criticality_text } = req.body;
+
+    await db.runAsync(
+      `UPDATE project_criticalities SET criticality_text = ? WHERE id = ? AND project_id = ?`,
+      [criticality_text, req.params.criticalityId, req.params.projectId]
+    );
+
+    res.json({ message: 'Criticality updated successfully' });
+  } catch (error) {
+    console.error('Error updating criticality:', error);
+    res.status(500).json({ error: 'Failed to update criticality' });
+  }
+});
+
+// Delete criticality
+app.delete('/api/criticalities/:projectId/:criticalityId', async (req, res) => {
+  try {
+    await db.runAsync(
+      'DELETE FROM project_criticalities WHERE id = ? AND project_id = ?',
+      [req.params.criticalityId, req.params.projectId]
+    );
+
+    res.json({ message: 'Criticality deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting criticality:', error);
+    res.status(500).json({ error: 'Failed to delete criticality' });
+  }
+});
+
+// ==================== FEATURES ROUTES ====================
+
+// Get all features for a project
+app.get('/api/features/:projectId', async (req, res) => {
+  try {
+    const features = await db.allAsync(
+      'SELECT * FROM features WHERE project_id = ? ORDER BY created_at DESC',
+      [req.params.projectId]
+    );
+    res.json(features);
+  } catch (error) {
+    console.error('Error fetching features:', error);
+    res.status(500).json({ error: 'Failed to fetch features' });
+  }
+});
+
+// Create new feature
+app.post('/api/features/:projectId', async (req, res) => {
+  try {
+    const { feature_name, description, purpose, tech_specs } = req.body;
+
+    const result = await db.runAsync(
+      `INSERT INTO features (project_id, feature_name, description, purpose, tech_specs)
+       VALUES (?, ?, ?, ?, ?)`,
+      [req.params.projectId, feature_name, description, purpose, tech_specs]
+    );
+
+    res.status(201).json({ id: result.id, message: 'Feature created successfully' });
+  } catch (error) {
+    console.error('Error creating feature:', error);
+    res.status(500).json({ error: 'Failed to create feature' });
+  }
+});
+
+// Update feature
+app.put('/api/features/:projectId/:featureId', async (req, res) => {
+  try {
+    const { feature_name, description, purpose, tech_specs } = req.body;
+
+    await db.runAsync(
+      `UPDATE features SET
+       feature_name = ?,
+       description = ?,
+       purpose = ?,
+       tech_specs = ?,
+       updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND project_id = ?`,
+      [feature_name, description, purpose, tech_specs, req.params.featureId, req.params.projectId]
+    );
+
+    res.json({ message: 'Feature updated successfully' });
+  } catch (error) {
+    console.error('Error updating feature:', error);
+    res.status(500).json({ error: 'Failed to update feature' });
+  }
+});
+
+// Delete feature
+app.delete('/api/features/:projectId/:featureId', async (req, res) => {
+  try {
+    await db.runAsync(
+      'DELETE FROM features WHERE id = ? AND project_id = ?',
+      [req.params.featureId, req.params.projectId]
+    );
+
+    res.json({ message: 'Feature deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting feature:', error);
+    res.status(500).json({ error: 'Failed to delete feature' });
   }
 });
 
