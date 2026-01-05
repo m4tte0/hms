@@ -5,6 +5,8 @@ import { Calendar, Clock, Users, Plus, Edit2, Trash2, X, Save, BookOpen, CheckCi
 const Knowledge = ({ projectId }) => {
   const [sessions, setSessions] = useState([]);
   const [teamContacts, setTeamContacts] = useState([]);
+  const [project, setProject] = useState(null);
+  const [phaseDates, setPhaseDates] = useState({});
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
   const [showAddModal, setShowAddModal] = useState(false);
@@ -17,6 +19,7 @@ const Knowledge = ({ projectId }) => {
   const [editSelectedAttendees, setEditSelectedAttendees] = useState([]);
   const [customAttendee, setCustomAttendee] = useState('');
   const [editCustomAttendee, setEditCustomAttendee] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
   const [newSession, setNewSession] = useState({
     session_topic: '',
     scheduled_date: '',
@@ -32,10 +35,43 @@ const Knowledge = ({ projectId }) => {
 
   useEffect(() => {
     if (projectId) {
+      loadProject();
       loadSessions();
       loadTeamContacts();
+      loadPhaseDates();
     }
   }, [projectId]);
+
+  const loadProject = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${projectId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProject(data);
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+    }
+  };
+
+  const loadPhaseDates = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/phase-dates/${projectId}`);
+      if (response.ok) {
+        const data = await response.json();
+        const datesMap = {};
+        data.forEach(item => {
+          datesMap[item.phase_id] = {
+            startDate: item.start_date,
+            endDate: item.end_date
+          };
+        });
+        setPhaseDates(datesMap);
+      }
+    } catch (error) {
+      console.error('Error loading phase dates:', error);
+    }
+  };
 
   const loadTeamContacts = async () => {
     try {
@@ -288,20 +324,72 @@ const Knowledge = ({ projectId }) => {
     });
   };
 
-  const renderCalendar = () => {
-    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
-    const weeks = [];
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                        'July', 'August', 'September', 'October', 'November', 'December'];
+  // Determine which phase a date belongs to
+  const getPhaseForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
 
-    let currentWeek = [];
-    let weekNumber = null;
-    let dayCounter = 0;
+    // Check each phase
+    for (const phaseId of ['Phase 1', 'Phase 2', 'Phase 3']) {
+      const phase = phaseDates[phaseId];
+      if (phase?.startDate && phase?.endDate) {
+        if (dateStr >= phase.startDate && dateStr <= phase.endDate) {
+          return phaseId;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  // Get phase color
+  const getPhaseColor = (phaseId) => {
+    const colors = {
+      'Phase 1': 'bg-blue-400',
+      'Phase 2': 'bg-yellow-400',
+      'Phase 3': 'bg-green-400'
+    };
+    return colors[phaseId] || 'bg-secondary-300';
+  };
+
+  // Generate array of months between project start and end dates
+  const getProjectMonths = () => {
+    if (!project?.start_date || !project?.target_date) {
+      // Default: show current month ± 2 months if no project dates
+      const now = new Date();
+      const months = [];
+      for (let i = -2; i <= 2; i++) {
+        const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        months.push(date);
+      }
+      return months;
+    }
+
+    const start = new Date(project.start_date);
+    const end = new Date(project.target_date);
+    const months = [];
+
+    let current = new Date(start.getFullYear(), start.getMonth(), 1);
+    const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+
+    while (current <= endMonth) {
+      months.push(new Date(current));
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    return months;
+  };
+
+  const renderCompactMonth = (monthDate) => {
+    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(monthDate);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    const days = [];
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
-      currentWeek.push(<div key={`empty-${i}`} className="h-32 bg-gray-50 border border-gray-200"></div>);
-      dayCounter++;
+      days.push(<div key={`empty-${i}`} className="aspect-square"></div>);
     }
 
     // Add cells for each day of the month
@@ -309,151 +397,166 @@ const Knowledge = ({ projectId }) => {
       const date = new Date(year, month, day);
       const daySessions = getSessionsForDate(date);
       const isToday = new Date().toDateString() === date.toDateString();
-      const isSundayDay = isSunday(date);
-      const isBankHolidayDay = isBankHoliday(date);
-      const isMondayColumn = dayCounter % 7 === 0;
+      const hasSessions = daySessions.length > 0;
+      const phaseId = getPhaseForDate(date);
+      const phaseColor = phaseId ? getPhaseColor(phaseId) : null;
 
-      // Get week number for Monday
-      if (isMondayColumn) {
-        weekNumber = getWeekNumber(date);
+      // Check if this is the project start or end date
+      const dateStr = date.toISOString().split('T')[0];
+      const isStartDate = project?.start_date === dateStr;
+      const isEndDate = project?.target_date === dateStr;
+
+      // Determine if we should show strip or use phase color as border
+      const hasSpecialBackground = isToday || isStartDate || isEndDate || hasSessions;
+      const showStripAtBottom = phaseColor && !hasSpecialBackground;
+      const usePhaseBorder = phaseColor && hasSpecialBackground;
+
+      // Get the appropriate ring color
+      let ringColorClass = '';
+      if (usePhaseBorder) {
+        // Use phase color for border
+        const phaseBorderColors = {
+          'Phase 1': 'ring-blue-400',
+          'Phase 2': 'ring-yellow-400',
+          'Phase 3': 'ring-green-400'
+        };
+        ringColorClass = phaseBorderColors[phaseId] || 'ring-secondary-300';
+      } else {
+        // Use default colors based on special state
+        if (isToday) ringColorClass = 'ring-primary-500';
+        else if (isStartDate) ringColorClass = 'ring-green-500';
+        else if (isEndDate) ringColorClass = 'ring-red-500';
       }
 
-      // Determine background color based on day type
-      let bgColor = 'bg-white hover:bg-gray-50';
-      let textColor = 'text-secondary-700';
-
-      if (isToday) {
-        bgColor = 'bg-blue-50 border-blue-300';
-        textColor = 'text-blue-600';
-      } else if (isBankHolidayDay) {
-        bgColor = 'bg-red-50 hover:bg-red-100';
-        textColor = 'text-red-700';
-      } else if (isSundayDay) {
-        bgColor = 'bg-orange-50 hover:bg-orange-100';
-        textColor = 'text-orange-700';
-      }
-
-      currentWeek.push(
-        <div
+      days.push(
+        <button
           key={day}
-          className={`h-32 border border-gray-200 p-2 overflow-y-auto ${bgColor} relative`}
+          onClick={() => {
+            setSelectedDate(date);
+            setNewSession(prev => ({ ...prev, scheduled_date: date.toISOString().split('T')[0] }));
+            setShowAddModal(true);
+          }}
+          className={`aspect-square text-xs font-medium rounded transition-all relative overflow-hidden
+            ${isToday ? 'bg-primary-100 text-primary-700' :
+              isStartDate ? 'bg-green-50 text-green-700 hover:bg-green-100' :
+              isEndDate ? 'bg-red-50 text-red-700 hover:bg-red-100' :
+              hasSessions ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' :
+              'hover:bg-secondary-100 text-secondary-700'}
+            ${hasSpecialBackground ? `ring-2 ${ringColorClass}` : ''}`}
         >
-          {isMondayColumn && (
-            <div className="absolute top-0 left-0 bg-gray-700 text-white text-[10px] font-bold px-1 rounded-br">
-              W{weekNumber}
-            </div>
-          )}
-          <div className={`text-sm font-semibold mb-1 ${textColor} ${isMondayColumn ? 'mt-3' : ''}`}>
+          <div className="relative z-10">
             {day}
           </div>
-          <div className="space-y-1">
-            {daySessions.map(session => (
-              <div
-                key={session.id}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs p-2 rounded hover:from-blue-100 hover:to-indigo-100 transition-colors cursor-pointer"
-                onClick={() => openEditModal(session)}
-              >
-                <div className="font-semibold text-secondary-900 truncate mb-1">{session.session_topic}</div>
-                <div className="flex items-center gap-1 text-blue-600">
-                  {session.start_time && (
-                    <>
-                      <Clock className="w-3 h-3" />
-                      <span className="font-medium">{session.start_time}</span>
-                    </>
-                  )}
-                  {session.start_time && session.duration && <span className="text-gray-400">•</span>}
-                  {session.duration && <span className="text-secondary-700">{session.duration} h</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-
-      dayCounter++;
-
-      // When we complete a week (7 days), add it to weeks array
-      if (currentWeek.length === 7) {
-        weeks.push(
-          <div key={`week-${weeks.length}`} className="grid grid-cols-7 gap-0">
-            {currentWeek}
-          </div>
-        );
-        currentWeek = [];
-      }
-    }
-
-    // Add remaining cells to complete the last week
-    if (currentWeek.length > 0) {
-      while (currentWeek.length < 7) {
-        currentWeek.push(
-          <div key={`empty-end-${currentWeek.length}`} className="h-32 bg-gray-50 border border-gray-200"></div>
-        );
-      }
-      weeks.push(
-        <div key={`week-${weeks.length}`} className="grid grid-cols-7 gap-0">
-          {currentWeek}
-        </div>
+          {/* Phase color strip at bottom - only show if no special background */}
+          {showStripAtBottom && (
+            <div className={`absolute bottom-0 left-0 right-0 h-1 ${phaseColor}`}></div>
+          )}
+        </button>
       );
     }
 
     return (
-      <div className="bg-white rounded shadow-sm border border-gray-200 p-6">
+      <div className="bg-white border border-secondary-200 rounded p-3">
+        <div className="text-center mb-2">
+          <div className="text-sm font-bold text-secondary-900">{monthNames[month]}</div>
+          <div className="text-xs text-secondary-500">{year}</div>
+        </div>
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {dayNames.map((name, i) => (
+            <div key={i} className="text-[10px] font-semibold text-secondary-500 text-center">
+              {name}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {days}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCalendar = () => {
+    const projectMonths = getProjectMonths();
+
+    return (
+      <div className="bg-white rounded shadow-sm border border-secondary-200 p-6">
         {/* Calendar Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-secondary-900">
-            {monthNames[month]} {year}
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-secondary-900 mb-3">
+            Project Calendar
           </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
-              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-            >
-              ← Previous
-            </button>
-            <button
-              onClick={() => setCurrentMonth(new Date())}
-              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-            >
-              Today
-            </button>
-            <button
-              onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
-              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-            >
-              Next →
-            </button>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-primary-100 border-2 border-primary-500"></div>
+              <span className="text-secondary-600">Today</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
+              <span className="text-secondary-600">Has Sessions</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-green-50 border-2 border-green-500"></div>
+              <span className="text-secondary-600">Start Date</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-red-50 border-2 border-red-500"></div>
+              <span className="text-secondary-600">End Date</span>
+            </div>
+            <div className="border-l border-secondary-300 pl-4 flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-1 bg-blue-400"></div>
+                <span className="text-secondary-600">Phase 1</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-1 bg-yellow-400"></div>
+                <span className="text-secondary-600">Phase 2</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-1 bg-green-400"></div>
+                <span className="text-secondary-600">Phase 3</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-4 mb-4 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-blue-50 border border-blue-300 rounded"></div>
-            <span className="text-secondary-600">Today</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-orange-50 border border-gray-200 rounded"></div>
-            <span className="text-secondary-600">Sunday</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-red-50 border border-gray-200 rounded"></div>
-            <span className="text-secondary-600">Bank Holiday</span>
-          </div>
-        </div>
-
-        {/* Day Names */}
-        <div className="grid grid-cols-7 gap-0 mb-2">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-            <div key={day} className="text-center font-semibold text-secondary-600 text-sm py-2">
-              {day}
+        {/* Multi-Month Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {projectMonths.map((monthDate, index) => (
+            <div key={index}>
+              {renderCompactMonth(monthDate)}
             </div>
           ))}
         </div>
 
-        {/* Calendar Grid */}
-        <div className="border border-gray-200">
-          {weeks}
+        {/* Sessions Summary */}
+        <div className="mt-6 pt-4 border-t border-secondary-200">
+          <div className="text-sm font-semibold text-secondary-900 mb-2">
+            Quick Info
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-blue-50 rounded p-3">
+              <div className="text-2xl font-bold text-blue-600">{sessions.length}</div>
+              <div className="text-xs text-blue-700">Total Sessions</div>
+            </div>
+            <div className="bg-green-50 rounded p-3">
+              <div className="text-2xl font-bold text-green-600">
+                {sessions.filter(s => s.status === 'Completed').length}
+              </div>
+              <div className="text-xs text-green-700">Completed</div>
+            </div>
+            <div className="bg-yellow-50 rounded p-3">
+              <div className="text-2xl font-bold text-yellow-600">
+                {sessions.filter(s => s.status === 'Scheduled').length}
+              </div>
+              <div className="text-xs text-yellow-700">Scheduled</div>
+            </div>
+            <div className="bg-purple-50 rounded p-3">
+              <div className="text-2xl font-bold text-purple-600">
+                {projectMonths.length}
+              </div>
+              <div className="text-xs text-purple-700">Project Months</div>
+            </div>
+          </div>
         </div>
       </div>
     );
