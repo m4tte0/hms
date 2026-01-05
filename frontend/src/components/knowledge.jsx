@@ -7,6 +7,11 @@ const Knowledge = ({ projectId }) => {
   const [teamContacts, setTeamContacts] = useState([]);
   const [project, setProject] = useState(null);
   const [phaseDates, setPhaseDates] = useState({});
+  const [phaseNames, setPhaseNames] = useState({
+    'Phase 1': 'Phase 1: Pre-Handover Assessment',
+    'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
+    'Phase 3': 'Phase 3: Final Sign-Offs'
+  });
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
   const [showAddModal, setShowAddModal] = useState(false);
@@ -39,6 +44,7 @@ const Knowledge = ({ projectId }) => {
       loadSessions();
       loadTeamContacts();
       loadPhaseDates();
+      loadPhaseNames();
     }
   }, [projectId]);
 
@@ -70,6 +76,24 @@ const Knowledge = ({ projectId }) => {
       }
     } catch (error) {
       console.error('Error loading phase dates:', error);
+    }
+  };
+
+  const loadPhaseNames = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/phase-names/${projectId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          const phaseNameMap = {};
+          data.forEach(pn => {
+            phaseNameMap[pn.phase_id] = pn.phase_name;
+          });
+          setPhaseNames(phaseNameMap);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading phase names:', error);
     }
   };
 
@@ -479,41 +503,82 @@ const Knowledge = ({ projectId }) => {
     const projectMonths = getProjectMonths();
 
     return (
-      <div className="bg-white rounded shadow-sm border border-secondary-200 p-6">
+      <div className="bg-white rounded shadow-sm border border-secondary-200 p-6 group">
         {/* Calendar Header */}
         <div className="mb-4">
-          <h2 className="text-base font-semibold text-secondary-900 mb-3">
-            Project Calendar
-          </h2>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-primary-100 border-2 border-primary-500"></div>
-              <span className="text-secondary-600">Today</span>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-secondary-900">
+              Project Calendar
+            </h2>
+            <div className="flex items-center gap-2">
+              {/* View Toggle - Always Visible */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`p-1.5 rounded transition-all ${
+                    viewMode === 'calendar'
+                      ? 'bg-primary-100 text-primary-600'
+                      : 'text-secondary-600 hover:bg-secondary-100'
+                  }`}
+                  title="Calendar View"
+                >
+                  <Calendar className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-1.5 rounded transition-all ${
+                    viewMode === 'list'
+                      ? 'bg-primary-100 text-primary-600'
+                      : 'text-secondary-600 hover:bg-secondary-100'
+                  }`}
+                  title="List View"
+                >
+                  <BookOpen className="w-4 h-4" />
+                </button>
+              </div>
+              {/* Add Session Button - Visible on Hover */}
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="p-1.5 bg-success-100 text-success-600 rounded hover:bg-success-200 transition-all opacity-0 group-hover:opacity-100"
+                title="Add Session"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
-              <span className="text-secondary-600">Has Sessions</span>
+          </div>
+          <div className="space-y-2">
+            {/* First Row - Date Indicators */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-primary-100 border-2 border-primary-500"></div>
+                <span className="text-secondary-600">Today</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
+                <span className="text-secondary-600">Has Sessions</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-green-50 border-2 border-green-500"></div>
+                <span className="text-secondary-600">Start Date</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-red-50 border-2 border-red-500"></div>
+                <span className="text-secondary-600">End Date</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-green-50 border-2 border-green-500"></div>
-              <span className="text-secondary-600">Start Date</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-red-50 border-2 border-red-500"></div>
-              <span className="text-secondary-600">End Date</span>
-            </div>
-            <div className="border-l border-secondary-300 pl-4 flex items-center gap-3">
+            {/* Second Row - Phase Indicators */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-4 h-1 bg-blue-400"></div>
-                <span className="text-secondary-600">Phase 1</span>
+                <span className="text-secondary-600">{phaseNames['Phase 1']}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-4 h-1 bg-yellow-400"></div>
-                <span className="text-secondary-600">Phase 2</span>
+                <span className="text-secondary-600">{phaseNames['Phase 2']}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-4 h-1 bg-green-400"></div>
-                <span className="text-secondary-600">Phase 3</span>
+                <span className="text-secondary-600">{phaseNames['Phase 3']}</span>
               </div>
             </div>
           </div>
@@ -568,8 +633,45 @@ const Knowledge = ({ projectId }) => {
     );
 
     return (
-      <div className="bg-white rounded shadow-sm border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-secondary-900 mb-4">All Sessions</h2>
+      <div className="bg-white rounded shadow-sm border border-gray-200 p-6 group">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-secondary-900">All Sessions</h2>
+          <div className="flex items-center gap-2">
+            {/* View Toggle - Always Visible */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`p-1.5 rounded transition-all ${
+                  viewMode === 'calendar'
+                    ? 'bg-primary-100 text-primary-600'
+                    : 'text-secondary-600 hover:bg-secondary-100'
+                }`}
+                title="Calendar View"
+              >
+                <Calendar className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-primary-100 text-primary-600'
+                    : 'text-secondary-600 hover:bg-secondary-100'
+                }`}
+                title="List View"
+              >
+                <BookOpen className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Add Session Button - Visible on Hover */}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="p-1.5 bg-success-100 text-success-600 rounded hover:bg-success-200 transition-all opacity-0 group-hover:opacity-100"
+              title="Add Session"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
         {sortedSessions.length === 0 ? (
           <div className="text-center py-12 text-secondary-500">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -673,109 +775,109 @@ const Knowledge = ({ projectId }) => {
 
   return (
     <div className="space-y-4 pb-24">
-      {/* Header with Actions */}
-      <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-base font-bold text-secondary-900">Knowledge Transfer</h1>
-            <p className="text-xs text-secondary-600 mt-0.5">
-              Schedule and track knowledge transfer sessions between teams
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex bg-gray-100 rounded p-1">
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'
-                }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-2" />
-                Calendar
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-secondary-600 hover:text-secondary-900'
-                }`}
-              >
-                <BookOpen className="w-4 h-4 inline mr-2" />
-                List
-              </button>
-            </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Session
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Calendar or List View */}
+      {viewMode === 'calendar' ? renderCalendar() : renderList()}
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-          <div className="text-xl font-bold text-primary-600">{sessions.length}</div>
-          <div className="text-xs text-secondary-600">Total Sessions</div>
-        </div>
-        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-          <div className="text-xl font-bold text-success-600">
-            {sessions.filter(s => s.status === 'Completed').length}
-          </div>
-          <div className="text-xs text-secondary-600">Completed</div>
-        </div>
-        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-          <div className="text-xl font-bold text-warning-600">
-            {sessions.filter(s => s.status === 'Scheduled').length}
-          </div>
-          <div className="text-xs text-secondary-600">Scheduled</div>
-        </div>
-        <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-          <div className="text-xl font-bold text-primary-600">
-            {sessions.filter(s => s.effectiveness_rating).length > 0
-              ? (sessions.filter(s => s.effectiveness_rating).reduce((acc, s) => acc + s.effectiveness_rating, 0) /
-                 sessions.filter(s => s.effectiveness_rating).length).toFixed(1)
-              : 'N/A'}
-          </div>
-          <div className="text-xs text-secondary-600">Avg Rating</div>
-        </div>
-      </div>
-
-      {/* Completion Progress Bar */}
+      {/* Knowledge Transfer Progress */}
       {(() => {
         const completedSessions = sessions.filter(s => s.status === 'Completed').length;
         const totalSessions = sessions.length;
-        const progressPercentage = totalSessions > 0 ? (completedSessions / totalSessions) * 100 : 0;
+        const progressPercentage = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
 
         return (
-          <div className="bg-white rounded shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <BookOpen className="w-4 h-4 text-secondary-700" />
                 <h3 className="text-sm font-semibold text-secondary-900">Knowledge Transfer Progress</h3>
               </div>
-              <span className="text-sm font-bold text-secondary-900">
-                {completedSessions} / {totalSessions} Sessions
-              </span>
+              <div className="flex items-center gap-2 text-xs text-secondary-600">
+                <span className="font-semibold text-success-600">
+                  {completedSessions} / {totalSessions} sessions completed
+                </span>
+              </div>
             </div>
-            <div className="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 ease-out flex items-center justify-center"
-                style={{ width: `${progressPercentage}%` }}
-              >
-                {progressPercentage > 10 && (
-                  <span className="text-xs font-bold text-white">
-                    {progressPercentage.toFixed(0)}%
-                  </span>
+
+            {/* Visual Progress Bar */}
+            <div className="bg-secondary-50 rounded p-3">
+              <div className="relative">
+                {/* Progress Bar */}
+                <div className="relative h-3 rounded-full overflow-hidden flex">
+                  {/* Background */}
+                  <div className="absolute inset-0 bg-secondary-200" />
+
+                  {/* Progress Gradient */}
+                  <div
+                    className="absolute h-full bg-gradient-to-r from-blue-400 to-green-500 transition-all duration-500"
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+
+                {/* Progress Marker */}
+                {totalSessions > 0 && (
+                  <div
+                    className="absolute top-0 flex flex-col items-center z-10"
+                    style={{ left: `${progressPercentage}%`, transform: 'translateX(-50%)' }}
+                  >
+                    {/* Marker dot */}
+                    <div className="w-3 h-3 bg-success-600 rounded-full border-2 border-white shadow-md"></div>
+                    {/* Progress label */}
+                    <div className="mt-1 px-2 py-0.5 bg-success-600 text-white text-xs font-bold rounded whitespace-nowrap">
+                      {progressPercentage}%
+                    </div>
+                  </div>
                 )}
               </div>
-              {progressPercentage <= 10 && progressPercentage > 0 && (
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-secondary-700">
-                  {progressPercentage.toFixed(0)}%
-                </span>
-              )}
+
+              {/* Labels */}
+              <div className="flex justify-between items-center mt-8 text-xs">
+                <div className="text-left">
+                  <div className="text-secondary-500 font-medium">Not Started</div>
+                  <div className="text-sm font-semibold text-secondary-900">
+                    {sessions.filter(s => s.status === 'Scheduled').length} sessions
+                  </div>
+                </div>
+                <div className="text-center bg-success-50 px-3 py-1 rounded">
+                  <div className="text-secondary-500 font-medium">Completion</div>
+                  <div className="text-sm font-semibold text-success-600">
+                    {progressPercentage}%
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-secondary-500 font-medium">Completed</div>
+                  <div className="text-sm font-semibold text-success-600">
+                    {completedSessions} sessions
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Indicator */}
+            <div className={`mt-3 p-2 rounded ${progressPercentage >= 100 ? 'bg-success-50' : progressPercentage >= 50 ? 'bg-primary-50' : 'bg-warning-50'}`}>
+              <div className="flex items-center gap-2">
+                {progressPercentage >= 100 ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 text-success-600 flex-shrink-0" />
+                    <span className="text-xs font-medium text-success-800">
+                      All knowledge transfer sessions completed
+                    </span>
+                  </>
+                ) : progressPercentage >= 50 ? (
+                  <>
+                    <Clock className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                    <span className="text-xs font-medium text-primary-800">
+                      Knowledge transfer in progress - {progressPercentage}% completed
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                    <span className="text-xs font-medium text-warning-800">
+                      Knowledge transfer starting - {totalSessions - completedSessions} sessions remaining
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -867,9 +969,6 @@ const Knowledge = ({ projectId }) => {
         }
         return null;
       })()}
-
-      {/* Calendar or List View */}
-      {viewMode === 'calendar' ? renderCalendar() : renderList()}
 
       {/* Add Session Modal */}
       {showAddModal && (
