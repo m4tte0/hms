@@ -1061,6 +1061,191 @@ app.delete('/api/features/:projectId/:featureId', async (req, res) => {
   }
 });
 
+// ==================== NEWSLETTER ROUTES ====================
+
+const newsletterService = require('./services/newsletterService');
+const newsletterScheduler = require('./services/newsletterScheduler');
+
+// Get newsletter subscriptions for a project
+app.get('/api/newsletter/subscriptions/:projectId', async (req, res) => {
+  try {
+    const subscriptions = await db.allAsync(
+      'SELECT * FROM newsletter_subscriptions WHERE project_id = ? ORDER BY email',
+      [req.params.projectId]
+    );
+    res.json(subscriptions);
+  } catch (error) {
+    console.error('Error fetching subscriptions:', error);
+    res.status(500).json({ error: 'Failed to fetch subscriptions' });
+  }
+});
+
+// Add newsletter subscription
+app.post('/api/newsletter/subscriptions/:projectId', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email is required' });
+    }
+
+    const result = await db.runAsync(
+      `INSERT OR REPLACE INTO newsletter_subscriptions (project_id, email, subscribed, updated_at)
+       VALUES (?, ?, 1, CURRENT_TIMESTAMP)`,
+      [req.params.projectId, email.toLowerCase().trim()]
+    );
+
+    res.status(201).json({ id: result.id, message: 'Subscription added successfully' });
+  } catch (error) {
+    console.error('Error adding subscription:', error);
+    res.status(500).json({ error: 'Failed to add subscription' });
+  }
+});
+
+// Update subscription status (subscribe/unsubscribe)
+app.put('/api/newsletter/subscriptions/:projectId/:subscriptionId', async (req, res) => {
+  try {
+    const { subscribed } = req.body;
+
+    await db.runAsync(
+      `UPDATE newsletter_subscriptions
+       SET subscribed = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ? AND project_id = ?`,
+      [subscribed ? 1 : 0, req.params.subscriptionId, req.params.projectId]
+    );
+
+    res.json({ message: 'Subscription updated successfully' });
+  } catch (error) {
+    console.error('Error updating subscription:', error);
+    res.status(500).json({ error: 'Failed to update subscription' });
+  }
+});
+
+// Delete subscription
+app.delete('/api/newsletter/subscriptions/:projectId/:subscriptionId', async (req, res) => {
+  try {
+    await db.runAsync(
+      'DELETE FROM newsletter_subscriptions WHERE id = ? AND project_id = ?',
+      [req.params.subscriptionId, req.params.projectId]
+    );
+
+    res.json({ message: 'Subscription deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting subscription:', error);
+    res.status(500).json({ error: 'Failed to delete subscription' });
+  }
+});
+
+// Auto-subscribe team members
+app.post('/api/newsletter/auto-subscribe/:projectId', async (req, res) => {
+  try {
+    const result = await newsletterService.autoSubscribeTeamMembers(req.params.projectId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error auto-subscribing:', error);
+    res.status(500).json({ error: 'Failed to auto-subscribe team members' });
+  }
+});
+
+// Get newsletter settings for a project
+app.get('/api/newsletter/settings/:projectId', async (req, res) => {
+  try {
+    let settings = await db.getAsync(
+      'SELECT * FROM newsletter_settings WHERE project_id = ?',
+      [req.params.projectId]
+    );
+
+    // Create default settings if none exist
+    if (!settings) {
+      await db.runAsync(
+        `INSERT INTO newsletter_settings (project_id)
+         VALUES (?)`,
+        [req.params.projectId]
+      );
+
+      settings = await db.getAsync(
+        'SELECT * FROM newsletter_settings WHERE project_id = ?',
+        [req.params.projectId]
+      );
+    }
+
+    res.json(settings);
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// Update newsletter settings
+app.put('/api/newsletter/settings/:projectId', async (req, res) => {
+  try {
+    const {
+      enabled,
+      include_metrics,
+      include_tasks,
+      include_issues,
+      include_team_changes,
+      include_attachments,
+      include_upcoming_events
+    } = req.body;
+
+    await db.runAsync(
+      `INSERT OR REPLACE INTO newsletter_settings
+       (project_id, enabled, include_metrics, include_tasks, include_issues,
+        include_team_changes, include_attachments, include_upcoming_events, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [
+        req.params.projectId,
+        enabled ? 1 : 0,
+        include_metrics ? 1 : 0,
+        include_tasks ? 1 : 0,
+        include_issues ? 1 : 0,
+        include_team_changes ? 1 : 0,
+        include_attachments ? 1 : 0,
+        include_upcoming_events ? 1 : 0
+      ]
+    );
+
+    res.json({ message: 'Settings updated successfully' });
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// Get newsletter history
+app.get('/api/newsletter/history/:projectId', async (req, res) => {
+  try {
+    const history = await db.allAsync(
+      `SELECT * FROM newsletter_history
+       WHERE project_id = ?
+       ORDER BY sent_at DESC
+       LIMIT 50`,
+      [req.params.projectId]
+    );
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching history:', error);
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// Manual trigger newsletter (for testing)
+app.post('/api/newsletter/trigger', async (req, res) => {
+  try {
+    // Only allow in development/testing
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ error: 'Manual trigger not allowed in production' });
+    }
+
+    newsletterScheduler.triggerNow();
+    res.json({ message: 'Newsletter generation triggered' });
+  } catch (error) {
+    console.error('Error triggering newsletter:', error);
+    res.status(500).json({ error: 'Failed to trigger newsletter' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -1077,4 +1262,12 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`📊 API available at http://localhost:${PORT}/api`);
   console.log(`💾 Database: ${process.env.DATABASE_PATH || './database/handover.db'}`);
+
+  // Start newsletter scheduler
+  if (process.env.BREVO_API_KEY) {
+    newsletterScheduler.start();
+  } else {
+    console.log('⚠️  Newsletter scheduler not started - BREVO_API_KEY not configured');
+    console.log('   Add BREVO_API_KEY to .env file to enable weekly newsletters');
+  }
 });

@@ -3,3 +3,7 @@ backend/node_modules/
 frontend/node_modules/
 node_modules
 
+# Environment variables (contains secrets!)
+backend/.env
+.env
+

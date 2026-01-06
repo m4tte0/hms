@@ -52,5 +52,27 @@ export const teamContactsAPI = {
   deleteContact: (projectId, contactId) => apiClient.delete(`/team-contacts/${projectId}/${contactId}`),
 };
 
+// --- API per le Newsletter ---
+export const newsletterAPI = {
+  // Subscriptions
+  getSubscriptions: (projectId) => apiClient.get(`/newsletter/subscriptions/${projectId}`),
+  addSubscription: (projectId, email) => apiClient.post(`/newsletter/subscriptions/${projectId}`, { email }),
+  updateSubscription: (projectId, subscriptionId, subscribed) =>
+    apiClient.put(`/newsletter/subscriptions/${projectId}/${subscriptionId}`, { subscribed }),
+  deleteSubscription: (projectId, subscriptionId) =>
+    apiClient.delete(`/newsletter/subscriptions/${projectId}/${subscriptionId}`),
+  autoSubscribe: (projectId) => apiClient.post(`/newsletter/auto-subscribe/${projectId}`),
+
+  // Settings
+  getSettings: (projectId) => apiClient.get(`/newsletter/settings/${projectId}`),
+  updateSettings: (projectId, settings) => apiClient.put(`/newsletter/settings/${projectId}`, settings),
+
+  // History
+  getHistory: (projectId) => apiClient.get(`/newsletter/history/${projectId}`),
+
+  // Manual trigger (testing only)
+  triggerNow: () => apiClient.post('/newsletter/trigger')
+};
+
 // Esportiamo il client di default per usi generici, se necessario.
 export default apiClient;
