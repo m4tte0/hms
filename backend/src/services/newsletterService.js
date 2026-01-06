@@ -79,22 +79,16 @@ class NewsletterService {
 
       const phaseProgress = this.calculatePhaseProgress(allTasks);
 
-      // Get upcoming sessions (next 2 weeks) - handle missing table gracefully
-      let upcomingSessions = [];
-      try {
-        upcomingSessions = await db.allAsync(
-          `SELECT * FROM sessions
-           WHERE project_id = ?
-           AND scheduled_date >= ?
-           AND status != 'Cancelled'
-           ORDER BY scheduled_date ASC
-           LIMIT 5`,
-          [projectId, new Date().toISOString()]
-        );
-      } catch (error) {
-        // Table doesn't exist yet, skip sessions
-        console.log('ℹ️  Sessions table not found, skipping upcoming events');
-      }
+      // Get upcoming sessions (next 2 weeks)
+      const upcomingSessions = await db.allAsync(
+        `SELECT * FROM knowledge_sessions
+         WHERE project_id = ?
+         AND scheduled_date >= ?
+         AND status != 'Cancelled'
+         ORDER BY scheduled_date ASC
+         LIMIT 5`,
+        [projectId, new Date().toISOString().split('T')[0]]
+      );
 
       // Get phase dates for deadlines
       const phaseDates = await db.allAsync(
