@@ -350,7 +350,11 @@ const Knowledge = ({ projectId }) => {
 
   // Determine which phase a date belongs to
   const getPhaseForDate = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    // Format date in local time to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
 
     // Check each phase
     for (const phaseId of ['Phase 1', 'Phase 2', 'Phase 3']) {
@@ -388,8 +392,12 @@ const Knowledge = ({ projectId }) => {
       return months;
     }
 
-    const start = new Date(project.start_date);
-    const end = new Date(project.target_date);
+    // Parse dates in local time to avoid timezone offset issues
+    const [startYear, startMonth, startDay] = project.start_date.split('-').map(Number);
+    const [endYear, endMonthNum, endDay] = project.target_date.split('-').map(Number);
+
+    const start = new Date(startYear, startMonth - 1, startDay);
+    const end = new Date(endYear, endMonthNum - 1, endDay);
     const months = [];
 
     let current = new Date(start.getFullYear(), start.getMonth(), 1);
@@ -425,20 +433,27 @@ const Knowledge = ({ projectId }) => {
       const phaseId = getPhaseForDate(date);
       const phaseColor = phaseId ? getPhaseColor(phaseId) : null;
 
-      // Check if this is the project start or end date
-      const dateStr = date.toISOString().split('T')[0];
+      // Check if this is the project start or end date (fix timezone issue)
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const isStartDate = project?.start_date === dateStr;
       const isEndDate = project?.target_date === dateStr;
 
       // Determine if we should show strip or use phase color as border
       const hasSpecialBackground = isToday || isStartDate || isEndDate || hasSessions;
       const showStripAtBottom = phaseColor && !hasSpecialBackground;
-      const usePhaseBorder = phaseColor && hasSpecialBackground;
+
+      // Start/End dates ALWAYS get their own borders, even if in a phase
+      const usePhaseBorder = phaseColor && hasSpecialBackground && !isStartDate && !isEndDate;
 
       // Get the appropriate ring color
       let ringColorClass = '';
-      if (usePhaseBorder) {
-        // Use phase color for border
+      // Priority: Start/End dates always get their specific borders
+      if (isStartDate) {
+        ringColorClass = 'ring-green-500';
+      } else if (isEndDate) {
+        ringColorClass = 'ring-red-500';
+      } else if (usePhaseBorder) {
+        // Use phase color for border (only for today/hasSessions, not start/end)
         const phaseBorderColors = {
           'Phase 1': 'ring-blue-400',
           'Phase 2': 'ring-yellow-400',
@@ -448,8 +463,6 @@ const Knowledge = ({ projectId }) => {
       } else {
         // Use default colors based on special state
         if (isToday) ringColorClass = 'ring-primary-500';
-        else if (isStartDate) ringColorClass = 'ring-green-500';
-        else if (isEndDate) ringColorClass = 'ring-red-500';
       }
 
       days.push(
@@ -457,7 +470,7 @@ const Knowledge = ({ projectId }) => {
           key={day}
           onClick={() => {
             setSelectedDate(date);
-            setNewSession(prev => ({ ...prev, scheduled_date: date.toISOString().split('T')[0] }));
+            setNewSession(prev => ({ ...prev, scheduled_date: dateStr }));
             setShowAddModal(true);
           }}
           className={`aspect-square text-xs font-medium rounded transition-all relative overflow-hidden
