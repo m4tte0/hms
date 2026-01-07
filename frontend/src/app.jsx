@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText, CheckCircle, BarChart3, Clock, Users, Paperclip,
-  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart
+  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart, Settings
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
@@ -33,6 +33,9 @@ function App() {
 
   // Report modal state
   const [showReport, setShowReport] = useState(false);
+
+  // Project Settings modal state
+  const [showProjectSettings, setShowProjectSettings] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -308,6 +311,141 @@ function App() {
   return (
     <div className="h-screen bg-slate-100 overflow-hidden">
       {/* Delete Confirmation Modal */}
+      {/* Project Settings Modal */}
+      {showProjectSettings && currentProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-secondary-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-primary-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-secondary-900">Project Settings</h3>
+                  <p className="text-xs text-secondary-500">Manage project configuration and metrics</p>
+                </div>
+              </div>
+              <button onClick={() => setShowProjectSettings(false)} className="p-1 hover:bg-secondary-100 rounded transition-colors">
+                <X className="w-5 h-5 text-secondary-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Basic Information Section */}
+              <div>
+                <h4 className="text-sm font-semibold text-secondary-900 mb-3">Basic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">
+                      Project Name <span className="text-danger-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={currentProject.project_name || ''}
+                      onChange={(e) => setCurrentProject({ ...currentProject, project_name: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Enter project name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">
+                      Handover ID <span className="text-danger-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={currentProject.handover_id || ''}
+                      onChange={(e) => setCurrentProject({ ...currentProject, handover_id: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="HTD-YYYY-XXX"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={currentProject.start_date || ''}
+                      onChange={(e) => setCurrentProject({ ...currentProject, start_date: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Target Completion Date</label>
+                    <input
+                      type="date"
+                      value={currentProject.target_date || ''}
+                      onChange={(e) => setCurrentProject({ ...currentProject, target_date: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Metrics Section */}
+              <div className="pt-3 border-t border-secondary-200">
+                <h4 className="text-sm font-semibold text-secondary-900 mb-3">Project Metrics</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Project Priority</label>
+                    <select
+                      value={currentProject.business_priority || 'Media'}
+                      onChange={(e) => setCurrentProject({ ...currentProject, business_priority: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="Alta">Alta</option>
+                      <option value="Media">Media</option>
+                      <option value="Bassa">Bassa</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Complexity Level</label>
+                    <select
+                      value={currentProject.complexity_level || 'Media'}
+                      onChange={(e) => setCurrentProject({ ...currentProject, complexity_level: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="Alta">Alta</option>
+                      <option value="Media">Media</option>
+                      <option value="Bassa">Bassa</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-secondary-700 mb-1">Project Score (Auto-calculated)</label>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 bg-secondary-50 px-3 py-2 border border-secondary-300 rounded text-sm text-secondary-700 font-semibold">
+                        {currentProject.project_score || 0} / 15
+                      </div>
+                      <div className="flex-1">
+                        <div className="w-full bg-secondary-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              (currentProject.project_score || 0) >= 12 ? 'bg-danger-500' :
+                              (currentProject.project_score || 0) >= 9 ? 'bg-warning-500' :
+                              (currentProject.project_score || 0) >= 6 ? 'bg-warning-600' :
+                              'bg-success-500'
+                            }`}
+                            style={{ width: `${((currentProject.project_score || 0) / 15) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-secondary-500 mt-1">Calculated from Priority (weight: 2) and Complexity (weight: 3)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-secondary-200">
+              <button
+                onClick={() => setShowProjectSettings(false)}
+                className="px-4 py-2 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-5">
@@ -356,6 +494,15 @@ function App() {
                 </p>
               )}
             </div>
+            {currentProject && (
+              <button
+                onClick={() => setShowProjectSettings(true)}
+                className="absolute right-0 p-2 hover:bg-primary-600 rounded transition-colors"
+                title="Project Settings"
+              >
+                <Settings className="w-6 h-6 text-white" />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -392,9 +539,11 @@ function App() {
                       <div className={`font-medium text-sm text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'}`}>
                         {project.project_name}
                       </div>
-                      <div className={`text-xs text-secondary-500 truncate ${isSelected ? 'mb-1.5' : 'mb-0'}`}>
-                        {project.handover_id}
-                      </div>
+                      {isSelected && (
+                        <div className="text-xs text-secondary-500 truncate mb-1.5">
+                          {project.handover_id}
+                        </div>
+                      )}
 
                       {isSelected ? (
                         <>

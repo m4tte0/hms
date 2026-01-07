@@ -761,12 +761,16 @@ const Overview = ({ project, setProject }) => {
           <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Project Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name <span className="text-danger-500">*</span></label>
-              <input type="text" value={project.project_name || ''} onChange={(e) => handleChange('project_name', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter project name" />
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name</label>
+              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
+                {project.project_name || 'Not set'}
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Handover ID <span className="text-danger-500">*</span></label>
-              <input type="text" value={project.handover_id || ''} onChange={(e) => handleChange('handover_id', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="HTD-YYYY-XXX" />
+              <label className="block text-sm font-medium text-secondary-700 mb-1">Handover ID</label>
+              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
+                {project.handover_id || 'Not set'}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary-700 mb-1">R&D Project Lead</label>
@@ -812,11 +816,15 @@ const Overview = ({ project, setProject }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
-              <input type="date" value={project.start_date || ''} onChange={(e) => handleChange('start_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
+                {project.start_date ? new Date(project.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-secondary-700 mb-1">Target Completion Date</label>
-              <input type="date" value={project.target_date || ''} onChange={(e) => handleChange('target_date', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
+                {project.target_date ? new Date(project.target_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+              </div>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-secondary-200">
@@ -824,19 +832,15 @@ const Overview = ({ project, setProject }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Project Priority</label>
-                <select value={project.business_priority || 'Media'} onChange={(e) => handleChange('business_priority', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                  <option value="Alta">Alta</option>
-                  <option value="Media">Media</option>
-                  <option value="Bassa">Bassa</option>
-                </select>
+                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
+                  {project.business_priority || 'Media'}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Complexity Level</label>
-                <select value={project.complexity_level || 'Media'} onChange={(e) => handleChange('complexity_level', e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                  <option value="Alta">Alta</option>
-                  <option value="Media">Media</option>
-                  <option value="Bassa">Bassa</option>
-                </select>
+                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
+                  {project.complexity_level || 'Media'}
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Project Score</label>
@@ -859,24 +863,6 @@ const Overview = ({ project, setProject }) => {
           </div>
         </div>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-primary-600 mb-0.5">{calculateOverallProgress()}%</div>
-              <div className="text-xs text-secondary-600">Overall Progress</div>
-            </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-success-600 mb-0.5">{getCompletedTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Tasks Completed</div>
-            </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-warning-600 mb-0.5">{getInProgressTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Tasks In Progress</div>
-            </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-secondary-600 mb-0.5">{getNotStartedTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Not Started</div>
-            </div>
-          </div>
           <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
@@ -1010,6 +996,24 @@ const Overview = ({ project, setProject }) => {
                 ))}
               </div>
             )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-secondary-600 mb-0.5">{getNotStartedTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Not Started</div>
+            </div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-warning-600 mb-0.5">{getInProgressTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Tasks In Progress</div>
+            </div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-success-600 mb-0.5">{getCompletedTasksCount()}</div>
+              <div className="text-xs text-secondary-600">Tasks Completed</div>
+            </div>
+            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
+              <div className="text-xl font-bold text-primary-600 mb-0.5">{calculateOverallProgress()}%</div>
+              <div className="text-xs text-secondary-600">Overall Progress</div>
+            </div>
           </div>
         </div>
       </div>
