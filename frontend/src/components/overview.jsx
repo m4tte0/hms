@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Users, Plus, X, Trash2, Edit, Calendar, ChevronDown, ChevronUp, Star, Circle, Layers } from 'lucide-react';
 import { teamContactsAPI, checklistAPI, issuesAPI, phaseNamesAPI, phaseDatesAPI } from '../services/api';
 
 const Overview = ({ project, setProject }) => {
@@ -827,40 +827,6 @@ const Overview = ({ project, setProject }) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-secondary-200">
-            <h3 className="text-sm font-semibold text-secondary-700 mb-3">Project Metrics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Priority</label>
-                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
-                  {project.business_priority || 'Media'}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Complexity Level</label>
-                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
-                  {project.complexity_level || 'Media'}
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Score</label>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-secondary-50 px-2.5 py-1.5 border border-secondary-300 rounded text-sm text-secondary-700 font-semibold">{project.project_score || 0} / 15</div>
-                  <div className="flex-1">
-                    <div className="w-full bg-secondary-200 rounded-full h-2">
-                      <div className={`h-2 rounded-full transition-all duration-500 ${
-                        (project.project_score || 0) >= 12 ? 'bg-danger-500' :
-                        (project.project_score || 0) >= 9 ? 'bg-warning-500' :
-                        (project.project_score || 0) >= 6 ? 'bg-warning-600' :
-                        'bg-success-500'
-                      }`} style={{ width: `${((project.project_score || 0) / 15) * 100}%` }} />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-secondary-500 mt-0.5">Calculated from Priority (weight: 2) and Complexity (weight: 3)</p>
-              </div>
-            </div>
-          </div>
         </div>
         <div className="space-y-4">
           <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
@@ -997,26 +963,78 @@ const Overview = ({ project, setProject }) => {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-secondary-600 mb-0.5">{getNotStartedTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Not Started</div>
+        </div>
+      </div>
+
+      {/* Project Metrics Summary */}
+      <div className="bg-gradient-to-br from-white to-secondary-50 rounded shadow-md border-2 border-secondary-200 p-4">
+        <h2 className="text-sm font-semibold text-secondary-900 mb-3 flex items-center gap-2">
+          <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
+          Project Metrics & Progress
+        </h2>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Task Statistics */}
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-secondary-200 shadow-sm">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100">
+              <Circle className="w-4 h-4 text-secondary-600" />
             </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-warning-600 mb-0.5">{getInProgressTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Tasks In Progress</div>
+            <div>
+              <div className="text-sm font-bold text-secondary-600">{getNotStartedTasksCount()}</div>
+              <div className="text-xs text-secondary-500">Not Started</div>
             </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-success-600 mb-0.5">{getCompletedTasksCount()}</div>
-              <div className="text-xs text-secondary-600">Tasks Completed</div>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-warning-200 shadow-sm">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-warning-100">
+              <Clock className="w-4 h-4 text-warning-600" />
             </div>
-            <div className="bg-white rounded shadow-sm border border-secondary-200 p-3">
-              <div className="text-xl font-bold text-primary-600 mb-0.5">{calculateOverallProgress()}%</div>
-              <div className="text-xs text-secondary-600">Overall Progress</div>
+            <div>
+              <div className="text-sm font-bold text-warning-600">{getInProgressTasksCount()}</div>
+              <div className="text-xs text-secondary-500">In Progress</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-success-200 shadow-sm">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-success-100">
+              <CheckCircle className="w-4 h-4 text-success-600" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-success-600">{getCompletedTasksCount()}</div>
+              <div className="text-xs text-secondary-500">Completed</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg border-2 border-primary-300 shadow-sm">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-500">
+              <span className="text-sm font-bold text-white">{calculateOverallProgress()}%</span>
+            </div>
+            <div>
+              <div className="text-xs text-primary-700 font-medium">Overall Progress</div>
+            </div>
+          </div>
+
+          {/* Vertical Divider */}
+          <div className="w-px h-12 bg-secondary-300"></div>
+
+          {/* Project Metrics */}
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-secondary-200 shadow-sm">
+            <AlertCircle className="w-5 h-5 text-primary-600" />
+            <div>
+              <div className="text-xs text-secondary-500">Priority</div>
+              <div className="text-sm font-semibold text-secondary-900">{project.business_priority || 'Media'}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-secondary-200 shadow-sm">
+            <Layers className="w-5 h-5 text-secondary-600" />
+            <div>
+              <div className="text-xs text-secondary-500">Complexity</div>
+              <div className="text-sm font-semibold text-secondary-900">{project.complexity_level || 'Media'}</div>
             </div>
           </div>
         </div>
       </div>
+
       <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
         <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Handover Process Overview</h2>
         <div className="space-y-2">
