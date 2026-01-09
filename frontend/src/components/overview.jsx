@@ -759,71 +759,69 @@ const Overview = ({ project, setProject }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
           <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Project Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name</label>
-              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
-                {project.project_name || 'Not set'}
+          <div className="space-y-3">
+            <div className="flex flex-col md:flex-row gap-3">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name</label>
+                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
+                  {project.project_name || 'Not set'}
+                </div>
+              </div>
+              <div className="flex-shrink-0 md:mt-1.5">
+                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Start Date</label>
+                <div className="px-2.5 py-2 bg-secondary-50 border border-secondary-200 rounded text-xs text-secondary-900 whitespace-nowrap">
+                  {project.start_date ? new Date(project.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+                </div>
+              </div>
+              <div className="flex-shrink-0 md:mt-1.5">
+                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Target Date</label>
+                <div className="px-2.5 py-2 bg-secondary-50 border border-secondary-200 rounded text-xs text-secondary-900 whitespace-nowrap">
+                  {project.target_date ? new Date(project.target_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+                </div>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Handover ID</label>
-              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
-                {project.handover_id || 'Not set'}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">R&D Project Lead</label>
-              {project.rd_lead ? (
-                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
-                  <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-secondary-900">
-                      {project.rd_lead.split(' (')[0]}
-                    </span>
-                    <span className="text-xs text-secondary-600">
-                      {project.rd_lead.match(/\(([^)]+)\)/)?.[1] || ''}
-                    </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">R&D Project Lead</label>
+                {project.rd_lead ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
+                    <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-secondary-900">
+                        {project.rd_lead.split(' (')[0]}
+                      </span>
+                      <span className="text-xs text-secondary-600">
+                        {project.rd_lead.match(/\(([^)]+)\)/)?.[1] || ''}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
-                  <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
-                  <span className="text-xs text-warning-700">No R&D team lead assigned</span>
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Automation Team Lead</label>
-              {project.automation_lead ? (
-                <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
-                  <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-secondary-900">
-                      {project.automation_lead.split(' (')[0]}
-                    </span>
-                    <span className="text-xs text-secondary-600">
-                      {project.automation_lead.match(/\(([^)]+)\)/)?.[1] || ''}
-                    </span>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
+                    <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                    <span className="text-xs text-warning-700">No R&D team lead assigned</span>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
-                  <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
-                  <span className="text-xs text-warning-700">No Automation team lead assigned</span>
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
-              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
-                {project.start_date ? new Date(project.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+                )}
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Target Completion Date</label>
-              <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm text-secondary-900">
-                {project.target_date ? new Date(project.target_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Automation Team Lead</label>
+                {project.automation_lead ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
+                    <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-secondary-900">
+                        {project.automation_lead.split(' (')[0]}
+                      </span>
+                      <span className="text-xs text-secondary-600">
+                        {project.automation_lead.match(/\(([^)]+)\)/)?.[1] || ''}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
+                    <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
+                    <span className="text-xs text-warning-700">No Automation team lead assigned</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
