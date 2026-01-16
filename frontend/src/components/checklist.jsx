@@ -21,6 +21,11 @@ const Checklist = ({ projectId }) => {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [newItemPhase, setNewItemPhase] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('');
+  const [showAddPhaseModal, setShowAddPhaseModal] = useState(false);
+  const [newPhaseName, setNewPhaseName] = useState('');
+  const [newPhaseColor, setNewPhaseColor] = useState('blue');
+  const [showDeletePhaseModal, setShowDeletePhaseModal] = useState(false);
+  const [phaseToDelete, setPhaseToDelete] = useState(null);
   const [collapsedPhases, setCollapsedPhases] = useState({});
   const [collapsedCategories, setCollapsedCategories] = useState({});
   
@@ -584,6 +589,17 @@ const Checklist = ({ projectId }) => {
   const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
 
+    // Check if this is the last item in the phase
+    const itemsInPhase = items.filter(item => item.phase === itemToDelete.phase);
+
+    if (itemsInPhase.length === 1) {
+      setSaveStatus('Cannot delete: last item in phase');
+      setTimeout(() => setSaveStatus(''), 3000);
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+      return;
+    }
+
     try {
       console.log(`🗑️ Deleting item ${itemToDelete.id}`);
 
@@ -596,13 +612,13 @@ const Checklist = ({ projectId }) => {
       }
 
       setItems(items.filter(item => item.id !== itemToDelete.id));
-      
+
       setShowDeleteModal(false);
       setItemToDelete(null);
-      
+
       setSaveStatus('Item deleted');
       setTimeout(() => setSaveStatus(''), 2000);
-      
+
       console.log('✅ Item deleted successfully');
     } catch (error) {
       console.error('❌ Error deleting item:', error);
@@ -774,6 +790,143 @@ const Checklist = ({ projectId }) => {
     setShowAddItemModal(false);
     setNewItemPhase('');
     setNewItemCategory('');
+  };
+
+  const handleAddPhaseClick = () => {
+    setNewPhaseName('');
+    setNewPhaseColor('blue');
+    setShowAddPhaseModal(true);
+  };
+
+  const handleAddPhaseConfirm = async () => {
+    if (!newPhaseName.trim()) {
+      setSaveStatus('Phase name cannot be empty');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    try {
+      // Generate new phase ID
+      const existingPhaseNumbers = phases
+        .map(p => {
+          const match = p.id.match(/Phase (\d+)/);
+          return match ? parseInt(match[1]) : 0;
+        })
+        .filter(n => n > 0);
+
+      const nextPhaseNumber = existingPhaseNumbers.length > 0
+        ? Math.max(...existingPhaseNumbers) + 1
+        : 1;
+
+      const newPhaseId = `Phase ${nextPhaseNumber}`;
+
+      // Create the new phase object
+      const newPhase = {
+        id: newPhaseId,
+        name: newPhaseName,
+        color: newPhaseColor
+      };
+
+      // Add to phases array
+      const updatedPhases = [...phases, newPhase];
+      setPhases(updatedPhases);
+
+      // Save to database
+      await savePhaseNames(updatedPhases);
+
+      // Create a default item for the new phase
+      const newItem = {
+        phase: newPhaseId,
+        category: 'General',
+        requirement: 'New requirement',
+        status: 'Not Started',
+        verification_date: null,
+        verified_by: '',
+        notes: ''
+      };
+
+      const response = await fetch(`${API_BASE_URL}/checklist/${projectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItem)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      setItems([...items, { ...newItem, id: result.id }]);
+
+      setShowAddPhaseModal(false);
+      setNewPhaseName('');
+      setNewPhaseColor('blue');
+
+      setSaveStatus('Phase added successfully');
+      setTimeout(() => setSaveStatus(''), 2000);
+    } catch (error) {
+      console.error('❌ Error adding phase:', error);
+      setSaveStatus('Error adding phase');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleAddPhaseCancel = () => {
+    setShowAddPhaseModal(false);
+    setNewPhaseName('');
+    setNewPhaseColor('blue');
+  };
+
+  const handleDeletePhaseClick = (phaseId) => {
+    setPhaseToDelete(phaseId);
+    setShowDeletePhaseModal(true);
+  };
+
+  const handleDeletePhaseConfirm = async () => {
+    if (!phaseToDelete) return;
+
+    try {
+      console.log(`🗑️ Deleting phase ${phaseToDelete}`);
+
+      // Get all items in the phase
+      const itemsToDelete = items.filter(item => item.phase === phaseToDelete);
+
+      // Delete all items in the phase
+      const deletePromises = itemsToDelete.map(item =>
+        fetch(`${API_BASE_URL}/checklist/${projectId}/${item.id}`, {
+          method: 'DELETE'
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      // Remove the phase from the phases array
+      const updatedPhases = phases.filter(p => p.id !== phaseToDelete);
+      setPhases(updatedPhases);
+
+      // Save updated phases to database
+      await savePhaseNames(updatedPhases);
+
+      // Update items state
+      setItems(items.filter(item => item.phase !== phaseToDelete));
+
+      setShowDeletePhaseModal(false);
+      setPhaseToDelete(null);
+
+      setSaveStatus('Phase deleted successfully');
+      setTimeout(() => setSaveStatus(''), 2000);
+
+      console.log('✅ Phase deleted successfully');
+    } catch (error) {
+      console.error('❌ Error deleting phase:', error);
+      setSaveStatus('Error deleting phase');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleDeletePhaseCancel = () => {
+    setShowDeletePhaseModal(false);
+    setPhaseToDelete(null);
   };
 
   const togglePhase = (phaseId) => {
@@ -1067,6 +1220,123 @@ const Checklist = ({ projectId }) => {
         </div>
       )}
 
+      {/* Add Phase Modal */}
+      {showAddPhaseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                <Plus className="w-6 h-6 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Add New Phase</h3>
+                <p className="text-sm text-gray-500">Create a new phase for the checklist</p>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phase Name
+              </label>
+              <input
+                type="text"
+                value={newPhaseName}
+                onChange={(e) => setNewPhaseName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Enter phase name..."
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddPhaseConfirm();
+                  if (e.key === 'Escape') handleAddPhaseCancel();
+                }}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phase Color
+              </label>
+              <select
+                value={newPhaseColor}
+                onChange={(e) => setNewPhaseColor(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="blue">Blue</option>
+                <option value="yellow">Yellow</option>
+                <option value="green">Green</option>
+                <option value="purple">Purple</option>
+                <option value="red">Red</option>
+                <option value="orange">Orange</option>
+                <option value="pink">Pink</option>
+                <option value="indigo">Indigo</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                A default item will be created in this phase
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleAddPhaseCancel}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddPhaseConfirm}
+                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Phase
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Phase Confirmation Modal */}
+      {showDeletePhaseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded shadow-xl max-w-md w-full p-5">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-10 h-10 rounded-full bg-danger-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-danger-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-secondary-900">Delete Entire Phase?</h3>
+                <p className="text-xs text-secondary-500">This will delete all items in this phase</p>
+              </div>
+            </div>
+
+            <div className="bg-secondary-50 rounded p-3 mb-3">
+              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
+              <p className="font-semibold text-sm text-secondary-900">
+                {phases.find(p => p.id === phaseToDelete)?.name}
+              </p>
+              <p className="text-xs text-danger-600 mt-1.5 font-medium">
+                {items.filter(item => item.phase === phaseToDelete).length} item(s) will be deleted
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleDeletePhaseCancel}
+                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeletePhaseConfirm}
+                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete Phase
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -1084,6 +1354,13 @@ const Checklist = ({ projectId }) => {
                 {saveStatus}
               </span>
             )}
+            <button
+              onClick={handleAddPhaseClick}
+              className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              Add Phase
+            </button>
           </div>
         </div>
 
@@ -1189,6 +1466,16 @@ const Checklist = ({ projectId }) => {
                           title="Edit phase name"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePhaseClick(phaseInfo.id);
+                          }}
+                          className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-danger-600 hover:bg-opacity-20 rounded transition-all"
+                          title="Delete phase"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                         {isPhaseCollapsed ? (
                           <ChevronDown className="w-4 h-4" />
