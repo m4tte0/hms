@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText, CheckCircle, BarChart3, Clock, Users, Paperclip,
-  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart, Settings
+  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart, Settings, Calendar
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
@@ -13,6 +13,7 @@ import Knowledge from './components/Knowledge';
 import Attachments from './components/Attachments';
 import Issues from './components/Issues';
 import StatusReport from './components/StatusReport';
+import OverallCalendar from './components/OverallCalendar';
 import { projectsAPI, checklistAPI } from './services/api';
 
 function App() {
@@ -38,6 +39,9 @@ function App() {
 
   // Actions menu state
   const [showActionsMenu, setShowActionsMenu] = useState(false);
+
+  // Overall Calendar state
+  const [showOverallCalendar, setShowOverallCalendar] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -551,16 +555,16 @@ function App() {
 
                   {/* Dropdown Menu */}
                   {showActionsMenu && (
-                    <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border-2 border-secondary-300 py-2 z-50">
+                    <div className="absolute top-full right-0 mt-1 w-44 bg-white rounded-lg shadow-xl border-2 border-secondary-300 py-2 z-[100]">
                       <button
                         onClick={() => {
                           handleCreateProject();
                           setShowActionsMenu(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
                       >
-                        <Plus className="w-4 h-4 text-primary-600" />
-                        <span className="font-medium">New Project</span>
+                        <Plus className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                        <span className="font-medium whitespace-nowrap">New Project</span>
                       </button>
 
                       <button
@@ -569,10 +573,10 @@ function App() {
                           setShowActionsMenu(false);
                         }}
                         disabled={refreshing}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
                       >
-                        <RefreshCw className={`w-4 h-4 text-secondary-600 ${refreshing ? 'animate-spin' : ''}`} />
-                        <span className="font-medium">Refresh Data</span>
+                        <RefreshCw className={`w-4 h-4 text-secondary-600 flex-shrink-0 ${refreshing ? 'animate-spin' : ''}`} />
+                        <span className="font-medium whitespace-nowrap">Refresh Data</span>
                       </button>
 
                       {currentProject && (
@@ -584,10 +588,10 @@ function App() {
                               setShowReport(true);
                               setShowActionsMenu(false);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
                           >
-                            <FileBarChart className="w-4 h-4 text-secondary-600" />
-                            <span className="font-medium">Generate Report</span>
+                            <FileBarChart className="w-4 h-4 text-secondary-600 flex-shrink-0" />
+                            <span className="font-medium whitespace-nowrap">Generate Report</span>
                           </button>
 
                           <div className="border-t border-secondary-200 my-1"></div>
@@ -597,16 +601,25 @@ function App() {
                               handleDeleteClick(currentProject);
                               setShowActionsMenu(false);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
                           >
-                            <Trash2 className="w-4 h-4" />
-                            <span className="font-medium">Delete Project</span>
+                            <Trash2 className="w-4 h-4 flex-shrink-0" />
+                            <span className="font-medium whitespace-nowrap">Delete Project</span>
                           </button>
                         </>
                       )}
                     </div>
                   )}
                 </div>
+
+                {/* Calendar Icon */}
+                <button
+                  onClick={() => setShowOverallCalendar(true)}
+                  className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
+                  title="Overall Calendar"
+                >
+                  <Calendar className="w-4 h-4 text-secondary-700" />
+                </button>
 
                 {/* Settings Icon */}
                 {currentProject && (
@@ -771,6 +784,11 @@ function App() {
           projectId={currentProject.id}
           onClose={() => setShowReport(false)}
         />
+      )}
+
+      {/* Overall Calendar */}
+      {showOverallCalendar && (
+        <OverallCalendar onClose={() => setShowOverallCalendar(false)} />
       )}
     </div>
   );
