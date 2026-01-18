@@ -25,6 +25,7 @@ const Knowledge = ({ projectId }) => {
   const [customAttendee, setCustomAttendee] = useState('');
   const [editCustomAttendee, setEditCustomAttendee] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
+  const [hoveredDate, setHoveredDate] = useState(null);
   const [newSession, setNewSession] = useState({
     session_topic: '',
     scheduled_date: '',
@@ -466,29 +467,86 @@ const Knowledge = ({ projectId }) => {
       }
 
       days.push(
-        <button
-          key={day}
-          onClick={() => {
-            setSelectedDate(date);
-            setNewSession(prev => ({ ...prev, scheduled_date: dateStr }));
-            setShowAddModal(true);
-          }}
-          className={`aspect-square text-xs font-medium rounded transition-all relative overflow-hidden
-            ${isToday ? 'bg-primary-100 text-primary-700' :
-              isStartDate ? 'bg-green-50 text-green-700 hover:bg-green-100' :
-              isEndDate ? 'bg-red-50 text-red-700 hover:bg-red-100' :
-              hasSessions ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' :
-              'hover:bg-secondary-100 text-secondary-700'}
-            ${hasSpecialBackground ? `ring-2 ${ringColorClass}` : ''}`}
-        >
-          <div className="relative z-10">
-            {day}
-          </div>
-          {/* Phase color strip at bottom - only show if no special background */}
-          {showStripAtBottom && (
-            <div className={`absolute bottom-0 left-0 right-0 h-1 ${phaseColor}`}></div>
+        <div key={day} className="relative">
+          <button
+            onClick={() => {
+              setSelectedDate(date);
+              setNewSession(prev => ({ ...prev, scheduled_date: dateStr }));
+              setShowAddModal(true);
+            }}
+            onMouseEnter={() => hasSessions && setHoveredDate(date)}
+            onMouseLeave={() => setHoveredDate(null)}
+            className={`w-full aspect-square text-xs font-medium rounded transition-all relative overflow-hidden
+              ${isToday ? 'bg-primary-100 text-primary-700' :
+                isStartDate ? 'bg-green-50 text-green-700 hover:bg-green-100' :
+                isEndDate ? 'bg-red-50 text-red-700 hover:bg-red-100' :
+                hasSessions ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' :
+                'hover:bg-secondary-100 text-secondary-700'}
+              ${hasSpecialBackground ? `ring-2 ${ringColorClass}` : ''}`}
+          >
+            <div className="relative z-10">
+              {day}
+            </div>
+            {/* Phase color strip at bottom - only show if no special background */}
+            {showStripAtBottom && (
+              <div className={`absolute bottom-0 left-0 right-0 h-1 ${phaseColor}`}></div>
+            )}
+          </button>
+
+          {/* Tooltip for sessions on hover */}
+          {hasSessions && hoveredDate && hoveredDate.toDateString() === date.toDateString() && (
+            <div className="absolute z-50 bg-white border-2 border-blue-300 rounded-lg shadow-xl p-3 min-w-[280px] max-w-[320px] -translate-y-full -mt-2 left-1/2 -translate-x-1/2">
+              <div className="space-y-2">
+                {daySessions.map((session, idx) => (
+                  <div key={session.id} className={`${idx > 0 ? 'pt-2 border-t border-secondary-200' : ''}`}>
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="font-semibold text-sm text-secondary-900 flex-1">
+                        {session.session_topic}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(session);
+                          setHoveredDate(null);
+                        }}
+                        className="p-1 hover:bg-blue-100 rounded transition-colors flex-shrink-0"
+                        title="Edit session"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 text-blue-600" />
+                      </button>
+                    </div>
+                    <div className="space-y-1 text-xs text-secondary-600">
+                      {session.start_time && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{session.start_time}</span>
+                          {session.duration && <span className="text-secondary-400">• {session.duration}h</span>}
+                        </div>
+                      )}
+                      {session.attendees && (
+                        <div className="flex items-start gap-1">
+                          <Users className="w-3 h-3 mt-0.5" />
+                          <span className="flex-1">{session.attendees}</span>
+                        </div>
+                      )}
+                      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(session.status)}`}>
+                        {getStatusIcon(session.status)}
+                        {session.status}
+                      </div>
+                      {session.notes && (
+                        <div className="mt-1 text-xs text-secondary-500 bg-secondary-50 p-2 rounded">
+                          {session.notes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Arrow pointing down */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-r-2 border-b-2 border-blue-300 transform rotate-45"></div>
+            </div>
           )}
-        </button>
+        </div>
       );
     }
 
@@ -788,6 +846,93 @@ const Knowledge = ({ projectId }) => {
 
   return (
     <div className="space-y-4 pb-24">
+      {/* Next Incoming Event */}
+      {(() => {
+        const now = new Date();
+        const upcomingSessions = sessions
+          .filter(s => new Date(s.scheduled_date) >= now && s.status !== 'Cancelled')
+          .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
+
+        const nextSession = upcomingSessions[0];
+
+        if (nextSession) {
+          const sessionDate = new Date(nextSession.scheduled_date);
+          const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
+
+          return (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded shadow-sm border border-blue-200 p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-sm font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
+                  </div>
+                  <h2 className="text-base font-bold text-secondary-900 mb-3">{nextSession.session_topic}</h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center gap-2 text-secondary-700">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-secondary-500">Date</div>
+                        <div className="font-semibold">
+                          {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-secondary-700">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-secondary-500">Time & Duration</div>
+                        <div className="font-semibold">
+                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
+                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
+                          {nextSession.duration && <span>{nextSession.duration} h</span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {nextSession.attendees && (
+                      <div className="flex items-start gap-2 text-secondary-700">
+                        <Users className="w-4 h-4 text-blue-600 mt-1" />
+                        <div>
+                          <div className="text-xs text-secondary-500 mb-1">Attendees</div>
+                          <div className="font-semibold">
+                            {nextSession.attendees.split(',').map((attendee, index) => (
+                              <div key={index}>{attendee.trim()}</div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {nextSession.notes && (
+                    <div className="mt-3 text-sm text-secondary-600 bg-white bg-opacity-60 p-3 rounded">
+                      {nextSession.notes}
+                    </div>
+                  )}
+                </div>
+
+                <div className="ml-4 text-center">
+                  <div className="bg-blue-600 text-white rounded px-4 py-3 min-w-[80px]">
+                    <div className="text-3xl font-bold">{daysUntil}</div>
+                    <div className="text-xs uppercase tracking-wide">
+                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
+                    {getStatusIcon(nextSession.status)}
+                    {nextSession.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Calendar or List View */}
       {viewMode === 'calendar' ? renderCalendar() : renderList()}
 
@@ -894,93 +1039,6 @@ const Knowledge = ({ projectId }) => {
             </div>
           </div>
         );
-      })()}
-
-      {/* Next Incoming Event */}
-      {(() => {
-        const now = new Date();
-        const upcomingSessions = sessions
-          .filter(s => new Date(s.scheduled_date) >= now && s.status !== 'Cancelled')
-          .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
-
-        const nextSession = upcomingSessions[0];
-
-        if (nextSession) {
-          const sessionDate = new Date(nextSession.scheduled_date);
-          const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
-
-          return (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded shadow-sm border border-blue-200 p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
-                  </div>
-                  <h2 className="text-base font-bold text-secondary-900 mb-3">{nextSession.session_topic}</h2>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2 text-secondary-700">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <div className="text-xs text-secondary-500">Date</div>
-                        <div className="font-semibold">
-                          {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-secondary-700">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <div className="text-xs text-secondary-500">Time & Duration</div>
-                        <div className="font-semibold">
-                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
-                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
-                          {nextSession.duration && <span>{nextSession.duration} h</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {nextSession.attendees && (
-                      <div className="flex items-start gap-2 text-secondary-700">
-                        <Users className="w-4 h-4 text-blue-600 mt-1" />
-                        <div>
-                          <div className="text-xs text-secondary-500 mb-1">Attendees</div>
-                          <div className="font-semibold">
-                            {nextSession.attendees.split(',').map((attendee, index) => (
-                              <div key={index}>{attendee.trim()}</div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {nextSession.notes && (
-                    <div className="mt-3 text-sm text-secondary-600 bg-white bg-opacity-60 p-3 rounded">
-                      {nextSession.notes}
-                    </div>
-                  )}
-                </div>
-
-                <div className="ml-4 text-center">
-                  <div className="bg-blue-600 text-white rounded px-4 py-3 min-w-[80px]">
-                    <div className="text-3xl font-bold">{daysUntil}</div>
-                    <div className="text-xs uppercase tracking-wide">
-                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
-                    </div>
-                  </div>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
-                    {getStatusIcon(nextSession.status)}
-                    {nextSession.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        }
-        return null;
       })()}
 
       {/* Add Session Modal */}
