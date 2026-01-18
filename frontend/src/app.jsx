@@ -22,7 +22,6 @@ function App() {
   const [projectsProgress, setProjectsProgress] = useState({});
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
-  const [showProjectList, setShowProjectList] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [lastSaved, setLastSaved] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -271,7 +270,6 @@ function App() {
 
   const handleProjectSelect = (project) => {
     setCurrentProject(project);
-    setShowProjectList(false);
   };
 
   const handleProjectChange = (field, value) => {
@@ -496,26 +494,12 @@ function App() {
       )}
       <header className="bg-gradient-to-r from-primary-700 to-primary-800 border-b-2 border-primary-900 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-center gap-4 relative">
-            <button onClick={() => setShowProjectList(!showProjectList)} className="absolute left-0 p-2 hover:bg-primary-600 rounded transition-colors" title="Toggle project list">
-              <Menu className="w-6 h-6 text-white" />
-            </button>
-            <div className="text-center">
-              <h1 className="text-xl font-bold text-white">Handover Management System</h1>
-              {currentProject && (
-                <p className="text-sm text-primary-100 mt-0.5">
-                  {currentProject.project_name} <span className="text-xs">({currentProject.handover_id})</span>
-                </p>
-              )}
-            </div>
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-white">Handover Management System</h1>
             {currentProject && (
-              <button
-                onClick={() => setShowProjectSettings(true)}
-                className="absolute right-0 p-2 hover:bg-primary-600 rounded transition-colors"
-                title="Project Settings"
-              >
-                <Settings className="w-6 h-6 text-white" />
-              </button>
+              <p className="text-sm text-primary-100 mt-0.5">
+                {currentProject.project_name} <span className="text-xs">({currentProject.handover_id})</span>
+              </p>
             )}
           </div>
         </div>
@@ -524,15 +508,93 @@ function App() {
       <div className="flex h-[calc(100vh-73px)]">
         {/* Project Sidebar */}
         <aside
-          className={`${
-            showProjectList ? 'translate-x-0' : '-translate-x-full'
-          } fixed lg:relative lg:translate-x-0 w-72 bg-gradient-to-b from-secondary-200 to-secondary-300 border-r-2 border-secondary-400 h-full transition-transform duration-300 z-40 shadow-xl flex flex-col`}
+          className="w-72 bg-gradient-to-b from-secondary-200 to-secondary-300 border-r-2 border-secondary-400 h-full shadow-xl flex flex-col"
         >
           {/* Projects List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-3">
             <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-secondary-500">
               <h2 className="text-sm font-semibold text-secondary-900">Projects ({projects.length})</h2>
-              <button onClick={() => setShowProjectList(false)} className="lg:hidden p-1 hover:bg-secondary-100 rounded"><X className="w-4 h-4" /></button>
+              <div className="flex items-center gap-2">
+                {/* Actions Menu */}
+                <div className="relative actions-menu-container">
+                  <button
+                    onClick={() => setShowActionsMenu(!showActionsMenu)}
+                    className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
+                    title="Actions"
+                  >
+                    <Menu className="w-4 h-4 text-secondary-700" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showActionsMenu && (
+                    <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border-2 border-secondary-300 py-2 z-50">
+                      <button
+                        onClick={() => {
+                          handleCreateProject();
+                          setShowActionsMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                      >
+                        <Plus className="w-4 h-4 text-primary-600" />
+                        <span className="font-medium">New Project</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleRefresh();
+                          setShowActionsMenu(false);
+                        }}
+                        disabled={refreshing}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-4 h-4 text-secondary-600 ${refreshing ? 'animate-spin' : ''}`} />
+                        <span className="font-medium">Refresh Data</span>
+                      </button>
+
+                      {currentProject && (
+                        <>
+                          <div className="border-t border-secondary-200 my-1"></div>
+
+                          <button
+                            onClick={() => {
+                              setShowReport(true);
+                              setShowActionsMenu(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                          >
+                            <FileBarChart className="w-4 h-4 text-secondary-600" />
+                            <span className="font-medium">Generate Report</span>
+                          </button>
+
+                          <div className="border-t border-secondary-200 my-1"></div>
+
+                          <button
+                            onClick={() => {
+                              handleDeleteClick(currentProject);
+                              setShowActionsMenu(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="font-medium">Delete Project</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Settings Icon */}
+                {currentProject && (
+                  <button
+                    onClick={() => setShowProjectSettings(true)}
+                    className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
+                    title="Project Settings"
+                  >
+                    <Settings className="w-4 h-4 text-secondary-700" />
+                  </button>
+                )}
+              </div>
             </div>
             <div className="relative mb-3">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-secondary-400" />
@@ -601,80 +663,10 @@ function App() {
             )}
           </div>
 
-          {/* Bottom Controls - Fixed */}
-          <div className="border-t-2 border-secondary-500 bg-secondary-300 p-3 space-y-2">
-            {/* Save Status */}
+          {/* Bottom Status - Fixed */}
+          <div className="border-t-2 border-secondary-500 bg-secondary-300 p-3">
             <div className="flex items-center justify-center h-6">
               {getSaveStatusDisplay()}
-            </div>
-
-            {/* Actions Menu Button */}
-            <div className="relative actions-menu-container">
-              <button
-                onClick={() => setShowActionsMenu(!showActionsMenu)}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors font-medium shadow-sm"
-              >
-                <Menu className="w-4 h-4" />
-                Actions
-              </button>
-
-              {/* Dropdown Menu */}
-              {showActionsMenu && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border-2 border-secondary-300 py-2 z-50">
-                  <button
-                    onClick={() => {
-                      handleCreateProject();
-                      setShowActionsMenu(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
-                  >
-                    <Plus className="w-4 h-4 text-primary-600" />
-                    <span className="font-medium">New Project</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      handleRefresh();
-                      setShowActionsMenu(false);
-                    }}
-                    disabled={refreshing}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 text-secondary-600 ${refreshing ? 'animate-spin' : ''}`} />
-                    <span className="font-medium">Refresh Data</span>
-                  </button>
-
-                  {currentProject && (
-                    <>
-                      <div className="border-t border-secondary-200 my-1"></div>
-
-                      <button
-                        onClick={() => {
-                          setShowReport(true);
-                          setShowActionsMenu(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
-                      >
-                        <FileBarChart className="w-4 h-4 text-secondary-600" />
-                        <span className="font-medium">Generate Report</span>
-                      </button>
-
-                      <div className="border-t border-secondary-200 my-1"></div>
-
-                      <button
-                        onClick={() => {
-                          handleDeleteClick(currentProject);
-                          setShowActionsMenu(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span className="font-medium">Delete Project</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </aside>
