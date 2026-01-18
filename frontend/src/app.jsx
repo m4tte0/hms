@@ -276,7 +276,31 @@ function App() {
     setCurrentProject(prev => ({ ...prev, [field]: value }));
   };
 
-  const filteredProjects = projects.filter(p => 
+  // Get project status indicator color based on target date
+  const getProjectStatusColor = (project) => {
+    if (!project.target_date) return null; // No target date = no indicator
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare dates only
+
+    const targetDate = new Date(project.target_date);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const daysUntilTarget = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+
+    if (daysUntilTarget < 0) {
+      // Past deadline - RED
+      return 'bg-red-500';
+    } else if (daysUntilTarget <= 7) {
+      // Within 7 days - YELLOW (at risk)
+      return 'bg-yellow-500';
+    } else {
+      // More than 7 days - GREEN (on track)
+      return 'bg-green-500';
+    }
+  };
+
+  const filteredProjects = projects.filter(p =>
     p.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.handover_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -612,8 +636,15 @@ function App() {
                         : 'bg-secondary-50 hover:bg-white border-2 border-secondary-300 hover:border-primary-400 hover:shadow-sm'
                     }`}>
                     <button onClick={() => handleProjectSelect(project)} className={`w-full text-left pr-8 ${isSelected ? 'p-2' : 'p-1.5'}`}>
-                      <div className={`font-medium text-sm text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'}`}>
-                        {project.project_name}
+                      <div className={`font-medium text-sm text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'} flex items-center gap-1.5`}>
+                        <span className="truncate">{project.project_name}</span>
+                        {getProjectStatusColor(project) && (
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getProjectStatusColor(project)}`} title={
+                            getProjectStatusColor(project) === 'bg-red-500' ? 'Overdue' :
+                            getProjectStatusColor(project) === 'bg-yellow-500' ? 'Due within 7 days' :
+                            'On track'
+                          }></span>
+                        )}
                       </div>
                       {isSelected && (
                         <div className="text-xs text-secondary-500 truncate mb-1.5">
