@@ -37,6 +37,9 @@ function App() {
   // Project Settings modal state
   const [showProjectSettings, setShowProjectSettings] = useState(false);
 
+  // Actions menu state
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
+
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const tabs = [
@@ -65,6 +68,17 @@ function App() {
     }, 2000);
     return () => clearTimeout(timer);
   }, [currentProject]);
+
+  // Close actions menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showActionsMenu && !event.target.closest('.actions-menu-container')) {
+        setShowActionsMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showActionsMenu]);
 
   const loadProjects = async (silent = false) => {
     try {
@@ -594,46 +608,73 @@ function App() {
               {getSaveStatusDisplay()}
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2">
+            {/* Actions Menu Button */}
+            <div className="relative actions-menu-container">
               <button
-                onClick={handleCreateProject}
+                onClick={() => setShowActionsMenu(!showActionsMenu)}
                 className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors font-medium shadow-sm"
               >
-                <Plus className="w-4 h-4" />
-                New Project
+                <Menu className="w-4 h-4" />
+                Actions
               </button>
 
-              <div className="grid grid-cols-3 gap-2 pb-6">
-                <button
-                  onClick={handleRefresh}
-                  disabled={refreshing}
-                  className="p-2 bg-white hover:bg-secondary-50 text-secondary-700 rounded transition-colors shadow-sm"
-                  title="Refresh data"
-                >
-                  <RefreshCw className={`w-4 h-4 mx-auto ${refreshing ? 'animate-spin' : ''}`} />
-                </button>
+              {/* Dropdown Menu */}
+              {showActionsMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border-2 border-secondary-300 py-2 z-50">
+                  <button
+                    onClick={() => {
+                      handleCreateProject();
+                      setShowActionsMenu(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                  >
+                    <Plus className="w-4 h-4 text-primary-600" />
+                    <span className="font-medium">New Project</span>
+                  </button>
 
-                {currentProject && (
-                  <>
-                    <button
-                      onClick={() => setShowReport(true)}
-                      className="p-2 bg-white hover:bg-secondary-50 text-secondary-700 rounded transition-colors shadow-sm"
-                      title="Generate status report"
-                    >
-                      <FileBarChart className="w-4 h-4 mx-auto" />
-                    </button>
+                  <button
+                    onClick={() => {
+                      handleRefresh();
+                      setShowActionsMenu(false);
+                    }}
+                    disabled={refreshing}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 text-secondary-600 ${refreshing ? 'animate-spin' : ''}`} />
+                    <span className="font-medium">Refresh Data</span>
+                  </button>
 
-                    <button
-                      onClick={() => handleDeleteClick(currentProject)}
-                      className="p-2 bg-white hover:bg-danger-50 text-danger-600 rounded transition-colors shadow-sm"
-                      title="Delete current project"
-                    >
-                      <Trash2 className="w-4 h-4 mx-auto" />
-                    </button>
-                  </>
-                )}
-              </div>
+                  {currentProject && (
+                    <>
+                      <div className="border-t border-secondary-200 my-1"></div>
+
+                      <button
+                        onClick={() => {
+                          setShowReport(true);
+                          setShowActionsMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                      >
+                        <FileBarChart className="w-4 h-4 text-secondary-600" />
+                        <span className="font-medium">Generate Report</span>
+                      </button>
+
+                      <div className="border-t border-secondary-200 my-1"></div>
+
+                      <button
+                        onClick={() => {
+                          handleDeleteClick(currentProject);
+                          setShowActionsMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="font-medium">Delete Project</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </aside>
