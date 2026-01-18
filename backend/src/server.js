@@ -388,6 +388,12 @@ app.put('/api/knowledge/:projectId/:sessionId', async (req, res) => {
   try {
     const { session_topic, scheduled_date, start_time, duration, attendees, status, effectiveness_rating, notes } = req.body;
 
+    // Convert empty strings to null for proper COALESCE behavior
+    const cleanStartTime = start_time === '' ? null : start_time;
+    const cleanDuration = duration === '' ? null : duration;
+    const cleanAttendees = attendees === '' ? null : attendees;
+    const cleanNotes = notes === '' ? null : notes;
+
     await db.runAsync(
       `UPDATE knowledge_sessions SET
        session_topic = COALESCE(?, session_topic),
@@ -400,7 +406,7 @@ app.put('/api/knowledge/:projectId/:sessionId', async (req, res) => {
        notes = COALESCE(?, notes),
        updated_at = CURRENT_TIMESTAMP
        WHERE id = ? AND project_id = ?`,
-      [session_topic, scheduled_date, start_time, duration, attendees, status, effectiveness_rating, notes, req.params.sessionId, req.params.projectId]
+      [session_topic, scheduled_date, cleanStartTime, cleanDuration, cleanAttendees, status, effectiveness_rating, cleanNotes, req.params.sessionId, req.params.projectId]
     );
 
     res.json({ message: 'Session updated' });

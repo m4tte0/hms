@@ -243,6 +243,8 @@ const Knowledge = ({ projectId }) => {
   };
 
   const openEditModal = (session) => {
+    console.log('Opening edit modal for session:', session);
+    console.log('start_time value:', session.start_time);
     setEditingSession(session);
     // Parse existing attendees string into array
     const attendeesArray = session.attendees
@@ -466,8 +468,25 @@ const Knowledge = ({ projectId }) => {
         if (isToday) ringColorClass = 'ring-primary-500';
       }
 
+      // Determine tooltip position based on day of week to avoid overflow
+      const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, etc.
+      const adjustedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday
+
+      let tooltipPositionClass = 'left-1/2 -translate-x-1/2'; // Default: centered
+      let arrowPositionClass = 'left-1/2 -translate-x-1/2'; // Default: centered arrow
+
+      if (adjustedDayOfWeek === 0) {
+        // Monday: align left
+        tooltipPositionClass = 'left-0';
+        arrowPositionClass = 'left-4';
+      } else if (adjustedDayOfWeek === 6) {
+        // Sunday: align right
+        tooltipPositionClass = 'right-0';
+        arrowPositionClass = 'right-4';
+      }
+
       days.push(
-        <div key={day} className="relative">
+        <div key={day} className="relative calendar-day-wrapper">
           <button
             onClick={() => {
               setSelectedDate(date);
@@ -475,7 +494,6 @@ const Knowledge = ({ projectId }) => {
               setShowAddModal(true);
             }}
             onMouseEnter={() => hasSessions && setHoveredDate(date)}
-            onMouseLeave={() => setHoveredDate(null)}
             className={`w-full aspect-square text-xs font-medium rounded transition-all relative overflow-hidden
               ${isToday ? 'bg-primary-100 text-primary-700' :
                 isStartDate ? 'bg-green-50 text-green-700 hover:bg-green-100' :
@@ -495,7 +513,11 @@ const Knowledge = ({ projectId }) => {
 
           {/* Tooltip for sessions on hover */}
           {hasSessions && hoveredDate && hoveredDate.toDateString() === date.toDateString() && (
-            <div className="absolute z-50 bg-white border-2 border-blue-300 rounded-lg shadow-xl p-3 min-w-[280px] max-w-[320px] -translate-y-full -mt-2 left-1/2 -translate-x-1/2">
+            <div
+              className={`absolute z-50 bg-white border-2 border-blue-300 rounded-lg shadow-xl p-3 min-w-[280px] max-w-[320px] -translate-y-full -mt-1 ${tooltipPositionClass} pointer-events-auto`}
+              onMouseEnter={() => setHoveredDate(date)}
+              onMouseLeave={() => setHoveredDate(null)}
+            >
               <div className="space-y-2">
                 {daySessions.map((session, idx) => (
                   <div key={session.id} className={`${idx > 0 ? 'pt-2 border-t border-secondary-200' : ''}`}>
@@ -543,7 +565,7 @@ const Knowledge = ({ projectId }) => {
                 ))}
               </div>
               {/* Arrow pointing down */}
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-r-2 border-b-2 border-blue-300 transform rotate-45"></div>
+              <div className={`absolute -bottom-2 ${arrowPositionClass} w-4 h-4 bg-white border-r-2 border-b-2 border-blue-300 transform rotate-45 pointer-events-none`}></div>
             </div>
           )}
         </div>
@@ -860,71 +882,61 @@ const Knowledge = ({ projectId }) => {
           const daysUntil = Math.ceil((sessionDate - now) / (1000 * 60 * 60 * 24));
 
           return (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded shadow-sm border border-blue-200 p-4">
-              <div className="flex items-start justify-between">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded shadow-sm border border-blue-200 p-3">
+              <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
                   </div>
-                  <h2 className="text-base font-bold text-secondary-900 mb-3">{nextSession.session_topic}</h2>
+                  <h2 className="text-sm font-bold text-secondary-900 mb-2">{nextSession.session_topic}</h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2 text-secondary-700">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <div className="text-xs text-secondary-500">Date</div>
-                        <div className="font-semibold">
-                          {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-secondary-700">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                      <span className="font-medium">
+                        {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-secondary-700">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                      <div>
-                        <div className="text-xs text-secondary-500">Time & Duration</div>
-                        <div className="font-semibold">
-                          {nextSession.start_time && <span className="text-blue-600">{nextSession.start_time}</span>}
-                          {nextSession.start_time && nextSession.duration && <span className="text-gray-400 mx-1">•</span>}
-                          {nextSession.duration && <span>{nextSession.duration} h</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {nextSession.attendees && (
-                      <div className="flex items-start gap-2 text-secondary-700">
-                        <Users className="w-4 h-4 text-blue-600 mt-1" />
-                        <div>
-                          <div className="text-xs text-secondary-500 mb-1">Attendees</div>
-                          <div className="font-semibold">
-                            {nextSession.attendees.split(',').map((attendee, index) => (
-                              <div key={index}>{attendee.trim()}</div>
-                            ))}
-                          </div>
-                        </div>
+                    {(nextSession.start_time || nextSession.duration) && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="font-medium">
+                          {nextSession.start_time && <span>{nextSession.start_time}</span>}
+                          {nextSession.start_time && nextSession.duration && <span className="text-secondary-400 mx-1">•</span>}
+                          {nextSession.duration && <span>{nextSession.duration}h</span>}
+                        </span>
                       </div>
                     )}
+
+                    {nextSession.attendees && (
+                      <div className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="font-medium">{nextSession.attendees}</span>
+                      </div>
+                    )}
+
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(nextSession.status)}`}>
+                      {getStatusIcon(nextSession.status)}
+                      {nextSession.status}
+                    </span>
                   </div>
 
                   {nextSession.notes && (
-                    <div className="mt-3 text-sm text-secondary-600 bg-white bg-opacity-60 p-3 rounded">
+                    <div className="mt-2 text-xs text-secondary-600 bg-white bg-opacity-60 p-2 rounded">
                       {nextSession.notes}
                     </div>
                   )}
                 </div>
 
-                <div className="ml-4 text-center">
-                  <div className="bg-blue-600 text-white rounded px-4 py-3 min-w-[80px]">
-                    <div className="text-3xl font-bold">{daysUntil}</div>
-                    <div className="text-xs uppercase tracking-wide">
+                <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                  <div className="bg-blue-600 text-white rounded px-3 py-2 min-w-[60px] text-center">
+                    <div className="text-xl font-bold leading-none">{daysUntil}</div>
+                    <div className="text-[10px] uppercase tracking-wide mt-0.5">
                       {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
                     </div>
                   </div>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border mt-3 ${getStatusColor(nextSession.status)}`}>
-                    {getStatusIcon(nextSession.status)}
-                    {nextSession.status}
-                  </span>
                 </div>
               </div>
             </div>
