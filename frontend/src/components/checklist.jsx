@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Edit2, X, ChevronDown, ChevronUp, Save } from 'lucide-react';
+import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Edit2, X, ChevronDown, ChevronUp, Save, MoreVertical, FileText } from 'lucide-react';
 
 const Checklist = ({ projectId }) => {
   const [items, setItems] = useState([]);
@@ -28,6 +28,14 @@ const Checklist = ({ projectId }) => {
   const [phaseToDelete, setPhaseToDelete] = useState(null);
   const [collapsedPhases, setCollapsedPhases] = useState({});
   const [collapsedCategories, setCollapsedCategories] = useState({});
+
+  // Notes modal state
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [notesItem, setNotesItem] = useState(null);
+  const [editingNotes, setEditingNotes] = useState('');
+
+  // Actions menu state
+  const [openActionsMenu, setOpenActionsMenu] = useState(null);
   
   // Phase configuration - can be customized per project
   const [phases, setPhases] = useState([
@@ -985,6 +993,43 @@ const Checklist = ({ projectId }) => {
     return colors[color] || colors.blue;
   };
 
+  // Convert full name to short name (e.g., "Matteo Hon Fucci" -> "M. Hon Fucci")
+  const getShortName = (fullName) => {
+    if (!fullName) return '';
+    const parts = fullName.split(' ');
+    if (parts.length <= 2) return fullName;
+    return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+  };
+
+  // Cycle through status values
+  const cycleStatus = (currentStatus) => {
+    const statuses = ['Not Started', 'In Progress', 'Complete'];
+    const currentIndex = statuses.indexOf(currentStatus);
+    return statuses[(currentIndex + 1) % statuses.length];
+  };
+
+  // Handle notes modal
+  const handleOpenNotes = (item) => {
+    setNotesItem(item);
+    setEditingNotes(item.notes || '');
+    setShowNotesModal(true);
+  };
+
+  const handleSaveNotes = async () => {
+    if (notesItem) {
+      await handleUpdateItem(notesItem.id, { notes: editingNotes });
+      setShowNotesModal(false);
+      setNotesItem(null);
+      setEditingNotes('');
+    }
+  };
+
+  const handleCloseNotes = () => {
+    setShowNotesModal(false);
+    setNotesItem(null);
+    setEditingNotes('');
+  };
+
   // Group items by phase and category
   const groupedItems = items.reduce((acc, item) => {
     const phase = item.phase || 'Phase 1';
@@ -1337,6 +1382,65 @@ const Checklist = ({ projectId }) => {
         </div>
       )}
 
+      {/* Notes Modal */}
+      {showNotesModal && notesItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Notes</h3>
+                  <p className="text-sm text-gray-500 truncate max-w-md">{notesItem.requirement}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleCloseNotes}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                title="Close"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Additional Notes
+              </label>
+              <textarea
+                value={editingNotes}
+                onChange={(e) => setEditingNotes(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="Add any additional notes or comments..."
+                rows={6}
+                autoFocus
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {editingNotes.length} characters
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleCloseNotes}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNotes}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Save className="w-4 h-4" />
+                Save Notes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -1624,129 +1728,152 @@ const Checklist = ({ projectId }) => {
                         </div>
                       </div>
 
-                      {/* Category Items */}
+                      {/* Category Items - Condensed Table Row Layout */}
                       {!isCategoryCollapsed && (
-                        <div className="divide-y divide-gray-200">
-                          {categoryItems.map((item) => (
-                            <div key={item.id} className="p-4 hover:bg-white transition-colors">
-                              <div className="flex items-start gap-4">
-                                <div className="flex-shrink-0 pt-1">
-                                  {getStatusIcon(item.status)}
-                                </div>
+                        <div className="divide-y divide-gray-200 bg-white">
+                          {categoryItems.map((item) => {
+                            const notesCount = item.notes?.trim() ? 1 : 0;
+                            const shortName = getShortName(item.verified_by || '');
 
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between gap-4 mb-3">
-                                    <div className="flex-1">
-                                      {editingItemId === item.id ? (
-                                        <div className="flex items-center gap-2 mb-2">
-                                          <input
-                                            type="text"
-                                            value={editingText}
-                                            onChange={(e) => setEditingText(e.target.value)}
-                                            className="flex-1 px-3 py-2 border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            autoFocus
-                                            placeholder="Enter requirement..."
-                                            onKeyDown={(e) => {
-                                              if (e.key === 'Enter') handleSaveEdit(item.id);
-                                              if (e.key === 'Escape') handleCancelEdit();
-                                            }}
-                                          />
-                                          <button
-                                            onClick={() => handleSaveEdit(item.id)}
-                                            className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                            title="Save"
-                                          >
-                                            <CheckCircle className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            onClick={handleCancelEdit}
-                                            className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                                            title="Cancel"
-                                          >
-                                            <X className="w-4 h-4" />
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <div className="flex items-start justify-between gap-2 mb-2 group">
-                                          <h4 className="font-medium text-gray-900 flex-1">{item.requirement}</h4>
-                                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                              onClick={() => handleStartEdit(item)}
-                                              className="p-1.5 hover:bg-blue-100 text-blue-600 rounded transition-colors"
-                                              title="Edit name"
-                                            >
-                                              <Edit2 className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                              onClick={() => handleDeleteClick(item)}
-                                              className="p-1.5 hover:bg-red-100 text-red-600 rounded transition-colors"
-                                              title="Delete item"
-                                            >
-                                              <Trash2 className="w-4 h-4" />
-                                            </button>
-                                          </div>
-                                        </div>
-                                      )}
-                                      
-                                      <select
-                                        value={item.status}
-                                        onChange={(e) => handleUpdateItem(item.id, { status: e.target.value })}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(item.status)} cursor-pointer hover:shadow-sm transition-shadow`}
-                                      >
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Complete">Complete</option>
-                                      </select>
-                                    </div>
+                            return (
+                              <div key={item.id} className="px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                {editingItemId === item.id ? (
+                                  // Edit mode - full row input
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="text"
+                                      value={editingText}
+                                      onChange={(e) => setEditingText(e.target.value)}
+                                      className="flex-1 px-3 py-1.5 text-sm border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      autoFocus
+                                      placeholder="Enter requirement..."
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSaveEdit(item.id);
+                                        if (e.key === 'Escape') handleCancelEdit();
+                                      }}
+                                    />
+                                    <button
+                                      onClick={() => handleSaveEdit(item.id)}
+                                      className="p-1.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                      title="Save"
+                                    >
+                                      <CheckCircle className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={handleCancelEdit}
+                                      className="p-1.5 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                      title="Cancel"
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
                                   </div>
+                                ) : (
+                                  // View mode - condensed single row
+                                  <div className="flex items-center gap-3">
+                                    {/* Status Icon - small dot */}
+                                    <div className="flex-shrink-0">
+                                      <div className={`w-2 h-2 rounded-full ${
+                                        item.status === 'Complete' ? 'bg-green-500' :
+                                        item.status === 'In Progress' ? 'bg-yellow-500' :
+                                        'bg-gray-300'
+                                      }`} title={item.status}></div>
+                                    </div>
 
-                                  {/* Item Details Grid */}
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div>
-                                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                                        Verification Date
-                                      </label>
+                                    {/* Title - truncated with tooltip */}
+                                    <div className="flex-1 min-w-0" title={item.requirement}>
+                                      <p className="text-sm font-medium text-gray-900 truncate">{item.requirement}</p>
+                                    </div>
+
+                                    {/* Status Badge - clickable */}
+                                    <button
+                                      onClick={() => handleUpdateItem(item.id, { status: cycleStatus(item.status) })}
+                                      className={`px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${getStatusColor(item.status)} hover:shadow-md transition-all`}
+                                      title="Click to change status"
+                                    >
+                                      {item.status}
+                                    </button>
+
+                                    {/* Verification Date - inline picker */}
+                                    <div className="flex-shrink-0 w-32">
                                       <input
                                         type="date"
                                         value={item.verification_date || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verification_date: e.target.value })}
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        title="Verification date"
                                       />
                                     </div>
 
-                                    <div>
-                                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                                        Verified By
-                                      </label>
+                                    {/* Verified By - short name with dropdown */}
+                                    <div className="flex-shrink-0 w-32">
                                       <select
                                         value={item.verified_by || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verified_by: e.target.value })}
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+                                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white cursor-pointer"
+                                        title={item.verified_by || 'Select verifier'}
                                       >
-                                        <option value="">Select verifier...</option>
-                                        <option value="Matteo Hon Fucci">Matteo Hon Fucci (Automation Manager)</option>
-                                        <option value="Stefano Corbelli">Stefano Corbelli (Technical Director)</option>
-                                        <option value="Ivan De Zanet">Ivan De Zanet (R&D Manager)</option>
+                                        <option value="">—</option>
+                                        <option value="Matteo Hon Fucci">M. Hon Fucci</option>
+                                        <option value="Stefano Corbelli">S. Corbelli</option>
+                                        <option value="Ivan De Zanet">I. De Zanet</option>
                                       </select>
                                     </div>
 
-                                    <div>
-                                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                                        Notes
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={item.notes || ''}
-                                        onChange={(e) => handleUpdateItem(item.id, { notes: e.target.value })}
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Additional notes"
-                                      />
+                                    {/* Notes Icon - click to open modal */}
+                                    <button
+                                      onClick={() => handleOpenNotes(item)}
+                                      className="flex-shrink-0 p-1.5 hover:bg-blue-50 rounded transition-colors relative"
+                                      title={notesCount ? 'View/edit notes' : 'Add notes'}
+                                    >
+                                      <FileText className={`w-4 h-4 ${notesCount ? 'text-blue-600' : 'text-gray-400'}`} />
+                                      {notesCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-600 rounded-full text-[8px] text-white flex items-center justify-center font-bold">
+                                          {notesCount}
+                                        </span>
+                                      )}
+                                    </button>
+
+                                    {/* Actions Menu - three dots */}
+                                    <div className="flex-shrink-0 relative">
+                                      <button
+                                        onClick={() => setOpenActionsMenu(openActionsMenu === item.id ? null : item.id)}
+                                        className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                                        title="Actions"
+                                      >
+                                        <MoreVertical className="w-4 h-4 text-gray-600" />
+                                      </button>
+
+                                      {/* Actions Dropdown */}
+                                      {openActionsMenu === item.id && (
+                                        <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded shadow-xl border border-gray-200 py-1 z-50">
+                                          <button
+                                            onClick={() => {
+                                              handleStartEdit(item);
+                                              setOpenActionsMenu(null);
+                                            }}
+                                            className="w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
+                                          >
+                                            <Edit2 className="w-3.5 h-3.5 text-blue-600" />
+                                            Edit name
+                                          </button>
+                                          <button
+                                            onClick={() => {
+                                              handleDeleteClick(item);
+                                              setOpenActionsMenu(null);
+                                            }}
+                                            className="w-full px-3 py-1.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                            Delete
+                                          </button>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
-                                </div>
+                                )}
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
