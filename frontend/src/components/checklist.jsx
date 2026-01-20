@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Edit2, X, ChevronDown, ChevronUp, Save, MoreVertical, FileText } from 'lucide-react';
+import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Edit2, X, ChevronDown, ChevronUp, Save, FileText } from 'lucide-react';
 
 const Checklist = ({ projectId }) => {
   const [items, setItems] = useState([]);
@@ -33,9 +33,6 @@ const Checklist = ({ projectId }) => {
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [notesItem, setNotesItem] = useState(null);
   const [editingNotes, setEditingNotes] = useState('');
-
-  // Actions menu state
-  const [openActionsMenu, setOpenActionsMenu] = useState(null);
   
   // Phase configuration - can be customized per project
   const [phases, setPhases] = useState([
@@ -993,6 +990,39 @@ const Checklist = ({ projectId }) => {
     return colors[color] || colors.blue;
   };
 
+  // Get phase number from phase ID (e.g., "Phase 1" -> 1)
+  const getPhaseNumber = (phaseId) => {
+    const match = phaseId.match(/Phase (\d+)/);
+    return match ? parseInt(match[1]) : 0;
+  };
+
+  // Get category number within phase (e.g., 1st category = 1, 2nd = 2, etc.)
+  const getCategoryNumber = (phaseId, category) => {
+    const categoriesInPhase = Object.keys(groupedItems[phaseId] || {});
+    return categoriesInPhase.indexOf(category) + 1;
+  };
+
+  // Get item number within category (e.g., 1st item = 1, 2nd = 2, etc.)
+  const getItemNumber = (phaseId, category, itemId) => {
+    const categoryItems = groupedItems[phaseId]?.[category] || [];
+    return categoryItems.findIndex(item => item.id === itemId) + 1;
+  };
+
+  // Get full hierarchical number for category (e.g., "1.1", "2.3")
+  const getCategoryFullNumber = (phaseId, category) => {
+    const phaseNum = getPhaseNumber(phaseId);
+    const categoryNum = getCategoryNumber(phaseId, category);
+    return `${phaseNum}.${categoryNum}`;
+  };
+
+  // Get full hierarchical number for item (e.g., "1.1.1", "2.3.2")
+  const getItemFullNumber = (phaseId, category, itemId) => {
+    const phaseNum = getPhaseNumber(phaseId);
+    const categoryNum = getCategoryNumber(phaseId, category);
+    const itemNum = getItemNumber(phaseId, category, itemId);
+    return `${phaseNum}.${categoryNum}.${itemNum}`;
+  };
+
   // Convert full name to short name (e.g., "Matteo Hon Fucci" -> "M. Hon Fucci")
   const getShortName = (fullName) => {
     if (!fullName) return '';
@@ -1070,6 +1100,21 @@ const Checklist = ({ projectId }) => {
 
   return (
     <div className="space-y-4 pb-24">
+      {/* CSS for centering date input */}
+      <style>{`
+        .date-input-centered::-webkit-calendar-picker-indicator {
+          position: absolute;
+          right: 4px;
+        }
+        .date-input-centered::-webkit-datetime-edit {
+          text-align: center;
+          width: 100%;
+        }
+        .date-input-centered::-webkit-datetime-edit-fields-wrapper {
+          justify-content: center;
+        }
+      `}</style>
+
       {/* Delete Item Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1560,7 +1605,10 @@ const Checklist = ({ projectId }) => {
                       </div>
                     ) : (
                       <>
-                        <h2 className="text-base font-bold">{phaseInfo.name}</h2>
+                        <h2 className="text-base font-bold">
+                          <span className="text-lg mr-2">Fase {getPhaseNumber(phaseInfo.id)} —</span>
+                          {phaseInfo.name}
+                        </h2>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1687,7 +1735,10 @@ const Checklist = ({ projectId }) => {
                               </div>
                             ) : (
                               <>
-                                <h3 className="font-semibold text-gray-900">{category}</h3>
+                                <h3 className="font-semibold text-gray-900">
+                                  <span className="text-blue-600 mr-2">{getCategoryFullNumber(phaseInfo.id, category)} —</span>
+                                  {category}
+                                </h3>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
                                     onClick={(e) => {
@@ -1734,9 +1785,10 @@ const Checklist = ({ projectId }) => {
                           {categoryItems.map((item) => {
                             const notesCount = item.notes?.trim() ? 1 : 0;
                             const shortName = getShortName(item.verified_by || '');
+                            const itemNumber = getItemFullNumber(phaseInfo.id, category, item.id);
 
                             return (
-                              <div key={item.id} className="px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                              <div key={item.id} className="pl-12 pr-4 py-2.5 hover:bg-gray-50 transition-colors group">
                                 {editingItemId === item.id ? (
                                   // Edit mode - full row input
                                   <div className="flex items-center gap-2">
@@ -1779,9 +1831,30 @@ const Checklist = ({ projectId }) => {
                                       }`} title={item.status}></div>
                                     </div>
 
-                                    {/* Title - truncated with tooltip */}
-                                    <div className="flex-1 min-w-0" title={item.requirement}>
-                                      <p className="text-sm font-medium text-gray-900 truncate">{item.requirement}</p>
+                                    {/* Title with Edit/Delete buttons - grouped together */}
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate" title={`${itemNumber} — ${item.requirement}`}>
+                                        <span className="text-gray-500 mr-2">{itemNumber} —</span>
+                                        {item.requirement}
+                                      </p>
+
+                                      {/* Edit and Delete Buttons - visible on hover */}
+                                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                        <button
+                                          onClick={() => handleStartEdit(item)}
+                                          className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
+                                          title="Edit item name"
+                                        >
+                                          <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteClick(item)}
+                                          className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
+                                          title="Delete item"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
                                     </div>
 
                                     {/* Status Badge - clickable */}
@@ -1794,14 +1867,23 @@ const Checklist = ({ projectId }) => {
                                     </button>
 
                                     {/* Verification Date - inline picker */}
-                                    <div className="flex-shrink-0 w-32">
+                                    <div className="flex-shrink-0 w-32 relative">
                                       <input
                                         type="date"
                                         value={item.verification_date || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verification_date: e.target.value })}
-                                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="date-input-centered w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         title="Verification date"
+                                        style={{
+                                          textAlign: 'center',
+                                          color: !item.verification_date ? 'transparent' : undefined
+                                        }}
                                       />
+                                      {!item.verification_date && (
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-xs text-gray-400">
+                                          Select date
+                                        </div>
+                                      )}
                                     </div>
 
                                     {/* Verified By - short name with dropdown */}
@@ -1832,43 +1914,6 @@ const Checklist = ({ projectId }) => {
                                         </span>
                                       )}
                                     </button>
-
-                                    {/* Actions Menu - three dots */}
-                                    <div className="flex-shrink-0 relative">
-                                      <button
-                                        onClick={() => setOpenActionsMenu(openActionsMenu === item.id ? null : item.id)}
-                                        className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                                        title="Actions"
-                                      >
-                                        <MoreVertical className="w-4 h-4 text-gray-600" />
-                                      </button>
-
-                                      {/* Actions Dropdown */}
-                                      {openActionsMenu === item.id && (
-                                        <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded shadow-xl border border-gray-200 py-1 z-50">
-                                          <button
-                                            onClick={() => {
-                                              handleStartEdit(item);
-                                              setOpenActionsMenu(null);
-                                            }}
-                                            className="w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2"
-                                          >
-                                            <Edit2 className="w-3.5 h-3.5 text-blue-600" />
-                                            Edit name
-                                          </button>
-                                          <button
-                                            onClick={() => {
-                                              handleDeleteClick(item);
-                                              setOpenActionsMenu(null);
-                                            }}
-                                            className="w-full px-3 py-1.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                          >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                            Delete
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
                                   </div>
                                 )}
                               </div>
