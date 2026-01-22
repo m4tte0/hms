@@ -115,7 +115,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
   if (!reportData) return null;
 
-  const { project, statistics, teamContacts, checklistByPhase, assessmentsByPhase, knowledgeSessions, issues, attachments, phaseNames } = reportData;
+  const { project, statistics, teamContacts, checklistByPhase, knowledgeSessions, issues, attachments, phaseNames, features } = reportData;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto p-4">
@@ -201,8 +201,51 @@ const StatusReport = ({ projectId, onClose }) => {
             </div>
           </div>
 
+          {/* Table of Contents */}
+          <div className="mb-6 print-page-break-before">
+            <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b-2 border-slate-600 pb-2">
+              Table of Contents
+            </h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                <span className="font-medium text-slate-700">1. Project Summary</span>
+              </div>
+              {teamContacts.length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">2. Team Composition</span>
+                </div>
+              )}
+              {features && features.length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">3. Specifiche Funzionalità</span>
+                </div>
+              )}
+              {knowledgeSessions.length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">4. Knowledge Transfer Calendar</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                <span className="font-medium text-slate-700">5. Handover Process Overview</span>
+              </div>
+              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                <span className="font-medium text-slate-700">6. Checklist Status Details</span>
+              </div>
+              {issues.length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">7. Issues & Risks</span>
+                </div>
+              )}
+              {attachments.length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">8. Attachments & Documentation</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* COMPACT HEADER: Sections 1-4 Combined */}
-          <section className="mb-6 page-break-inside-avoid">
+          <section className="mb-6 page-break-inside-avoid print-page-break-before">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-slate-600 pb-2">
               Project Summary
             </h3>
@@ -210,212 +253,199 @@ const StatusReport = ({ projectId, onClose }) => {
             {/* Two-column layout for compact display */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-              {/* Left Column: Project Details & Leadership */}
-              <div className="space-y-3">
+              {/* Left Column: Project Details & Leadership - Clean style matching Overview tab */}
+              <div className="space-y-4">
                 {/* Project Information */}
-                <div className="bg-white p-3 rounded-lg border-l-4 border-slate-600 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Project Information
                   </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">ID</span>
-                      <p className="font-semibold text-secondary-900">{project.handover_id || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Status</span>
-                      <div className="mt-0.5">
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
-                          {project.status || 'Active'}
-                        </span>
+                  <div className="space-y-2">
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Project Name</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-900">
+                          {project.project_name || 'N/A'}
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">ID</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                          {project.handover_id || 'N/A'}
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Status</label>
+                        <div className="px-2 py-1.5">
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                            {project.status || 'Active'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="col-span-2">
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Project Name</span>
-                      <p className="font-semibold text-secondary-900">{project.project_name || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Phase</span>
-                      <p className="font-medium text-secondary-900">{project.current_phase || 'Phase 1'}</p>
-                    </div>
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Score</span>
-                      <p className="font-semibold text-slate-700">{project.project_score || 0}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timeline & Progress */}
-                <div className="bg-white p-3 rounded-lg border-l-4 border-blue-600 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
-                    Timeline & Progress
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Start Date</span>
-                      <span className="font-medium text-secondary-900">{formatDate(project.start_date)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Target Date</span>
-                      <span className="font-medium text-secondary-900">{formatDate(project.target_date)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide">Days Remaining</span>
-                      <span className={`font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                        {project.daysRemaining !== null ? `${project.daysRemaining} days` : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t border-gray-100">
-                      <div className="flex justify-between mb-1.5">
-                        <span className="text-secondary-500 text-xs uppercase tracking-wide">Completion</span>
-                        <span className="font-bold text-blue-700">{project.completionPercentage}%</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Current Phase</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                          {project.current_phase || 'Phase 1'}
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
-                          style={{ width: `${project.completionPercentage}%` }}
-                        ></div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Project Score</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-700">
+                          {project.project_score || 0}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Project Metrics */}
-                <div className="bg-white p-3 rounded-lg border-l-4 border-amber-600 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-amber-600 rounded-full mr-2"></div>
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Project Metrics
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Priority</span>
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
-                        {project.business_priority || 'Not set'}
-                      </span>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Priority</label>
+                      <div className="px-2 py-1.5">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
+                          {project.business_priority || 'Not set'}
+                        </span>
+                      </div>
                     </div>
                     <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Complexity</span>
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
-                        {project.complexity_level || 'Not set'}
-                      </span>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Complexity</label>
+                      <div className="px-2 py-1.5">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
+                          {project.complexity_level || 'Not set'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Project Details */}
-                <div className="bg-white p-3 rounded-lg border-l-4 border-purple-600 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-purple-600 rounded-full mr-2"></div>
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Project Details
                   </h4>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Machine Family</span>
-                      <p className="font-medium text-secondary-900">{project.machine_family || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Deliverable</span>
-                      <p className="font-medium text-secondary-900">
-                        {project.deliverable ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">
-                            <CheckCircle className="w-3 h-3" />
-                            Yes (Voce a Listino)
-                          </span>
-                        ) : (
-                          <span className="text-secondary-600">No</span>
-                        )}
-                      </p>
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Machine Family</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                          {project.machine_family || 'Not specified'}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Deliverable</label>
+                        <div className="px-2 py-1.5">
+                          {project.deliverable ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">
+                              <CheckCircle className="w-3 h-3" />
+                              Yes (Voce a Listino)
+                            </span>
+                          ) : (
+                            <span className="text-sm text-slate-600">No</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     {project.description && (
                       <div>
-                        <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Description</span>
-                        <p className="text-xs text-secondary-700 leading-relaxed">{project.description}</p>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Description</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 leading-relaxed">
+                          {project.description}
+                        </div>
                       </div>
                     )}
                     {project.context_usage && (
                       <div>
-                        <span className="text-secondary-500 text-xs uppercase tracking-wide block mb-1">Context and Usage</span>
-                        <p className="text-xs text-secondary-700 leading-relaxed">{project.context_usage}</p>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Context and Usage</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 leading-relaxed">
+                          {project.context_usage}
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Leadership */}
-                <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-600 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-2"></div>
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Project Leadership
                   </h4>
-                  <div className="space-y-2 text-sm">
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">R&D Lead</span>
-                      <p className="font-medium text-secondary-900">{project.rd_lead || 'Not assigned'}</p>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">R&D Lead</label>
+                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                        {project.rd_lead || 'Not assigned'}
+                      </div>
                     </div>
                     <div>
-                      <span className="text-secondary-500 text-xs uppercase tracking-wide block">Automation Lead</span>
-                      <p className="font-medium text-secondary-900">{project.automation_lead || 'Not assigned'}</p>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Automation Lead</label>
+                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
+                        {project.automation_lead || 'Not assigned'}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Statistics Grid */}
+              {/* Right Column: Statistics Grid - Clean style matching Overview tab */}
               <div>
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 shadow-sm">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center">
-                    <div className="w-1.5 h-1.5 bg-slate-600 rounded-full mr-2"></div>
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Progress Statistics
                   </h4>
                   <div className="grid grid-cols-2 gap-3">
 
                     {/* Checklist Items */}
-                    <div className="bg-white p-3 rounded-lg border-l-4 border-emerald-500 shadow-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Checklist</p>
-                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Checklist</p>
+                          <p className="text-xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
                           <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Done</p>
                         </div>
-                        <CheckCircle className="w-7 h-7 text-emerald-500 opacity-30" />
+                        <CheckCircle className="w-5 h-5 text-emerald-500 opacity-50" />
                       </div>
                     </div>
 
                     {/* Knowledge Sessions */}
-                    <div className="bg-white p-3 rounded-lg border-l-4 border-blue-500 shadow-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Sessions</p>
-                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Sessions</p>
+                          <p className="text-xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
                           <p className="text-xs text-blue-600 font-medium mt-1">Completed</p>
                         </div>
-                        <Users className="w-7 h-7 text-blue-500 opacity-30" />
+                        <Users className="w-5 h-5 text-blue-500 opacity-50" />
                       </div>
                     </div>
 
                     {/* Open Issues */}
-                    <div className="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Issues</p>
-                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Open Issues</p>
+                          <p className="text-xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
                           <p className="text-xs text-amber-600 font-medium mt-1">of {statistics.issues.total} total</p>
                         </div>
-                        <AlertTriangle className="w-7 h-7 text-amber-500 opacity-30" />
+                        <AlertTriangle className="w-5 h-5 text-amber-500 opacity-50" />
                       </div>
                     </div>
 
                     {/* Attachments */}
-                    <div className="bg-white p-3 rounded-lg border-l-4 border-slate-500 shadow-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-secondary-500 uppercase tracking-wide mb-1">Files</p>
-                          <p className="text-2xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Files</p>
+                          <p className="text-xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
                           <p className="text-xs text-slate-600 font-medium mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
                         </div>
-                        <FileText className="w-7 h-7 text-slate-500 opacity-30" />
+                        <FileText className="w-5 h-5 text-slate-500 opacity-50" />
                       </div>
                     </div>
 
@@ -423,6 +453,125 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
               </div>
 
+            </div>
+
+            {/* Project Timeline - Full Width - Clean style */}
+            <div className="mt-4 page-break-inside-avoid">
+              <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-slate-600" />
+                  <span>Project Timeline</span>
+                </div>
+                <span className={`text-xs font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {project.daysRemaining !== null ? `${project.daysRemaining} days remaining` : ''}
+                </span>
+              </h4>
+
+              {/* Visual Timeline with Phase Colors */}
+              {project.start_date && project.target_date && (() => {
+                const start = new Date(project.start_date);
+                const end = new Date(project.target_date);
+                const today = new Date();
+                const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                const elapsedDays = Math.ceil((today - start) / (1000 * 60 * 60 * 24));
+                const timeProgress = Math.min(100, Math.max(0, Math.round((elapsedDays / totalDays) * 100)));
+
+                return (
+                  <div className="bg-slate-50 rounded p-3">
+                    <div className="relative">
+                      {/* Timeline Bar with Phase Segments */}
+                      <div className="relative h-3 rounded-full overflow-hidden flex">
+                        {/* Background */}
+                        <div className="absolute inset-0 bg-slate-200" />
+                        {/* Phase segments - default division */}
+                        <div className="absolute h-full bg-gradient-to-r from-blue-300 to-blue-500" style={{ left: '0%', width: '33%' }} />
+                        <div className="absolute h-full bg-gradient-to-r from-yellow-300 to-yellow-500" style={{ left: '33%', width: '50%' }} />
+                        <div className="absolute h-full bg-gradient-to-r from-green-300 to-green-500" style={{ left: '83%', width: '17%' }} />
+                      </div>
+
+                      {/* Phase Divider Markers */}
+                      <div className="absolute top-0 flex flex-col items-center pointer-events-none" style={{ left: '33%', transform: 'translateX(-50%)' }}>
+                        <div className="w-0.5 h-3 bg-slate-700 opacity-60"></div>
+                        <div className="w-1.5 h-1.5 bg-slate-700 rounded-full opacity-60"></div>
+                      </div>
+                      <div className="absolute top-0 flex flex-col items-center pointer-events-none" style={{ left: '83%', transform: 'translateX(-50%)' }}>
+                        <div className="w-0.5 h-3 bg-slate-700 opacity-60"></div>
+                        <div className="w-1.5 h-1.5 bg-slate-700 rounded-full opacity-60"></div>
+                      </div>
+
+                      {/* Month Markers */}
+                      {(() => {
+                        const monthMarkers = [];
+                        let currentDate = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+                        while (currentDate < end) {
+                          const markerPercent = ((currentDate - start) / (end - start)) * 100;
+                          if (markerPercent > 0 && markerPercent < 100) {
+                            monthMarkers.push(
+                              <div
+                                key={currentDate.toISOString()}
+                                className="absolute top-0 flex flex-col items-center pointer-events-none"
+                                style={{ left: `${markerPercent}%`, transform: 'translateX(-50%)' }}
+                              >
+                                <div className="w-px h-3 bg-slate-400 opacity-40"></div>
+                                <div className="mt-0.5 text-[9px] text-slate-500 opacity-70 whitespace-nowrap">
+                                  {currentDate.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}
+                                </div>
+                              </div>
+                            );
+                          }
+                          currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+                        }
+                        return monthMarkers;
+                      })()}
+
+                      {/* Today Marker */}
+                      <div
+                        className="absolute top-0 flex flex-col items-center z-10"
+                        style={{ left: `${timeProgress}%`, transform: 'translateX(-50%)' }}
+                      >
+                        <div className="w-0.5 h-3 bg-red-600"></div>
+                        <div className="w-3 h-3 bg-red-600 rounded-full border-2 border-white shadow-md"></div>
+                        <div className="mt-1 px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded whitespace-nowrap">
+                          TODAY
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Date Labels */}
+                    <div className="flex justify-between items-center mt-8 text-xs">
+                      <div className="text-left">
+                        <div className="text-slate-500 font-medium">Start</div>
+                        <div className="text-sm font-semibold text-slate-900">{formatDate(project.start_date)}</div>
+                      </div>
+                      <div className="text-center bg-emerald-50 px-3 py-1 rounded">
+                        <div className="text-slate-500 font-medium">Duration</div>
+                        <div className="text-sm font-semibold text-slate-900">{totalDays} days</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-slate-500 font-medium">Target</div>
+                        <div className="text-sm font-semibold text-slate-900">{formatDate(project.target_date)}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Status Indicator */}
+              <div className={`mt-3 p-2 rounded ${project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? 'bg-emerald-50' : 'bg-amber-50'}`}>
+                <div className="flex items-center gap-2">
+                  {project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                      <span className="text-xs font-medium text-emerald-800">On Track - Work progress ({project.completionPercentage}%) is ahead of schedule</span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                      <span className="text-xs font-medium text-amber-800">Behind Schedule - Work progress ({project.completionPercentage}%) is behind timeline</span>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </section>
 
@@ -460,76 +609,260 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* Knowledge Transfer Calendar - Sessions Timeline */}
+          {/* Specifiche Funzionalità - Feature Specifications */}
+          {features && features.length > 0 && (
+            <section className="mb-6 print-page-break-before">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-purple-500 pb-2 flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
+                Specifiche Funzionalità
+              </h3>
+              <div className="space-y-4">
+                {features.map((feature, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white border-l-4 border-purple-500 rounded-lg shadow-sm page-break-inside-avoid"
+                  >
+                    <div className="p-4">
+                      {/* Feature Name Header */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg text-sm font-semibold">
+                          #{idx + 1}
+                        </span>
+                        <h4 className="text-lg font-semibold text-secondary-900">
+                          {feature.feature_name || 'Unnamed Feature'}
+                        </h4>
+                      </div>
+
+                      {/* Feature Details */}
+                      <div className="space-y-3">
+                        {/* Description */}
+                        {feature.description && (
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs font-semibold text-secondary-500 uppercase tracking-wide mb-1">
+                              Descrizione
+                            </p>
+                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap">
+                              {feature.description}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Purpose / Finalità */}
+                        {feature.purpose && (
+                          <div className="bg-blue-50 rounded-lg p-3">
+                            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                              Finalità
+                            </p>
+                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap">
+                              {feature.purpose}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Technical Specifications */}
+                        {feature.tech_specs && (
+                          <div className="bg-amber-50 rounded-lg p-3">
+                            <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">
+                              Specifiche Tecniche
+                            </p>
+                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap font-mono">
+                              {feature.tech_specs}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Features Summary */}
+              <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-3 text-center page-break-inside-avoid">
+                <p className="text-sm text-secondary-600">
+                  Total Features Documented: <span className="font-bold text-purple-700">{features.length}</span>
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* Knowledge Transfer Calendar - Compact Multi-Month View (same style as Calendario tab) */}
           {knowledgeSessions.length > 0 && (
-            <section className="mb-6">
+            <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Calendar className="w-5 h-5 mr-2" />
                 Knowledge Transfer Calendar
               </h3>
-              <div className="space-y-3">
-                {knowledgeSessions
-                  .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
-                  .map((session, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white border-l-4 border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-shadow page-break-inside-avoid"
-                    >
-                      <div className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm font-semibold min-w-[120px] text-center">
+
+              {/* Calendar Legend */}
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
+                  <span className="text-secondary-600">Has Sessions</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-green-100 border border-green-400"></div>
+                  <span className="text-secondary-600">Completed</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-yellow-100 border border-yellow-400"></div>
+                  <span className="text-secondary-600">Scheduled</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-red-100 border border-red-400"></div>
+                  <span className="text-secondary-600">Cancelled</span>
+                </div>
+              </div>
+
+              {/* Multi-Month Calendar Grid */}
+              {(() => {
+                // Helper functions
+                const getDaysInMonth = (date) => {
+                  const year = date.getFullYear();
+                  const month = date.getMonth();
+                  const firstDay = new Date(year, month, 1);
+                  const lastDay = new Date(year, month + 1, 0);
+                  const daysInMonth = lastDay.getDate();
+                  const startingDayOfWeek = firstDay.getDay();
+                  const adjustedStartDay = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1; // Monday = 0
+                  return { daysInMonth, startingDayOfWeek: adjustedStartDay, year, month };
+                };
+
+                const getSessionsForDate = (date) => {
+                  return knowledgeSessions.filter(session => {
+                    const sessionDate = new Date(session.scheduled_date + 'T00:00:00');
+                    return sessionDate.toDateString() === date.toDateString();
+                  });
+                };
+
+                // Get unique months from sessions
+                const sessionMonths = new Set();
+                knowledgeSessions.forEach(session => {
+                  const date = new Date(session.scheduled_date + 'T00:00:00');
+                  sessionMonths.add(`${date.getFullYear()}-${date.getMonth()}`);
+                });
+
+                // Convert to sorted array of Date objects
+                const projectMonths = Array.from(sessionMonths)
+                  .map(key => {
+                    const [year, month] = key.split('-').map(Number);
+                    return new Date(year, month, 1);
+                  })
+                  .sort((a, b) => a - b);
+
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+                return (
+                  <div className="bg-white border border-secondary-200 rounded-lg p-4 page-break-inside-avoid">
+                    {/* Multi-Month Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {projectMonths.map((monthDate, index) => {
+                        const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(monthDate);
+
+                        return (
+                          <div key={index} className="bg-white border border-secondary-200 rounded p-3">
+                            {/* Month Header */}
+                            <div className="text-center mb-2">
+                              <div className="text-sm font-bold text-secondary-900">{monthNames[month]}</div>
+                              <div className="text-xs text-secondary-500">{year}</div>
+                            </div>
+
+                            {/* Day Name Headers */}
+                            <div className="grid grid-cols-7 gap-1 mb-1">
+                              {dayNames.map((name, i) => (
+                                <div key={i} className="text-[10px] font-semibold text-secondary-500 text-center">
+                                  {name}
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Calendar Days */}
+                            <div className="grid grid-cols-7 gap-1">
+                              {/* Empty cells before first day */}
+                              {Array.from({ length: startingDayOfWeek }, (_, i) => (
+                                <div key={`empty-${i}`} className="aspect-square"></div>
+                              ))}
+
+                              {/* Day cells */}
+                              {Array.from({ length: daysInMonth }, (_, i) => {
+                                const day = i + 1;
+                                const date = new Date(year, month, day);
+                                const daySessions = getSessionsForDate(date);
+                                const hasSessions = daySessions.length > 0;
+
+                                // Determine background color based on session status
+                                let bgClass = 'bg-white text-secondary-700';
+                                let ringClass = '';
+
+                                if (hasSessions) {
+                                  const hasCompleted = daySessions.some(s => s.status === 'Completed');
+                                  const hasCancelled = daySessions.some(s => s.status === 'Cancelled');
+                                  const hasScheduled = daySessions.some(s => s.status === 'Scheduled' || !s.status);
+
+                                  if (hasCompleted && !hasScheduled && !hasCancelled) {
+                                    bgClass = 'bg-green-100 text-green-800';
+                                    ringClass = 'ring-2 ring-green-400';
+                                  } else if (hasCancelled && !hasScheduled && !hasCompleted) {
+                                    bgClass = 'bg-red-100 text-red-800';
+                                    ringClass = 'ring-2 ring-red-400';
+                                  } else {
+                                    bgClass = 'bg-blue-50 text-blue-700';
+                                    ringClass = 'ring-2 ring-blue-300';
+                                  }
+                                }
+
+                                return (
+                                  <div
+                                    key={day}
+                                    className={`aspect-square flex items-center justify-center text-xs font-medium rounded ${bgClass} ${ringClass}`}
+                                    title={hasSessions ? daySessions.map(s => s.session_topic).join(', ') : ''}
+                                  >
+                                    {day}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Sessions List Below Calendar */}
+                    <div className="mt-4 pt-4 border-t border-secondary-200">
+                      <h4 className="text-sm font-semibold text-secondary-900 mb-3">Session Details</h4>
+                      <div className="space-y-2">
+                        {knowledgeSessions
+                          .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                          .map((session, idx) => (
+                            <div key={idx} className="flex items-start gap-3 bg-gray-50 rounded p-2 text-sm page-break-inside-avoid">
+                              <div className={`flex-shrink-0 px-2 py-1 rounded text-xs font-medium min-w-[80px] text-center ${
+                                session.status === 'Completed'
+                                  ? 'bg-green-100 text-green-700'
+                                  : session.status === 'Cancelled'
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}>
                                 {formatDate(session.scheduled_date)}
                               </div>
-                              {session.start_time && (
-                                <div className="flex items-center text-sm text-secondary-600">
-                                  <Clock className="w-4 h-4 mr-1" />
-                                  {session.start_time}
-                                  {session.duration && ` (${session.duration})`}
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-secondary-900">{session.session_topic}</div>
+                                <div className="text-xs text-secondary-500">
+                                  {session.start_time && <span>{session.start_time}</span>}
+                                  {session.duration && <span> ({session.duration})</span>}
+                                  {session.attendees && <span> · {session.attendees}</span>}
                                 </div>
-                              )}
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
+                              </div>
+                              <span className={`flex-shrink-0 px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(session.status)}`}>
                                 {session.status || 'Scheduled'}
                               </span>
                             </div>
-
-                            <h4 className="text-base font-semibold text-secondary-900 mb-2">
-                              {session.session_topic}
-                            </h4>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                              {session.attendees && (
-                                <div className="flex items-start">
-                                  <Users className="w-4 h-4 mr-2 text-secondary-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-secondary-700">{session.attendees}</span>
-                                </div>
-                              )}
-
-                              {session.effectiveness_rating && (
-                                <div className="flex items-center">
-                                  <TrendingUp className="w-4 h-4 mr-2 text-secondary-500 flex-shrink-0" />
-                                  <span className="text-secondary-700">
-                                    Effectiveness:
-                                    <span className="ml-1 font-semibold text-green-600">
-                                      {session.effectiveness_rating}/5
-                                    </span>
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            {session.notes && (
-                              <div className="mt-2 pt-2 border-t border-gray-100">
-                                <p className="text-sm text-secondary-600 italic">{session.notes}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          ))}
                       </div>
                     </div>
-                  ))}
-              </div>
+                  </div>
+                );
+              })()}
 
               {/* Summary Stats */}
               <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
@@ -553,48 +886,117 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 2: Phase Breakdown */}
-          <section className="mb-6">
+          {/* SECTION 2: Phase Breakdown - Matching Overview tab style */}
+          <section className="mb-6 print-page-break-before">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-              Phase Progress Breakdown
+              Handover Process Overview
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
-              <div className="space-y-4">
-                {Object.entries(statistics.phases).map(([phase, stats]) => {
-                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
-                  return (
-                    <div key={phase} className="bg-gray-50 p-4 rounded-lg page-break-inside-avoid">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="text-lg font-semibold">{phaseName}</h4>
-                        <span className="text-sm font-semibold text-blue-600">{stats.percentage}% Complete</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+              <div className="bg-white rounded shadow-sm border border-slate-200 p-4">
+                <div className="space-y-2">
+                  {(() => {
+                    // Define phase metadata
+                    const phaseMetadata = {
+                      'Phase 1': {
+                        activities: 'Prerequisites completion, documentation review, initial assessment',
+                        criteria: 'All technical and documentation requirements met'
+                      },
+                      'Phase 2': {
+                        activities: 'Training sessions, hands-on activities, shadow support',
+                        criteria: 'Team demonstrates competency in system operation'
+                      },
+                      'Phase 3': {
+                        activities: 'Approvals, documentation handover, transition activities',
+                        criteria: 'All sign-offs completed and access transferred'
+                      }
+                    };
+
+                    return Object.entries(statistics.phases).map(([phase, stats], index) => {
+                      const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
+                      const metadata = phaseMetadata[phase] || { activities: 'Phase activities', criteria: 'Phase criteria' };
+
+                      // Determine status based on progress
+                      const status = stats.percentage === 100 ? 'complete' :
+                                    (stats.percentage > 0 || stats.inProgress > 0) ? 'progress' : 'pending';
+
+                      return (
                         <div
-                          className="bg-blue-600 h-3 rounded-full transition-all"
-                          style={{ width: `${stats.percentage}%` }}
-                        ></div>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2 text-center text-sm">
-                        <div>
-                          <p className="text-secondary-600">Total</p>
-                          <p className="font-semibold">{stats.total}</p>
+                          key={phase}
+                          className={`p-3 rounded border page-break-inside-avoid ${
+                            status === 'complete' ? 'bg-emerald-50 border-emerald-200' :
+                            status === 'progress' ? 'bg-amber-50 border-amber-200' :
+                            'bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            {/* Phase Number Circle */}
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                              status === 'complete' ? 'bg-emerald-500 text-white' :
+                              status === 'progress' ? 'bg-amber-500 text-white' :
+                              'bg-slate-300 text-slate-600'
+                            }`}>
+                              {index + 1}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              {/* Phase Header */}
+                              <div className="flex items-center justify-between mb-1.5">
+                                <h4 className="text-sm font-semibold text-slate-900">{phaseName}</h4>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold text-blue-600">{stats.percentage}%</span>
+                                  {status === 'complete' && <CheckCircle className="w-4 h-4 text-emerald-500" />}
+                                  {status === 'progress' && <Clock className="w-4 h-4 text-amber-500" />}
+                                </div>
+                              </div>
+
+                              {/* Progress Bar */}
+                              <div className="w-full bg-slate-200 rounded-full h-1.5 mb-2">
+                                <div
+                                  className={`h-1.5 rounded-full ${
+                                    status === 'complete' ? 'bg-emerald-500' :
+                                    status === 'progress' ? 'bg-amber-500' :
+                                    'bg-slate-400'
+                                  }`}
+                                  style={{ width: `${stats.percentage}%` }}
+                                />
+                              </div>
+
+                              {/* Key Activities and Success Criteria */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                <div>
+                                  <span className="font-medium text-slate-700">Key Activities:</span>
+                                  <p className="text-slate-600 mt-0.5">{metadata.activities}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-slate-700">Success Criteria:</span>
+                                  <p className="text-slate-600 mt-0.5">{metadata.criteria}</p>
+                                </div>
+                              </div>
+
+                              {/* Task Statistics */}
+                              <div className="mt-2 pt-2 border-t border-slate-200">
+                                <div className="flex flex-wrap gap-3 text-xs">
+                                  <span className="text-slate-600">
+                                    <span className="font-medium">Total:</span> {stats.total}
+                                  </span>
+                                  <span className="text-emerald-600">
+                                    <span className="font-medium">Complete:</span> {stats.completed}
+                                  </span>
+                                  <span className="text-blue-600">
+                                    <span className="font-medium">In Progress:</span> {stats.inProgress}
+                                  </span>
+                                  <span className="text-slate-500">
+                                    <span className="font-medium">Not Started:</span> {stats.notStarted}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-green-600">Complete</p>
-                          <p className="font-semibold">{stats.completed}</p>
-                        </div>
-                        <div>
-                          <p className="text-blue-600">In Progress</p>
-                          <p className="font-semibold">{stats.inProgress}</p>
-                        </div>
-                        <div>
-                          <p className="text-secondary-600">Not Started</p>
-                          <p className="font-semibold">{stats.notStarted}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      );
+                    });
+                  })()}
+                </div>
               </div>
             ) : (
               <p className="text-secondary-500 italic">No phase data available</p>
@@ -602,7 +1004,7 @@ const StatusReport = ({ projectId, onClose }) => {
           </section>
 
           {/* SECTION 3: Checklist Details */}
-          <section className="mb-6">
+          <section className="mb-6 print-page-break-before">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
               Checklist Status Details
             </h3>
@@ -655,57 +1057,9 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 4: Assessment Summary */}
-          {Object.keys(assessmentsByPhase).length > 0 && (
-            <section className="mb-6">
-              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-                Assessment Summary
-              </h3>
-              <div className="space-y-4">
-                {Object.entries(assessmentsByPhase).map(([phase, scores]) => {
-                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
-                  const avgScore = scores.length > 0
-                    ? (scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length).toFixed(1)
-                    : 'N/A';
-                  return (
-                    <div key={phase} className="page-break-inside-avoid">
-                      <h4 className="text-lg font-semibold mb-2">{phaseName} - Average Score: {avgScore}</h4>
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white border border-gray-200 text-sm">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-3 py-2 text-left text-xs font-semibold">Category</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold">Criteria</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold">Score</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold">Evidence</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold">Assessed By</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {scores.map((score, idx) => (
-                              <tr key={idx} className="border-t border-gray-200">
-                                <td className="px-3 py-2">{score.category}</td>
-                                <td className="px-3 py-2">{score.criteria}</td>
-                                <td className="px-3 py-2">
-                                  <span className="font-semibold text-blue-600">{score.score}/10</span>
-                                </td>
-                                <td className="px-3 py-2 text-xs">{score.evidence || '-'}</td>
-                                <td className="px-3 py-2">{score.assessed_by || '-'}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* SECTION 5: Issues & Risks */}
+          {/* SECTION 4: Issues & Risks */}
           {issues.length > 0 && (
-            <section className="mb-6">
+            <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Issues & Risks
               </h3>
@@ -746,9 +1100,9 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* SECTION 6: Attachments */}
+          {/* SECTION 5: Attachments */}
           {attachments.length > 0 && (
-            <section className="mb-6">
+            <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Attachments & Documentation
               </h3>
@@ -844,6 +1198,12 @@ const StatusReport = ({ projectId, onClose }) => {
           .page-break-inside-avoid {
             page-break-inside: avoid;
             break-inside: avoid;
+          }
+
+          /* Force page break before element - for new sections */
+          .print-page-break-before {
+            page-break-before: always !important;
+            break-before: always !important;
           }
 
           /* Prevent section headers from being orphaned at bottom of page */

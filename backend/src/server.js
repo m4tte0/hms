@@ -143,20 +143,20 @@ app.get('/api/projects/:id/report', async (req, res) => {
       project,
       checklistItems,
       knowledgeSessions,
-      assessmentScores,
       issues,
       teamContacts,
       attachments,
-      phaseNames
+      phaseNames,
+      features
     ] = await Promise.all([
       db.getAsync('SELECT * FROM projects WHERE id = ?', [projectId]),
       db.allAsync('SELECT * FROM checklist_items WHERE project_id = ? ORDER BY phase, category, id', [projectId]),
       db.allAsync('SELECT * FROM knowledge_sessions WHERE project_id = ? ORDER BY scheduled_date', [projectId]),
-      db.allAsync('SELECT * FROM assessment_scores WHERE project_id = ? ORDER BY phase, category, criteria', [projectId]),
       db.allAsync('SELECT * FROM issues WHERE project_id = ? ORDER BY priority, date_reported DESC', [projectId]),
       db.allAsync('SELECT * FROM team_contacts WHERE project_id = ? ORDER BY department, role', [projectId]),
       db.allAsync('SELECT id, file_name, original_name, file_size, mime_type, description, uploaded_by, uploaded_at FROM attachments WHERE project_id = ? ORDER BY uploaded_at DESC', [projectId]),
-      db.allAsync('SELECT * FROM phase_names WHERE project_id = ? ORDER BY phase_id', [projectId])
+      db.allAsync('SELECT * FROM phase_names WHERE project_id = ? ORDER BY phase_id', [projectId]),
+      db.allAsync('SELECT * FROM features WHERE project_id = ? ORDER BY created_at DESC', [projectId])
     ]);
 
     if (!project) {
@@ -183,15 +183,6 @@ app.get('/api/projects/:id/report', async (req, res) => {
         checklistByPhase[item.phase][item.category] = [];
       }
       checklistByPhase[item.phase][item.category].push(item);
-    });
-
-    // Group assessments by phase
-    const assessmentsByPhase = {};
-    assessmentScores.forEach(score => {
-      if (!assessmentsByPhase[score.phase]) {
-        assessmentsByPhase[score.phase] = [];
-      }
-      assessmentsByPhase[score.phase].push(score);
     });
 
     // Calculate phase completion percentages
@@ -251,11 +242,11 @@ app.get('/api/projects/:id/report', async (req, res) => {
       },
       teamContacts,
       checklistByPhase,
-      assessmentsByPhase,
       knowledgeSessions,
       issues,
       attachments,
-      phaseNames
+      phaseNames,
+      features
     };
 
     res.json(report);
