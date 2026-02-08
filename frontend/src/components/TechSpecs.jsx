@@ -248,9 +248,10 @@ const TechSpecs = ({ projectId }) => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
+      {/* Header + Summary - Merged Box */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-6">
+        {/* Header Row */}
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Specifiche Tecniche</h2>
             <p className="text-sm text-gray-600 mt-1">
@@ -277,29 +278,29 @@ const TechSpecs = ({ projectId }) => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Summary Section - Hoisted to top */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Server className="w-5 h-5 text-blue-600" />
-          Riepilogo Specifiche Selezionate
-        </h3>
-        <div className="grid grid-cols-[200px_1fr] gap-x-6 gap-y-2">
-          {Object.entries(categories).map(([categoryKey, category]) => {
-            const selections = specs[categoryKey] || [];
-            if (selections.length === 0) return null;
+        {/* Summary Section */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Server className="w-5 h-5 text-blue-600" />
+            Riepilogo Specifiche Selezionate
+          </h3>
+          <div className="grid grid-cols-[200px_1fr] gap-x-6 gap-y-2">
+            {Object.entries(categories).map(([categoryKey, category]) => {
+              const selections = specs[categoryKey] || [];
+              if (selections.length === 0) return null;
 
-            return (
-              <React.Fragment key={categoryKey}>
-                <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                <div className="text-sm text-gray-600">{selections.join(', ')}</div>
-              </React.Fragment>
-            );
-          })}
-          {Object.values(specs).every(arr => arr.length === 0) && (
-            <p className="text-sm text-gray-500 italic col-span-2">Nessuna specifica selezionata</p>
-          )}
+              return (
+                <React.Fragment key={categoryKey}>
+                  <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
+                  <div className="text-sm text-gray-600">{selections.join(', ')}</div>
+                </React.Fragment>
+              );
+            })}
+            {Object.values(specs).every(arr => arr.length === 0) && (
+              <p className="text-sm text-gray-500 italic col-span-2">Nessuna specifica selezionata</p>
+            )}
+          </div>
         </div>
       </div>
 
