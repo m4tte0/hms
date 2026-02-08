@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2 } from 'lucide-react';
+import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2, Layout } from 'lucide-react';
 
 const TechSpecs = ({ projectId }) => {
   const [specs, setSpecs] = useState({
     dotnet_version: [],
+    gui_interface: [],
     retrofit_compatibility: [],
     platform_compatibility: [],
     hardware_requirements: [],
@@ -30,6 +31,16 @@ const TechSpecs = ({ projectId }) => {
         '.NET Core 3.1'
       ]
     },
+    gui_interface: {
+      title: 'Graphic User Interface',
+      icon: Layout,
+      color: 'teal',
+      options: [
+        'iRoll Performance',
+        'iRoll eXtreme',
+        'Smart Line'
+      ]
+    },
     retrofit_compatibility: {
       title: 'Compatibilità Retrofit',
       icon: RefreshCw,
@@ -37,11 +48,17 @@ const TechSpecs = ({ projectId }) => {
       options: [
         'Solo progetti legacy',
         'Solo nuovi progetti',
-        'Entrambi'
+        'Entrambi',
+        'MCE',
+        '3-Rolls',
+        '4-Rolls',
+        'MAV /AER',
+        'Hydraulic',
+        'All Segments'
       ]
     },
     platform_compatibility: {
-      title: 'Compatibilità Piattaforma',
+      title: 'Process Control',
       icon: Server,
       color: 'green',
       options: [
@@ -56,12 +73,9 @@ const TechSpecs = ({ projectId }) => {
       icon: Cpu,
       color: 'orange',
       options: [
-        'CPU ≥ 2 core',
-        'CPU ≥ 4 core',
-        'RAM ≥ 4GB',
-        'RAM ≥ 8GB',
-        'RAM ≥ 16GB',
-        'Disco ≥ 100GB SSD'
+        'ASEM:PB5600',
+        'ASEM:BM100',
+        'B&R:CP1686'
       ]
     },
     os_compatibility: {
@@ -84,6 +98,11 @@ const TechSpecs = ({ projectId }) => {
       active: 'bg-purple-100 text-purple-800 border-purple-400',
       inactive: 'bg-gray-100 text-gray-500 border-gray-300',
       hover: 'hover:bg-purple-50 hover:border-purple-300'
+    },
+    teal: {
+      active: 'bg-teal-100 text-teal-800 border-teal-400',
+      inactive: 'bg-gray-100 text-gray-500 border-gray-300',
+      hover: 'hover:bg-teal-50 hover:border-teal-300'
     },
     blue: {
       active: 'bg-blue-100 text-blue-800 border-blue-400',
@@ -109,6 +128,15 @@ const TechSpecs = ({ projectId }) => {
 
   useEffect(() => {
     if (projectId) {
+      // Reset specs to empty state before loading new project
+      setSpecs({
+        dotnet_version: [],
+        gui_interface: [],
+        retrofit_compatibility: [],
+        platform_compatibility: [],
+        hardware_requirements: [],
+        os_compatibility: []
+      });
       loadTechSpecs();
     }
   }, [projectId]);
@@ -126,10 +154,37 @@ const TechSpecs = ({ projectId }) => {
       if (data.specifiche_tecniche) {
         try {
           const parsedSpecs = JSON.parse(data.specifiche_tecniche);
-          setSpecs(parsedSpecs);
+          // Ensure all expected fields exist in parsed data
+          setSpecs({
+            dotnet_version: parsedSpecs.dotnet_version || [],
+            gui_interface: parsedSpecs.gui_interface || [],
+            retrofit_compatibility: parsedSpecs.retrofit_compatibility || [],
+            platform_compatibility: parsedSpecs.platform_compatibility || [],
+            hardware_requirements: parsedSpecs.hardware_requirements || [],
+            os_compatibility: parsedSpecs.os_compatibility || []
+          });
         } catch (e) {
           console.log('No valid tech specs found, using defaults');
+          // Reset to empty if parsing fails
+          setSpecs({
+            dotnet_version: [],
+            gui_interface: [],
+            retrofit_compatibility: [],
+            platform_compatibility: [],
+            hardware_requirements: [],
+            os_compatibility: []
+          });
         }
+      } else {
+        // No tech specs in database, use empty defaults
+        setSpecs({
+          dotnet_version: [],
+          gui_interface: [],
+          retrofit_compatibility: [],
+          platform_compatibility: [],
+          hardware_requirements: [],
+          os_compatibility: []
+        });
       }
     } catch (error) {
       console.error('Error loading tech specs:', error);
@@ -224,6 +279,30 @@ const TechSpecs = ({ projectId }) => {
         </div>
       </div>
 
+      {/* Summary Section - Hoisted to top */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <Server className="w-5 h-5 text-blue-600" />
+          Riepilogo Specifiche Selezionate
+        </h3>
+        <div className="grid grid-cols-[200px_1fr] gap-x-6 gap-y-2">
+          {Object.entries(categories).map(([categoryKey, category]) => {
+            const selections = specs[categoryKey] || [];
+            if (selections.length === 0) return null;
+
+            return (
+              <React.Fragment key={categoryKey}>
+                <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
+                <div className="text-sm text-gray-600">{selections.join(', ')}</div>
+              </React.Fragment>
+            );
+          })}
+          {Object.values(specs).every(arr => arr.length === 0) && (
+            <p className="text-sm text-gray-500 italic col-span-2">Nessuna specifica selezionata</p>
+          )}
+        </div>
+      </div>
+
       {/* Specification Categories */}
       <div className="space-y-6">
         {Object.entries(categories).map(([categoryKey, category]) => {
@@ -269,30 +348,6 @@ const TechSpecs = ({ projectId }) => {
             </div>
           );
         })}
-      </div>
-
-      {/* Summary Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Server className="w-5 h-5 text-blue-600" />
-          Riepilogo Specifiche Selezionate
-        </h3>
-        <div className="space-y-2">
-          {Object.entries(categories).map(([categoryKey, category]) => {
-            const selections = specs[categoryKey] || [];
-            if (selections.length === 0) return null;
-
-            return (
-              <div key={categoryKey} className="text-sm">
-                <span className="font-medium text-gray-700">{category.title}:</span>{' '}
-                <span className="text-gray-600">{selections.join(', ')}</span>
-              </div>
-            );
-          })}
-          {Object.values(specs).every(arr => arr.length === 0) && (
-            <p className="text-sm text-gray-500 italic">Nessuna specifica selezionata</p>
-          )}
-        </div>
       </div>
     </div>
   );
