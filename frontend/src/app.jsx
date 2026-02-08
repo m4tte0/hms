@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   FileText, CheckCircle, BarChart3, Clock, Users, Paperclip,
-  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart, Settings, Calendar
+  Save, AlertCircle, Menu, X, Plus, Search, Loader, RefreshCw, Trash2, AlertTriangle, FileBarChart, Settings, Calendar, Cpu
 } from 'lucide-react';
 import Checklist from './components/Checklist';
 import Overview from './components/Overview';
+import TechSpecs from './components/TechSpecs';
 import Features from './components/Features';
 // Hidden components - keep imports for potential future use
 // import Assessment from './components/Assessment';
@@ -47,6 +48,7 @@ function App() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: FileText },
+    { id: 'techspecs', label: 'Specifiche Tecniche', icon: Cpu },
     { id: 'features', label: 'Specifiche e Finalità', icon: FileBarChart },
     { id: 'checklist', label: 'Checklist', icon: CheckCircle },
     // Hidden tabs - keep code intact for potential future use
@@ -753,6 +755,8 @@ function App() {
               </div>
             ) : activeTab === 'overview' ? (
               <Overview project={currentProject} setProject={setCurrentProject} />
+            ) : activeTab === 'techspecs' ? (
+              <TechSpecs projectId={currentProject.id} />
             ) : activeTab === 'features' ? (
               <Features projectId={currentProject.id} />
             ) : activeTab === 'checklist' ? (
