@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2, Layout } from 'lucide-react';
+import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2, Layout, Zap } from 'lucide-react';
 
 const TechSpecs = ({ projectId }) => {
   const [specs, setSpecs] = useState({
@@ -9,7 +9,8 @@ const TechSpecs = ({ projectId }) => {
     platform_compatibility: [],
     calender_technology: [],
     hardware_requirements: [],
-    os_compatibility: []
+    os_compatibility: [],
+    power_segmentation: []
   });
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
@@ -19,7 +20,7 @@ const TechSpecs = ({ projectId }) => {
   // Badge definitions with colors and icons
   const categories = {
     calender_technology: {
-      title: 'Tecnologia di Calandratura',
+      title: 'Calandratura',
       icon: HardDrive,
       color: 'rose',
       options: [
@@ -95,6 +96,12 @@ const TechSpecs = ({ projectId }) => {
         'LTSC 2021',
         'LTSC 2024'
       ]
+    },
+    power_segmentation: {
+      title: 'Power Segmentation',
+      icon: Zap,
+      color: 'amber',
+      options: []
     }
   };
 
@@ -134,6 +141,11 @@ const TechSpecs = ({ projectId }) => {
       active: 'bg-rose-100 text-rose-800 border-rose-400',
       inactive: 'bg-gray-100 text-gray-500 border-gray-300',
       hover: 'hover:bg-rose-50 hover:border-rose-300'
+    },
+    amber: {
+      active: 'bg-amber-100 text-amber-800 border-amber-400',
+      inactive: 'bg-gray-100 text-gray-500 border-gray-300',
+      hover: 'hover:bg-amber-50 hover:border-amber-300'
     }
   };
 
@@ -200,7 +212,8 @@ const TechSpecs = ({ projectId }) => {
             retrofit_compatibility: parsedSpecs.retrofit_compatibility || [],
             platform_compatibility: parsedSpecs.platform_compatibility || [],
             hardware_requirements: parsedSpecs.hardware_requirements || [],
-            os_compatibility: parsedSpecs.os_compatibility || []
+            os_compatibility: parsedSpecs.os_compatibility || [],
+            power_segmentation: parsedSpecs.power_segmentation || []
           });
         } catch (e) {
           console.log('No valid tech specs found, using defaults');
@@ -329,10 +342,80 @@ const TechSpecs = ({ projectId }) => {
               const selections = specs[categoryKey] || [];
               if (selections.length === 0) return null;
 
+              // Split calender_technology into separate rows
+              if (categoryKey === 'calender_technology') {
+                const level1Options = new Set(category.options);
+                const level2Options = new Set(['3-Rolls', '4-Rolls', 'Smart Line']);
+                const level1 = selections.filter(s => level1Options.has(s));
+                const level2 = selections.filter(s => level2Options.has(s));
+                const level3 = selections.filter(s => !level1Options.has(s) && !level2Options.has(s));
+
+                return (
+                  <React.Fragment key={categoryKey}>
+                    {level1.length > 0 && (
+                      <>
+                        <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
+                        <div className="text-sm text-gray-600">{level1.join(' | ')}</div>
+                      </>
+                    )}
+                    {level2.length > 0 && (
+                      <>
+                        <div className="text-sm font-semibold text-gray-700">Machine Family:</div>
+                        <div className="text-sm text-gray-600">{level2.join(' | ')}</div>
+                      </>
+                    )}
+                    {level3.length > 0 && (
+                      <>
+                        <div className="text-sm font-semibold text-gray-700">Model:</div>
+                        <div className="text-sm text-gray-600">{level3.join(' | ')}</div>
+                      </>
+                    )}
+                  </React.Fragment>
+                );
+              }
+
+              // Skip dotnet_version as it's merged into GUI
+              if (categoryKey === 'dotnet_version') return null;
+
+              // Aggregate power_segmentation by model
+              if (categoryKey === 'power_segmentation') {
+                const grouped = {};
+                selections.forEach(s => {
+                  const [model, seg] = s.split('::');
+                  if (!grouped[model]) grouped[model] = [];
+                  grouped[model].push(seg);
+                });
+                const display = Object.entries(grouped)
+                  .map(([model, segs]) => `${model} :: ${segs.join('+')}`)
+                  .join(' | ');
+                return (
+                  <React.Fragment key={categoryKey}>
+                    <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
+                    <div className="text-sm text-gray-600">{display}</div>
+                  </React.Fragment>
+                );
+              }
+
+              // Merge .NET version into GUI labels
+              if (categoryKey === 'gui_interface') {
+                const dotnetSelections = specs.dotnet_version || [];
+                const dotnetSuffix = dotnetSelections.length > 0
+                  ? ` (${dotnetSelections.join(' | ')})`
+                  : '';
+                return (
+                  <React.Fragment key={categoryKey}>
+                    <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
+                    <div className="text-sm text-gray-600">
+                      {selections.map(g => `${g}${dotnetSuffix}`).join(' | ')}
+                    </div>
+                  </React.Fragment>
+                );
+              }
+
               return (
                 <React.Fragment key={categoryKey}>
                   <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                  <div className="text-sm text-gray-600">{selections.join(', ')}</div>
+                  <div className="text-sm text-gray-600">{selections.join(' | ')}</div>
                 </React.Fragment>
               );
             })}
@@ -364,7 +447,7 @@ const TechSpecs = ({ projectId }) => {
           };
           const level3 = {
             '3-Rolls': ['MAV', 'MAV/AER', 'MCO'],
-            '4-Rolls': ['MCA', 'MCB']
+            '4-Rolls': ['MCA', 'MCB', 'MCB/PS']
           };
 
           // MCE branch options
@@ -549,9 +632,191 @@ const TechSpecs = ({ projectId }) => {
           );
         })()}
 
+        {/* Power Segmentation */}
+        {(() => {
+          const psCategory = categories.power_segmentation;
+          const PsIcon = psCategory.icon;
+          const psStyles = colorStyles[psCategory.color];
+          const calSelections = specs.calender_technology || [];
+
+          // Power segmentation definitions per model
+          const segmentationMap = {
+            'MCA': ['A3', 'A4', 'A5', 'A6'],
+            'MCB': ['<=R', '>=T'],
+            'MCB/PS': ['<=K', 'N>>R', '>=T']
+          };
+
+          // Collect active models that have segmentation
+          const activeModels = Object.keys(segmentationMap).filter(m => calSelections.includes(m));
+
+          if (activeModels.length === 0) return null;
+
+          return (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <PsIcon className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{psCategory.title}</h3>
+                  <p className="text-xs text-gray-500">
+                    {(specs.power_segmentation || []).length > 0
+                      ? `${(specs.power_segmentation || []).length} selezionato/i`
+                      : 'Nessuna selezione'}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {activeModels.map((model) => {
+                  const segments = segmentationMap[model];
+                  return (
+                    <div key={model}>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{model}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {segments.map((seg) => {
+                          const segKey = `${model}::${seg}`;
+                          const selected = (specs.power_segmentation || []).includes(segKey);
+                          const isWildcard = seg === '*';
+                          return (
+                            <button
+                              key={segKey}
+                              onClick={() => {
+                                if (isWildcard) return;
+                                toggleBadge('power_segmentation', segKey);
+                              }}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                                isWildcard
+                                  ? 'bg-amber-50 text-amber-600 border-amber-300 cursor-default'
+                                  : selected
+                                    ? psStyles.active
+                                    : `${psStyles.inactive} ${psStyles.hover}`
+                              }`}
+                            >
+                              {seg}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* GUI + .NET side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* GUI - split into two rows */}
+          {(() => {
+            const guiCategory = categories.gui_interface;
+            const GuiIcon = guiCategory.icon;
+            const guiStyles = colorStyles[guiCategory.color];
+            const row1 = ['iRoll Performance', 'iRoll eXtreme'];
+            const row2 = guiCategory.options.filter(o => !row1.includes(o));
+
+            return (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
+                    <GuiIcon className="w-5 h-5 text-teal-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{guiCategory.title}</h3>
+                    <p className="text-xs text-gray-500">
+                      {(specs.gui_interface || []).length > 0
+                        ? `${(specs.gui_interface || []).length} selezionato/i`
+                        : 'Nessuna selezione'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {row1.map((option) => {
+                    const selected = isSelected('gui_interface', option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleBadge('gui_interface', option)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                          selected
+                            ? guiStyles.active
+                            : `${guiStyles.inactive} ${guiStyles.hover}`
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {row2.map((option) => {
+                    const selected = isSelected('gui_interface', option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleBadge('gui_interface', option)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                          selected
+                            ? guiStyles.active
+                            : `${guiStyles.inactive} ${guiStyles.hover}`
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* .NET */}
+          {(() => {
+            const dotnetCategory = categories.dotnet_version;
+            const DotnetIcon = dotnetCategory.icon;
+            const dotnetStyles = colorStyles[dotnetCategory.color];
+
+            return (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <DotnetIcon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{dotnetCategory.title}</h3>
+                    <p className="text-xs text-gray-500">
+                      {(specs.dotnet_version || []).length > 0
+                        ? `${(specs.dotnet_version || []).length} selezionato/i`
+                        : 'Nessuna selezione'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {dotnetCategory.options.map((option) => {
+                    const selected = isSelected('dotnet_version', option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleBadge('dotnet_version', option)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                          selected
+                            ? dotnetStyles.active
+                            : `${dotnetStyles.inactive} ${dotnetStyles.hover}`
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
         {/* Remaining categories */}
         {Object.entries(categories)
-          .filter(([key]) => key !== 'calender_technology' && key !== 'platform_compatibility' && key !== 'hardware_requirements')
+          .filter(([key]) => key !== 'calender_technology' && key !== 'platform_compatibility' && key !== 'hardware_requirements' && key !== 'gui_interface' && key !== 'dotnet_version' && key !== 'power_segmentation')
           .map(([categoryKey, category]) => {
             const Icon = category.icon;
             const styles = colorStyles[category.color];
