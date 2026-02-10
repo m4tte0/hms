@@ -7,6 +7,7 @@ const TechSpecs = ({ projectId }) => {
     gui_interface: [],
     retrofit_compatibility: [],
     platform_compatibility: [],
+    calender_technology: [],
     hardware_requirements: [],
     os_compatibility: []
   });
@@ -17,18 +18,22 @@ const TechSpecs = ({ projectId }) => {
 
   // Badge definitions with colors and icons
   const categories = {
-    dotnet_version: {
-      title: 'Versione .NET',
-      icon: Code2,
-      color: 'purple',
+    calender_technology: {
+      title: 'Tecnologia di Calandratura',
+      icon: HardDrive,
+      color: 'rose',
       options: [
-        '.NET 5',
-        '.NET 6',
-        '.NET 7',
-        '.NET 8',
-        '.NET Framework 4.8',
-        '.NET Framework 4.7',
-        '.NET Core 3.1'
+        'Hydraulic',
+        'MCE (Electric)'
+      ]
+    },
+    platform_compatibility: {
+      title: 'Process Control',
+      icon: Server,
+      color: 'green',
+      options: [
+        'SoftPLC',
+        'PLC'
       ]
     },
     gui_interface: {
@@ -38,7 +43,19 @@ const TechSpecs = ({ projectId }) => {
       options: [
         'iRoll Performance',
         'iRoll eXtreme',
-        'Smart Line'
+        'iRoll Easy',
+        'iRoll Plus',
+        'iRoll Aided',
+        'iRoll Aided Plus'
+      ]
+    },
+    dotnet_version: {
+      title: 'Versione .NET',
+      icon: Code2,
+      color: 'purple',
+      options: [
+        '.NET 5',
+        '.NET 8'
       ]
     },
     retrofit_compatibility: {
@@ -57,25 +74,14 @@ const TechSpecs = ({ projectId }) => {
         'All Segments'
       ]
     },
-    platform_compatibility: {
-      title: 'Process Control',
-      icon: Server,
-      color: 'green',
-      options: [
-        'SoftPLC',
-        'B&R',
-        'Entrambi',
-        'Altro'
-      ]
-    },
     hardware_requirements: {
       title: 'Requisiti Hardware',
       icon: Cpu,
       color: 'orange',
       options: [
-        'ASEM:PB5600',
-        'ASEM:BM100',
-        'B&R:CP1686'
+        'ASEM :: PB5600',
+        'ASEM :: BM100',
+        'B&R :: CP1686'
       ]
     },
     os_compatibility: {
@@ -83,11 +89,11 @@ const TechSpecs = ({ projectId }) => {
       icon: Monitor,
       color: 'indigo',
       options: [
-        'Windows 10',
-        'Windows 11',
-        'Windows Server 2019',
-        'Windows Server 2022',
-        'Linux'
+        'Win10 IoT Ent.',
+        'Win11 IoT Ent.',
+        'LTSC 2019',
+        'LTSC 2021',
+        'LTSC 2024'
       ]
     }
   };
@@ -123,6 +129,11 @@ const TechSpecs = ({ projectId }) => {
       active: 'bg-indigo-100 text-indigo-800 border-indigo-400',
       inactive: 'bg-gray-100 text-gray-500 border-gray-300',
       hover: 'hover:bg-indigo-50 hover:border-indigo-300'
+    },
+    rose: {
+      active: 'bg-rose-100 text-rose-800 border-rose-400',
+      inactive: 'bg-gray-100 text-gray-500 border-gray-300',
+      hover: 'hover:bg-rose-50 hover:border-rose-300'
     }
   };
 
@@ -134,6 +145,7 @@ const TechSpecs = ({ projectId }) => {
         gui_interface: [],
         retrofit_compatibility: [],
         platform_compatibility: [],
+        calender_technology: [],
         hardware_requirements: [],
         os_compatibility: []
       });
@@ -306,49 +318,192 @@ const TechSpecs = ({ projectId }) => {
 
       {/* Specification Categories */}
       <div className="space-y-6">
-        {Object.entries(categories).map(([categoryKey, category]) => {
+        {/* Tecnologia di Calandratura - Hierarchical Selection */}
+        {(() => {
+          const category = categories.calender_technology;
           const Icon = category.icon;
           const styles = colorStyles[category.color];
+          const selections = specs.calender_technology || [];
+
+          const hydraulicSelected = selections.includes('Hydraulic');
+          const mceSelected = selections.includes('MCE (Electric)');
+          const threeRollsSelected = selections.includes('3-Rolls');
+          const fourRollsSelected = selections.includes('4-Rolls');
+
+          // Hierarchy definition
+          const level2 = {
+            'Hydraulic': ['3-Rolls', '4-Rolls', 'Smart Line'],
+            'MCE (Electric)': ['MCE-A', 'MCE-B']
+          };
+          const level3 = {
+            '3-Rolls': ['MAV', 'MAV/AER', 'MCO'],
+            '4-Rolls': ['MCA', 'MCB']
+          };
+
+          // MCE branch options
+          const mceBranch = new Set(['MCE (Electric)', 'MCE-A', 'MCE-B']);
+          const roseStyles = colorStyles['rose'];
+          const blueStyles = colorStyles['blue'];
+
+          const renderBadge = (option, enabled) => {
+            const selected = isSelected('calender_technology', option);
+            const branchStyles = mceBranch.has(option) ? blueStyles : roseStyles;
+            return (
+              <button
+                key={option}
+                onClick={() => enabled && toggleBadge('calender_technology', option)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                  !enabled
+                    ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed'
+                    : selected
+                      ? branchStyles.active
+                      : `${branchStyles.inactive} ${branchStyles.hover}`
+                }`}
+                disabled={!enabled}
+              >
+                {option}
+              </button>
+            );
+          };
 
           return (
-            <div key={categoryKey} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              {/* Category Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-10 h-10 rounded-lg bg-${category.color}-100 flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 text-${category.color}-600`} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Tecnologia di Calandratura */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{category.title}</h3>
+                    <p className="text-xs text-gray-500">
+                      {selections.length > 0
+                        ? `${selections.length} selezionato/i`
+                        : 'Nessuna selezione'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{category.title}</h3>
-                  <p className="text-xs text-gray-500">
-                    {(specs[categoryKey] || []).length > 0
-                      ? `${(specs[categoryKey] || []).length} selezionato/i`
-                      : 'Nessuna selezione'}
-                  </p>
+
+                {/* Level 1: Technology */}
+                <div className="flex flex-wrap gap-2">
+                  {category.options.map((option) => renderBadge(option, true))}
                 </div>
+
+                {/* Level 2: Machine Family */}
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${(hydraulicSelected || mceSelected) ? 'text-gray-500' : 'text-gray-400'}`}>Machine Family</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[...level2['Hydraulic'], ...level2['MCE (Electric)']].map((option) => {
+                      const enabled = (level2['Hydraulic'].includes(option) && hydraulicSelected) ||
+                                      (level2['MCE (Electric)'].includes(option) && mceSelected);
+                      return renderBadge(option, enabled);
+                    })}
+                  </div>
+                </div>
+
+                {/* Level 3: Model */}
+                {(hydraulicSelected || threeRollsSelected || fourRollsSelected) && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${(threeRollsSelected || fourRollsSelected) ? 'text-gray-500' : 'text-gray-400'}`}>Model</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[...level3['3-Rolls'], ...level3['4-Rolls']].map((option) => {
+                        const enabled = (level3['3-Rolls'].includes(option) && threeRollsSelected) ||
+                                        (level3['4-Rolls'].includes(option) && fourRollsSelected);
+                        return renderBadge(option, enabled);
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Badges */}
-              <div className="flex flex-wrap gap-2">
-                {category.options.map((option) => {
-                  const selected = isSelected(categoryKey, option);
-                  return (
-                    <button
-                      key={option}
-                      onClick={() => toggleBadge(categoryKey, option)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
-                        selected
-                          ? styles.active
-                          : `${styles.inactive} ${styles.hover}`
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Process Control - side by side */}
+              {(() => {
+                const pcCategory = categories.platform_compatibility;
+                const PcIcon = pcCategory.icon;
+                const pcStyles = colorStyles[pcCategory.color];
+                return (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                        <PcIcon className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{pcCategory.title}</h3>
+                        <p className="text-xs text-gray-500">
+                          {(specs.platform_compatibility || []).length > 0
+                            ? `${(specs.platform_compatibility || []).length} selezionato/i`
+                            : 'Nessuna selezione'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {pcCategory.options.map((option) => {
+                        const selected = isSelected('platform_compatibility', option);
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => toggleBadge('platform_compatibility', option)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                              selected
+                                ? pcStyles.active
+                                : `${pcStyles.inactive} ${pcStyles.hover}`
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           );
-        })}
+        })()}
+
+        {/* Remaining categories */}
+        {Object.entries(categories)
+          .filter(([key]) => key !== 'calender_technology' && key !== 'platform_compatibility')
+          .map(([categoryKey, category]) => {
+            const Icon = category.icon;
+            const styles = colorStyles[category.color];
+
+            return (
+              <div key={categoryKey} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-lg bg-${category.color}-100 flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 text-${category.color}-600`} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{category.title}</h3>
+                    <p className="text-xs text-gray-500">
+                      {(specs[categoryKey] || []).length > 0
+                        ? `${(specs[categoryKey] || []).length} selezionato/i`
+                        : 'Nessuna selezione'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {category.options.map((option) => {
+                    const selected = isSelected(categoryKey, option);
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => toggleBadge(categoryKey, option)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                          selected
+                            ? styles.active
+                            : `${styles.inactive} ${styles.hover}`
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
