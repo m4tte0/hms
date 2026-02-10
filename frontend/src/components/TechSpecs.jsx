@@ -153,6 +153,33 @@ const TechSpecs = ({ projectId }) => {
     }
   }, [projectId]);
 
+  // Auto-compute hardware_requirements based on Process Control and GUI selections
+  useEffect(() => {
+    if (loading) return;
+    const softplcSelected = (specs.platform_compatibility || []).includes('SoftPLC');
+    const plcSelected = (specs.platform_compatibility || []).includes('PLC');
+    const irollExtremeSelected = (specs.gui_interface || []).includes('iRoll eXtreme');
+    const irollPerformanceSelected = (specs.gui_interface || []).includes('iRoll Performance');
+
+    const autoHw = [];
+    if (softplcSelected || irollExtremeSelected) {
+      autoHw.push('ASEM :: PB5600');
+    } else if (irollPerformanceSelected) {
+      autoHw.push('ASEM :: BM100');
+    }
+    if (plcSelected) {
+      autoHw.push('B&R :: CP1686');
+    }
+
+    const currentHw = specs.hardware_requirements || [];
+    const changed = autoHw.length !== currentHw.length || autoHw.some((v, i) => v !== currentHw[i]);
+    if (changed) {
+      const updatedSpecs = { ...specs, hardware_requirements: autoHw };
+      setSpecs(updatedSpecs);
+      saveTechSpecs(updatedSpecs);
+    }
+  }, [specs.platform_compatibility, specs.gui_interface, loading]);
+
   const loadTechSpecs = async () => {
     try {
       setLoading(true);
@@ -416,54 +443,115 @@ const TechSpecs = ({ projectId }) => {
                 )}
               </div>
 
-              {/* Process Control - side by side */}
-              {(() => {
-                const pcCategory = categories.platform_compatibility;
-                const PcIcon = pcCategory.icon;
-                const pcStyles = colorStyles[pcCategory.color];
-                return (
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                        <PcIcon className="w-5 h-5 text-green-600" />
+              {/* Process Control + Requisiti Hardware - stacked in right column */}
+              <div className="flex flex-col gap-6">
+                {/* Process Control */}
+                {(() => {
+                  const pcCategory = categories.platform_compatibility;
+                  const PcIcon = pcCategory.icon;
+                  const pcStyles = colorStyles[pcCategory.color];
+                  return (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                          <PcIcon className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{pcCategory.title}</h3>
+                          <p className="text-xs text-gray-500">
+                            {(specs.platform_compatibility || []).length > 0
+                              ? `${(specs.platform_compatibility || []).length} selezionato/i`
+                              : 'Nessuna selezione'}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{pcCategory.title}</h3>
-                        <p className="text-xs text-gray-500">
-                          {(specs.platform_compatibility || []).length > 0
-                            ? `${(specs.platform_compatibility || []).length} selezionato/i`
-                            : 'Nessuna selezione'}
-                        </p>
+                      <div className="flex flex-wrap gap-2">
+                        {pcCategory.options.map((option) => {
+                          const selected = isSelected('platform_compatibility', option);
+                          return (
+                            <button
+                              key={option}
+                              onClick={() => toggleBadge('platform_compatibility', option)}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                                selected
+                                  ? pcStyles.active
+                                  : `${pcStyles.inactive} ${pcStyles.hover}`
+                              }`}
+                            >
+                              {option}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {pcCategory.options.map((option) => {
-                        const selected = isSelected('platform_compatibility', option);
-                        return (
-                          <button
-                            key={option}
-                            onClick={() => toggleBadge('platform_compatibility', option)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
-                              selected
-                                ? pcStyles.active
-                                : `${pcStyles.inactive} ${pcStyles.hover}`
-                            }`}
-                          >
-                            {option}
-                          </button>
-                        );
-                      })}
+                  );
+                })()}
+
+                {/* Requisiti Hardware - auto-computed */}
+                {(() => {
+                  const hwCategory = categories.hardware_requirements;
+                  const HwIcon = hwCategory.icon;
+                  const hwStyles = colorStyles[hwCategory.color];
+
+                  const softplcSelected = (specs.platform_compatibility || []).includes('SoftPLC');
+                  const plcSelected = (specs.platform_compatibility || []).includes('PLC');
+                  const irollExtremeSelected = (specs.gui_interface || []).includes('iRoll eXtreme');
+                  const irollPerformanceSelected = (specs.gui_interface || []).includes('iRoll Performance');
+
+                  // Auto-selection rules
+                  const autoHw = [];
+                  if (softplcSelected || irollExtremeSelected) {
+                    autoHw.push('ASEM :: PB5600');
+                  } else if (irollPerformanceSelected) {
+                    autoHw.push('ASEM :: BM100');
+                  }
+                  if (plcSelected) {
+                    autoHw.push('B&R :: CP1686');
+                  }
+
+                  return (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                          <HwIcon className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{hwCategory.title}</h3>
+                          <p className="text-xs text-gray-500">
+                            {autoHw.length > 0
+                              ? `${autoHw.length} auto-selezionato/i`
+                              : 'Nessuna selezione'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {hwCategory.options.map((option) => {
+                          const selected = autoHw.includes(option);
+                          return (
+                            <div
+                              key={option}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 ${
+                                selected
+                                  ? hwStyles.active
+                                  : hwStyles.inactive
+                              }`}
+                            >
+                              {option}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
+              </div>
             </div>
           );
         })()}
 
         {/* Remaining categories */}
         {Object.entries(categories)
-          .filter(([key]) => key !== 'calender_technology' && key !== 'platform_compatibility')
+          .filter(([key]) => key !== 'calender_technology' && key !== 'platform_compatibility' && key !== 'hardware_requirements')
           .map(([categoryKey, category]) => {
             const Icon = category.icon;
             const styles = colorStyles[category.color];
