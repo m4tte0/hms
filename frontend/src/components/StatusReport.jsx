@@ -157,6 +157,17 @@ const StatusReport = ({ projectId, onClose }) => {
             <span className="text-slate-500">{project.handover_id || ''}</span>
           </div>
 
+          {/* Per-page footer — visible only in print */}
+          <div className="report-page-footer hidden print:flex">
+            <span className="text-slate-400" style={{flex: 1}}>
+              {new Date().toISOString().replace('T', ' ').slice(0, 16)}
+            </span>
+            <span className="text-slate-600 font-medium">
+              {`${(project.project_name || '').replace(/\s+/g, '_')}_${project.handover_id || ''}_${new Date().toISOString().split('T')[0]}`}
+            </span>
+            <span className="footer-page-num" style={{flex: 1}}></span>
+          </div>
+
           {/* Frontispiece - Cover Page for Print */}
           <div className="hidden print:flex print:flex-col print:justify-center print:items-center print:min-h-screen print:page-break-after-always text-center">
             {/* Top spacing */}
@@ -164,8 +175,8 @@ const StatusReport = ({ projectId, onClose }) => {
 
             {/* Main content */}
             <div className="flex-1 flex flex-col justify-center">
-              {/* Document Type */}
-              <div className="mb-8">
+              {/* Document Type - hidden in print */}
+              <div className="mb-8 print:hidden">
                 <div className="inline-block px-6 py-2 border-2 border-slate-300 rounded-lg">
                   <p className="text-sm uppercase tracking-widest text-slate-600 font-semibold">
                     Handover Management System
@@ -179,7 +190,7 @@ const StatusReport = ({ projectId, onClose }) => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-xl text-slate-600 mb-12">
+              <p className="text-xl font-semibold text-purple-700 mb-12">
                 Status Report
               </p>
 
@@ -189,22 +200,22 @@ const StatusReport = ({ projectId, onClose }) => {
               {/* Metadata */}
               <div className="space-y-4 text-slate-700">
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Project ID</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Project ID</p>
                   <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Handover Start Date</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Handover Start Date</p>
                   <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Generated On</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Generated On</p>
                   <p className="text-lg font-semibold">{formatDate(new Date().toISOString())}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-2">Team</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-2">Team</p>
                   {teamContacts.length > 0 ? (
                     <div className="space-y-1">
                       {teamContacts.map((member, idx) => (
@@ -981,7 +992,7 @@ const StatusReport = ({ projectId, onClose }) => {
           )}
 
           {/* SECTION 2: Phase Breakdown - Matching Overview tab style */}
-          <section className="mb-6 print-page-break-before">
+          <section className="mb-6 print-page-break-before print:hidden">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
               Handover Process Overview
             </h3>
@@ -1210,6 +1221,30 @@ const StatusReport = ({ projectId, onClose }) => {
             z-index: 1000;
           }
 
+          /* Per-page fixed footer */
+          .report-page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px 16px;
+            border-top: 1px solid #cbd5e1;
+            background: white;
+            font-size: 10px;
+            color: #475569;
+            z-index: 1000;
+            flex-direction: row;
+            align-items: center;
+          }
+
+          .report-page-footer .footer-page-num::after {
+            content: "Page " counter(page);
+            display: block;
+            text-align: right;
+            font-size: 9px;
+            color: #94a3b8;
+          }
+
           /* Push content below the fixed header on page-start elements */
           .print-page-break-before {
             padding-top: 28px !important;
@@ -1347,9 +1382,15 @@ const StatusReport = ({ projectId, onClose }) => {
             display: table-header-group;
           }
 
-          /* Better page margins */
+          /* Better page margins — suppress browser native header/footer decorations */
           @page {
-            margin: 1cm;
+            margin: 1cm 1cm 0.5cm 1cm;
+            @top-left { content: none; }
+            @top-center { content: none; }
+            @top-right { content: none; }
+            @bottom-left { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
           }
 
           /* ── Clean text output: strip box/card styling ── */
