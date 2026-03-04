@@ -244,16 +244,18 @@ const StatusReport = ({ projectId, onClose }) => {
                   <span className="font-medium text-slate-700">3. Specifiche Funzionalità</span>
                 </div>
               )}
+              {Object.keys(checklistByPhase).length > 0 && (
+                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">4. Checklist Status Details</span>
+                </div>
+              )}
               {knowledgeSessions.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">4. Knowledge Transfer Calendar</span>
+                  <span className="font-medium text-slate-700">5. Knowledge Transfer Calendar</span>
                 </div>
               )}
               <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                <span className="font-medium text-slate-700">5. Handover Process Overview</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                <span className="font-medium text-slate-700">6. Checklist Status Details</span>
+                <span className="font-medium text-slate-700">6. Handover Process Overview</span>
               </div>
               {issues.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
@@ -709,6 +711,45 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
+          {/* Checklist Status Details */}
+          {Object.keys(checklistByPhase).length > 0 && (
+            <section className="mb-6 print-page-break-before">
+              <h3 className="text-xl font-bold text-secondary-800 mb-4 border-b-2 border-blue-500 pb-2 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Checklist Status Details
+              </h3>
+              <div className="space-y-6">
+                {Object.entries(checklistByPhase).map(([phase, categories]) => {
+                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
+                  return (
+                    <div key={phase}>
+                      <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-3 pb-1 border-b border-slate-300">
+                        {phaseName}
+                      </h4>
+                      <div className="space-y-5">
+                        {Object.entries(categories).map(([category, items]) => (
+                          <div key={category} className="ml-2">
+                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+                              {category}
+                            </h5>
+                            <ul className="space-y-1">
+                              {items.map((item, idx) => (
+                                <li key={idx} className="text-sm text-slate-800 flex items-start gap-2">
+                                  <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                  {item.requirement}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
           {/* Knowledge Transfer Calendar - Compact Multi-Month View (same style as Calendario tab) */}
           {knowledgeSessions.length > 0 && (
             <section className="mb-6 print-page-break-before">
@@ -896,15 +937,24 @@ const StatusReport = ({ projectId, onClose }) => {
                   .slice()
                   .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
                   .map((session, idx) => (
-                    <li key={idx} className="page-break-inside-avoid py-1 border-b border-slate-200 last:border-0">
-                      <span className="font-semibold">{formatDate(session.scheduled_date)}</span>
-                      {' — '}
-                      <span>{session.session_topic}</span>
-                      {session.start_time && <span>, {session.start_time}</span>}
-                      {session.duration && <span> ({session.duration})</span>}
-                      {session.attendees && <span> · {session.attendees}</span>}
-                      {' '}
-                      <span className="text-slate-500">[{session.status || 'Scheduled'}]</span>
+                    <li key={idx} className="page-break-inside-avoid py-2 border-b border-slate-200 last:border-0">
+                      <div className="font-bold">{session.session_topic}</div>
+                      <div className="text-slate-500 text-xs mt-0.5">
+                        {formatDate(session.scheduled_date)}
+                        {session.start_time && <span> · {session.start_time}</span>}
+                        {session.duration && <span> ({session.duration})</span>}
+                        <span> [{session.status || 'Scheduled'}]</span>
+                      </div>
+                      {session.attendees && (
+                        <div className="text-slate-500 text-xs mt-0.5">
+                          <span className="italic">Attendees:</span>
+                          <ul className="list-disc list-inside ml-1 mt-0.5">
+                            {session.attendees.split(',').map((a, i) => (
+                              <li key={i} className="text-slate-400">{a.trim()}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </li>
                   ))}
               </ul>
@@ -1048,59 +1098,6 @@ const StatusReport = ({ projectId, onClose }) => {
             )}
           </section>
 
-          {/* SECTION 3: Checklist Details */}
-          <section className="mb-6 print-page-break-before">
-            <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-              Checklist Status Details
-            </h3>
-            {Object.keys(checklistByPhase).length > 0 ? (
-              <div className="space-y-6">
-                {Object.entries(checklistByPhase).map(([phase, categories]) => {
-                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
-                  return (
-                    <div key={phase} className="page-break-inside-avoid">
-                      <h4 className="text-xl font-semibold mb-3 text-secondary-700">{phaseName}</h4>
-                      {Object.entries(categories).map(([category, items]) => (
-                        <div key={category} className="mb-4 ml-4">
-                          <h5 className="text-lg font-medium mb-2 text-secondary-600">{category}</h5>
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-200 text-sm">
-                              <thead className="bg-gray-50">
-                                <tr>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold">Requirement</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold">Status</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold">Verified By</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold">Date</th>
-                                  <th className="px-3 py-2 text-left text-xs font-semibold">Notes</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {items.map((item, idx) => (
-                                  <tr key={idx} className="border-t border-gray-200">
-                                    <td className="px-3 py-2">{item.requirement}</td>
-                                    <td className="px-3 py-2">
-                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(item.status)}`}>
-                                        {item.status}
-                                      </span>
-                                    </td>
-                                    <td className="px-3 py-2">{item.verified_by || '-'}</td>
-                                    <td className="px-3 py-2">{formatDate(item.verification_date)}</td>
-                                    <td className="px-3 py-2 text-xs">{item.notes || '-'}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-secondary-500 italic">No checklist items available</p>
-            )}
-          </section>
 
           {/* SECTION 4: Issues & Risks */}
           {issues.length > 0 && (
