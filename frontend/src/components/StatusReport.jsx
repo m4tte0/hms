@@ -298,7 +298,7 @@ const StatusReport = ({ projectId, onClose }) => {
                           {project.handover_id || 'N/A'}
                         </div>
                       </div>
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 print:hidden">
                         <label className="block text-xs font-medium text-slate-600 mb-0.5">Status</label>
                         <div className="px-2 py-1.5">
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
@@ -307,7 +307,7 @@ const StatusReport = ({ projectId, onClose }) => {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-2 print:hidden">
                       <div>
                         <label className="block text-xs font-medium text-slate-600 mb-0.5">Current Phase</label>
                         <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
@@ -325,7 +325,7 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
 
                 {/* Project Metrics */}
-                <div>
+                <div className="print:hidden">
                   <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Project Metrics
                   </h4>
@@ -418,7 +418,7 @@ const StatusReport = ({ projectId, onClose }) => {
               </div>
 
               {/* Right Column: Statistics Grid - Clean style matching Overview tab */}
-              <div>
+              <div className="print:hidden">
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Progress Statistics
@@ -1322,6 +1322,59 @@ const StatusReport = ({ projectId, onClose }) => {
           /* Better page margins */
           @page {
             margin: 1cm;
+          }
+
+          /* ── Clean text output: strip box/card styling ── */
+
+          /* Remove muted background fills from field boxes and stat cards */
+          .report-content .bg-slate-50,
+          .report-content .bg-gray-50,
+          .report-content .bg-blue-50,
+          .report-content .bg-green-50,
+          .report-content .bg-amber-50,
+          .report-content .bg-emerald-50,
+          .report-content .bg-red-50,
+          .report-content .bg-yellow-50,
+          .report-content .bg-purple-50,
+          .report-content .bg-teal-50,
+          .report-content .bg-white {
+            background-color: transparent !important;
+          }
+
+          /* Remove decorative border colors on box containers */
+          .report-content .border-slate-200,
+          .report-content .border-slate-300,
+          .report-content .border-gray-200,
+          .report-content .border-gray-300 {
+            border-color: transparent !important;
+          }
+
+          /* Remove left accent borders on feature/team cards */
+          .report-content .border-l-4 {
+            border-left-width: 0 !important;
+          }
+
+          /* Remove box shadows */
+          .report-content .shadow-sm,
+          .report-content .shadow-md,
+          .report-content .shadow-lg,
+          .report-content .shadow-xl,
+          .report-content .shadow-2xl {
+            box-shadow: none !important;
+          }
+
+          /* Remove border radius */
+          .report-content .rounded,
+          .report-content .rounded-lg,
+          .report-content .rounded-xl,
+          .report-content .rounded-full {
+            border-radius: 0 !important;
+          }
+
+          /* Remove padding from field-value box wrappers */
+          .report-content .px-2.py-1\\.5,
+          .report-content .px-2.py-2 {
+            padding: 0 !important;
           }
         }
       `}} />
