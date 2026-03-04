@@ -259,7 +259,7 @@ const StatusReport = ({ projectId, onClose }) => {
               </div>
               {issues.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">7. Issues & Risks</span>
+                  <span className="font-medium text-slate-700">7. Criticità</span>
                 </div>
               )}
               {attachments.length > 0 && (
@@ -729,13 +729,12 @@ const StatusReport = ({ projectId, onClose }) => {
                       <div className="space-y-5">
                         {Object.entries(categories).map(([category, items]) => (
                           <div key={category} className="ml-2">
-                            <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+                            <h5 className="text-xs font-semibold text-blue-800 uppercase tracking-widest mb-3 mt-1">
                               {category}
                             </h5>
                             <ul className="space-y-1">
                               {items.map((item, idx) => (
-                                <li key={idx} className="text-sm text-slate-800 flex items-start gap-2">
-                                  <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                <li key={idx} className="text-sm text-slate-800">
                                   {item.requirement}
                                 </li>
                               ))}
@@ -1099,11 +1098,11 @@ const StatusReport = ({ projectId, onClose }) => {
           </section>
 
 
-          {/* SECTION 4: Issues & Risks */}
+          {/* SECTION 4: Criticità */}
           {issues.length > 0 && (
             <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-                Issues & Risks
+                Criticità
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
