@@ -200,17 +200,17 @@ const StatusReport = ({ projectId, onClose }) => {
               {/* Metadata */}
               <div className="space-y-4 text-slate-700">
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Project ID</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">ID Progetto</p>
                   <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Handover Start Date</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Data di Inizio</p>
                   <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Generated On</p>
+                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Data di Generazione</p>
                   <p className="text-lg font-semibold">{formatDate(new Date().toISOString())}</p>
                 </div>
 
@@ -239,15 +239,15 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* Table of Contents */}
           <div className="mb-6 print-page-break-before">
             <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b-2 border-slate-600 pb-2">
-              Table of Contents
+              Indice
             </h2>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                <span className="font-medium text-slate-700">1. Project Summary</span>
+                <span className="font-medium text-slate-700">1. Informazioni Progetto</span>
               </div>
               {teamContacts.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">2. Team Composition</span>
+                  <span className="font-medium text-slate-700">2. Composizione del Team</span>
                 </div>
               )}
               {features && features.length > 0 && (
@@ -257,16 +257,16 @@ const StatusReport = ({ projectId, onClose }) => {
               )}
               {Object.keys(checklistByPhase).length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">4. Checklist Status Details</span>
+                  <span className="font-medium text-slate-700">4. Dettaglio Checklist</span>
                 </div>
               )}
               {knowledgeSessions.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">5. Knowledge Transfer Calendar</span>
+                  <span className="font-medium text-slate-700">5. Calendario Sessioni</span>
                 </div>
               )}
-              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                <span className="font-medium text-slate-700">6. Handover Process Overview</span>
+              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300 print:hidden">
+                <span className="font-medium text-slate-700">6. Avanzamento Progetto</span>
               </div>
               {issues.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
@@ -275,7 +275,7 @@ const StatusReport = ({ projectId, onClose }) => {
               )}
               {attachments.length > 0 && (
                 <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">8. Attachments & Documentation</span>
+                  <span className="font-medium text-slate-700">8. Allegati e Documentazione</span>
                 </div>
               )}
             </div>
@@ -284,7 +284,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* COMPACT HEADER: Sections 1-4 Combined */}
           <section className="mb-6 page-break-inside-avoid print-page-break-before">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-slate-600 pb-2">
-              Project Summary
+              Informazioni Progetto
             </h3>
 
             {/* Two-column layout for compact display */}
@@ -295,12 +295,12 @@ const StatusReport = ({ projectId, onClose }) => {
                 {/* Project Information */}
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Project Information
+                    Informazioni Progetto
                   </h4>
                   <div className="space-y-2">
                     <div className="flex flex-col md:flex-row gap-2">
                       <div className="flex-1">
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Project Name</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Nome Progetto</label>
                         <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-900">
                           {project.project_name || 'N/A'}
                         </div>
@@ -365,12 +365,12 @@ const StatusReport = ({ projectId, onClose }) => {
                 {/* Project Details */}
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Project Details
+                    Dettagli Progetto
                   </h4>
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Machine Family</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Famiglia Macchina</label>
                         <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
                           {project.machine_family || 'Not specified'}
                         </div>
@@ -391,7 +391,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     </div>
                     {project.description && (
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Description</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Descrizione</label>
                         <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 leading-relaxed">
                           {project.description}
                         </div>
@@ -399,7 +399,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     )}
                     {project.context_usage && (
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Context and Usage</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Contesto e Utilizzo</label>
                         <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 leading-relaxed">
                           {project.context_usage}
                         </div>
@@ -411,7 +411,7 @@ const StatusReport = ({ projectId, onClose }) => {
                 {/* Leadership */}
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Project Leadership
+                    Responsabili
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
@@ -497,10 +497,10 @@ const StatusReport = ({ projectId, onClose }) => {
               <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-slate-600" />
-                  <span>Project Timeline</span>
+                  <span>Linea Temporale</span>
                 </div>
                 <span className={`text-xs font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                  {project.daysRemaining !== null ? `${project.daysRemaining} days remaining` : ''}
+                  {project.daysRemaining !== null ? `${project.daysRemaining} giorni rimanenti` : ''}
                 </span>
               </h4>
 
@@ -569,7 +569,7 @@ const StatusReport = ({ projectId, onClose }) => {
                         <div className="w-0.5 h-3 bg-red-600"></div>
                         <div className="w-3 h-3 bg-red-600 rounded-full border-2 border-white shadow-md"></div>
                         <div className="mt-1 px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded whitespace-nowrap">
-                          TODAY
+                          OGGI
                         </div>
                       </div>
                     </div>
@@ -577,15 +577,15 @@ const StatusReport = ({ projectId, onClose }) => {
                     {/* Date Labels */}
                     <div className="flex justify-between items-center mt-8 text-xs">
                       <div className="text-left">
-                        <div className="text-slate-500 font-medium">Start</div>
+                        <div className="text-slate-500 font-medium">Inizio</div>
                         <div className="text-sm font-semibold text-slate-900">{formatDate(project.start_date)}</div>
                       </div>
                       <div className="text-center bg-emerald-50 px-3 py-1 rounded">
-                        <div className="text-slate-500 font-medium">Duration</div>
+                        <div className="text-slate-500 font-medium">Durata</div>
                         <div className="text-sm font-semibold text-slate-900">{totalDays} days</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-slate-500 font-medium">Target</div>
+                        <div className="text-slate-500 font-medium">Scadenza</div>
                         <div className="text-sm font-semibold text-slate-900">{formatDate(project.target_date)}</div>
                       </div>
                     </div>
@@ -599,12 +599,12 @@ const StatusReport = ({ projectId, onClose }) => {
                   {project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? (
                     <>
                       <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                      <span className="text-xs font-medium text-emerald-800">On Track - Work progress ({project.completionPercentage}%) is ahead of schedule</span>
+                      <span className="text-xs font-medium text-emerald-800">In Linea - Avanzamento lavori ({project.completionPercentage}%) è in anticipo sui tempi</span>
                     </>
                   ) : (
                     <>
                       <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                      <span className="text-xs font-medium text-amber-800">Behind Schedule - Work progress ({project.completionPercentage}%) is behind timeline</span>
+                      <span className="text-xs font-medium text-amber-800">In Ritardo - Avanzamento lavori ({project.completionPercentage}%) è in ritardo sui tempi</span>
                     </>
                   )}
                 </div>
@@ -617,17 +617,17 @@ const StatusReport = ({ projectId, onClose }) => {
             <section className="mb-6 page-break-inside-avoid">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Users className="w-5 h-5 mr-2" />
-                Team Composition
+                Composizione del Team
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
                   <thead className="bg-gray-100">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Department</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Role</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Name</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Reparto</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Ruolo</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Nome</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold">Email</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Phone</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Telefono</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -727,7 +727,7 @@ const StatusReport = ({ projectId, onClose }) => {
             <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-4 border-b-2 border-blue-500 pb-2 flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />
-                Checklist Status Details
+                Dettaglio Checklist
               </h3>
               <div className="space-y-6">
                 {Object.entries(checklistByPhase).map(([phase, categories]) => {
@@ -765,7 +765,7 @@ const StatusReport = ({ projectId, onClose }) => {
             <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Calendar className="w-5 h-5 mr-2" />
-                Knowledge Transfer Calendar
+                Calendario Sessioni
               </h3>
 
               {/* Calendar Legend */}
@@ -994,7 +994,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {/* SECTION 2: Phase Breakdown - Matching Overview tab style */}
           <section className="mb-6 print-page-break-before print:hidden">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-              Handover Process Overview
+              Avanzamento Progetto
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
               <div className="bg-white rounded shadow-sm border border-slate-200 p-4">
@@ -1119,12 +1119,12 @@ const StatusReport = ({ projectId, onClose }) => {
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Issue ID</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Priority</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Description</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Assigned To</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Status</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Target Date</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">ID</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Priorità</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Descrizione</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Assegnato a</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Stato</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Scadenza</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1156,7 +1156,7 @@ const StatusReport = ({ projectId, onClose }) => {
           {attachments.length > 0 && (
             <section className="mb-6 print-page-break-before">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-                Attachments & Documentation
+                Allegati e Documentazione
               </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -1238,7 +1238,7 @@ const StatusReport = ({ projectId, onClose }) => {
           }
 
           .report-page-footer .footer-page-num::after {
-            content: "Page " counter(page);
+            content: "Pagina " counter(page);
             display: block;
             text-align: right;
             font-size: 9px;
