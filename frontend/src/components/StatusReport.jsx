@@ -28,8 +28,13 @@ const StatusReport = ({ projectId, onClose }) => {
   };
 
   const handlePrint = () => {
-    // Trigger browser print dialog
+    const today = new Date().toISOString().split('T')[0];
+    const name = (reportData?.project?.project_name || 'Project').replace(/[^a-zA-Z0-9À-ÿ\-_ ]/g, '').trim().replace(/\s+/g, '_');
+    const id = reportData?.project?.handover_id || reportData?.project?.id || '';
+    const originalTitle = document.title;
+    document.title = `${name}_${id}_${today}`;
     window.print();
+    document.title = originalTitle;
   };
 
   const formatDate = (dateString) => {
@@ -145,6 +150,13 @@ const StatusReport = ({ projectId, onClose }) => {
 
         {/* Report Content */}
         <div ref={reportRef} className="report-content flex-1 overflow-auto p-8 print:p-4">
+
+          {/* Per-page header — visible only in print, fixed so it repeats on every page */}
+          <div className="report-page-header hidden print:flex items-center justify-between">
+            <span className="font-semibold text-slate-700">{project.project_name || 'Handover Report'}</span>
+            <span className="text-slate-500">{project.handover_id || ''}</span>
+          </div>
+
           {/* Frontispiece - Cover Page for Print */}
           <div className="hidden print:flex print:flex-col print:justify-center print:items-center print:min-h-screen print:page-break-after-always text-center">
             {/* Top spacing */}
@@ -187,18 +199,30 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Prepared By</p>
-                  <p className="text-lg font-semibold">{project.automation_lead || project.rd_lead || 'Project Team'}</p>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-1">Generated On</p>
+                  <p className="text-lg font-semibold">{formatDate(new Date().toISOString())}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm uppercase tracking-wide text-slate-500 mb-2">Team</p>
+                  {teamContacts.length > 0 ? (
+                    <div className="space-y-1">
+                      {teamContacts.map((member, idx) => (
+                        <p key={idx} className="text-base font-semibold">
+                          {member.name}
+                          {member.role && <span className="text-sm font-normal text-slate-500 ml-2">— {member.role}</span>}
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-lg font-semibold">{project.automation_lead || project.rd_lead || 'Project Team'}</p>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Bottom section */}
-            <div className="flex-1 flex flex-col justify-end pb-12">
-              <p className="text-sm text-slate-500">
-                Generated on {formatDate(new Date().toISOString())}
-              </p>
-            </div>
+            {/* Bottom spacer */}
+            <div className="flex-1"></div>
           </div>
 
           {/* Table of Contents */}
@@ -1153,6 +1177,20 @@ const StatusReport = ({ projectId, onClose }) => {
           /* Show only the report content */
           .report-content, .report-content * {
             visibility: visible;
+          }
+
+          /* Per-page fixed header */
+          .report-page-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 4px 16px;
+            border-bottom: 1px solid #cbd5e1;
+            background: white;
+            font-size: 11px;
+            color: #475569;
+            z-index: 1000;
           }
 
           /* Position report at top of page */
