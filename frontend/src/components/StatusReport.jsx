@@ -661,7 +661,7 @@ const StatusReport = ({ projectId, onClose }) => {
                       <div className="space-y-3">
                         {/* Description */}
                         {feature.description && (
-                          <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="bg-gray-50 rounded-lg p-3 page-break-inside-avoid">
                             <p className="text-xs font-semibold text-secondary-500 uppercase tracking-wide mb-1">
                               Descrizione
                             </p>
@@ -673,7 +673,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
                         {/* Purpose / Finalità */}
                         {feature.purpose && (
-                          <div className="bg-blue-50 rounded-lg p-3">
+                          <div className="bg-blue-50 rounded-lg p-3 page-break-inside-avoid">
                             <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
                               Finalità
                             </p>
@@ -685,7 +685,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
                         {/* Technical Specifications */}
                         {feature.tech_specs && (
-                          <div className="bg-amber-50 rounded-lg p-3">
+                          <div className="bg-amber-50 rounded-lg p-3 page-break-inside-avoid">
                             <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">
                               Specifiche Tecniche
                             </p>
@@ -718,7 +718,7 @@ const StatusReport = ({ projectId, onClose }) => {
               </h3>
 
               {/* Calendar Legend */}
-              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs print:hidden">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
                   <span className="text-secondary-600">Has Sessions</span>
@@ -737,7 +737,8 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
               </div>
 
-              {/* Multi-Month Calendar Grid */}
+              {/* Multi-Month Calendar Grid + card list — screen only */}
+              <div className="print:hidden">
               {(() => {
                 // Helper functions
                 const getDaysInMonth = (date) => {
@@ -780,7 +781,7 @@ const StatusReport = ({ projectId, onClose }) => {
                 return (
                   <div className="bg-white border border-secondary-200 rounded-lg p-4 page-break-inside-avoid">
                     {/* Multi-Month Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 print:hidden">
                       {projectMonths.map((monthDate, index) => {
                         const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(monthDate);
 
@@ -853,8 +854,8 @@ const StatusReport = ({ projectId, onClose }) => {
                     </div>
 
                     {/* Sessions List Below Calendar */}
-                    <div className="mt-4 pt-4 border-t border-secondary-200">
-                      <h4 className="text-sm font-semibold text-secondary-900 mb-3">Session Details</h4>
+                    <div className="mt-4 pt-4 print:mt-0 print:pt-0 border-t border-secondary-200 print:border-none">
+                      <h4 className="text-sm font-semibold text-secondary-900 mb-3 print:hidden">Session Details</h4>
                       <div className="space-y-2">
                         {knowledgeSessions
                           .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
@@ -887,9 +888,29 @@ const StatusReport = ({ projectId, onClose }) => {
                   </div>
                 );
               })()}
+              </div>
+
+              {/* Print-only plain text sessions list */}
+              <ul className="hidden print:block text-sm">
+                {knowledgeSessions
+                  .slice()
+                  .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                  .map((session, idx) => (
+                    <li key={idx} className="page-break-inside-avoid py-1 border-b border-slate-200 last:border-0">
+                      <span className="font-semibold">{formatDate(session.scheduled_date)}</span>
+                      {' — '}
+                      <span>{session.session_topic}</span>
+                      {session.start_time && <span>, {session.start_time}</span>}
+                      {session.duration && <span> ({session.duration})</span>}
+                      {session.attendees && <span> · {session.attendees}</span>}
+                      {' '}
+                      <span className="text-slate-500">[{session.status || 'Scheduled'}]</span>
+                    </li>
+                  ))}
+              </ul>
 
               {/* Summary Stats */}
-              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
+              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid print:hidden">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                   <p className="text-xs text-secondary-600 mb-1">Total Sessions</p>
                   <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
@@ -1387,6 +1408,7 @@ const StatusReport = ({ projectId, onClose }) => {
           .report-content .px-2.py-2 {
             padding: 0 !important;
           }
+
         }
       `}} />
     </div>
