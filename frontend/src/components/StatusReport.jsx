@@ -1185,12 +1185,23 @@ const StatusReport = ({ projectId, onClose }) => {
             top: 0;
             left: 0;
             right: 0;
-            padding: 4px 16px;
+            padding: 3px 16px;
             border-bottom: 1px solid #cbd5e1;
             background: white;
-            font-size: 11px;
+            font-size: 10px;
             color: #475569;
             z-index: 1000;
+          }
+
+          /* Push content below the fixed header on page-start elements */
+          .print-page-break-before {
+            padding-top: 28px !important;
+          }
+
+          /* Feature cards and other avoid-break blocks can also land
+             at the top of a new page — give them the same clearance */
+          .page-break-inside-avoid {
+            padding-top: 28px !important;
           }
 
           /* Position report at top of page */
