@@ -1,5 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2, Layout, Zap } from 'lucide-react';
+import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save, Code2, Layout, Zap, TableProperties } from 'lucide-react';
+
+const MISURA_ROWS = [
+  { key: 'errore_misura',        label: 'Errore di misura' },
+  { key: 'raggio_min',           label: 'Raggio minimo misurabile [mm]' },
+  { key: 'raggio_max',           label: 'Raggio massimo misurabile [mm]' },
+  { key: 'dist_min',             label: 'Distanza minima Profilometro [mm]' },
+  { key: 'dist_max',             label: 'Distanza massima Profilometro [mm]' },
+  { key: 'corda_min',            label: 'Corda minima per misura affidabile [%]' },
+  { key: 'angolo_max',           label: 'Angolo massimo corda rispetto bisettrice [°]' },
+  { key: 'n_profilometri',       label: 'N° profilometri gestiti' },
+  { key: 'installazione',        label: 'Installazione meccanica' },
+];
+
+const MISURA_DEFAULTS = {
+  errore_misura:  { lj_x8400: '<4%',  lj_x8900: '<4%'  },
+  n_profilometri: { lj_x8400: 'Fino a 4 (indipendenti e simultanei)', lj_x8900: 'Fino a 4 (indipendenti e simultanei)' },
+  installazione:  { lj_x8400: 'Esterna ai rulli laterali · Interna tra rullo inferiore e rulli laterali', lj_x8900: 'Esterna ai rulli laterali · Interna tra rullo inferiore e rulli laterali' },
+};
+
+const emptyMisura = () => Object.fromEntries(
+  MISURA_ROWS.map(r => [r.key, { lj_x8400: MISURA_DEFAULTS[r.key]?.lj_x8400 || '', lj_x8900: MISURA_DEFAULTS[r.key]?.lj_x8900 || '' }])
+);
 
 const TechSpecs = ({ projectId }) => {
   const [specs, setSpecs] = useState({
@@ -10,7 +32,8 @@ const TechSpecs = ({ projectId }) => {
     calender_technology: [],
     hardware_requirements: [],
     os_compatibility: [],
-    power_segmentation: []
+    power_segmentation: [],
+    specifiche_misura: emptyMisura()
   });
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('');
@@ -159,7 +182,9 @@ const TechSpecs = ({ projectId }) => {
         platform_compatibility: [],
         calender_technology: [],
         hardware_requirements: [],
-        os_compatibility: []
+        os_compatibility: [],
+        power_segmentation: [],
+        specifiche_misura: emptyMisura()
       });
       loadTechSpecs();
     }
@@ -211,9 +236,11 @@ const TechSpecs = ({ projectId }) => {
             gui_interface: parsedSpecs.gui_interface || [],
             retrofit_compatibility: parsedSpecs.retrofit_compatibility || [],
             platform_compatibility: parsedSpecs.platform_compatibility || [],
+            calender_technology: parsedSpecs.calender_technology || [],
             hardware_requirements: parsedSpecs.hardware_requirements || [],
             os_compatibility: parsedSpecs.os_compatibility || [],
-            power_segmentation: parsedSpecs.power_segmentation || []
+            power_segmentation: parsedSpecs.power_segmentation || [],
+            specifiche_misura: parsedSpecs.specifiche_misura || emptyMisura()
           });
         } catch (e) {
           console.log('No valid tech specs found, using defaults');
@@ -288,6 +315,19 @@ const TechSpecs = ({ projectId }) => {
 
   const isSelected = (category, option) => {
     return (specs[category] || []).includes(option);
+  };
+
+  const updateMisura = (rowKey, col, value) => {
+    const updatedMisura = {
+      ...(specs.specifiche_misura || emptyMisura()),
+      [rowKey]: {
+        ...(specs.specifiche_misura?.[rowKey] || {}),
+        [col]: value
+      }
+    };
+    const updatedSpecs = { ...specs, specifiche_misura: updatedMisura };
+    setSpecs(updatedSpecs);
+    saveTechSpecs(updatedSpecs);
   };
 
   if (loading) {
@@ -857,6 +897,58 @@ const TechSpecs = ({ projectId }) => {
               </div>
             );
           })}
+        {/* Specifiche di Misura - editable table for Scheda Tecnica Section 2 */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center">
+              <TableProperties className="w-5 h-5 text-sky-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Specifiche di Misura</h3>
+              <p className="text-xs text-gray-500">Dati tecnici del profilometro — utilizzati nella Sezione 2 della Scheda Tecnica</p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-slate-50">
+                  <th className="text-left px-3 py-2 border border-slate-200 font-semibold text-slate-700 w-1/2">Parametro</th>
+                  <th className="text-left px-3 py-2 border border-slate-200 font-semibold text-slate-700 w-1/4">KEYENCE LJ-X8400</th>
+                  <th className="text-left px-3 py-2 border border-slate-200 font-semibold text-slate-700 w-1/4">KEYENCE LJ-X8900</th>
+                </tr>
+              </thead>
+              <tbody>
+                {MISURA_ROWS.map((row) => {
+                  const vals = (specs.specifiche_misura || emptyMisura())[row.key] || { lj_x8400: '', lj_x8900: '' };
+                  return (
+                    <tr key={row.key} className="hover:bg-slate-50">
+                      <td className="px-3 py-2 border border-slate-200 text-slate-700 font-medium">{row.label}</td>
+                      <td className="px-1 py-1 border border-slate-200">
+                        <input
+                          type="text"
+                          value={vals.lj_x8400}
+                          onChange={e => updateMisura(row.key, 'lj_x8400', e.target.value)}
+                          className="w-full px-2 py-1 text-sm text-slate-700 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 rounded"
+                          placeholder="—"
+                        />
+                      </td>
+                      <td className="px-1 py-1 border border-slate-200">
+                        <input
+                          type="text"
+                          value={vals.lj_x8900}
+                          onChange={e => updateMisura(row.key, 'lj_x8900', e.target.value)}
+                          className="w-full px-2 py-1 text-sm text-slate-700 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 rounded"
+                          placeholder="—"
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   );

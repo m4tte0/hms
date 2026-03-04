@@ -1,0 +1,1750 @@
+
+ ▐▛███▜▌   Claude Code v2.1.66
+▝▜█████▛▘  Sonnet 4.6 · Claude Pro
+  ▘▘ ▝▝    ~\Documents\GitHub\hms
+
+✻ Conversation compacted (ctrl+o for history)
+
+
+● Let me read the current TechSpecs.jsx to implement the label reordering.
+
+● Read 1 file (ctrl+o to expand)
+
+● Now I'll implement the reordering so selected/active badges appear first. I
+  need to sort options in three places: the Tecnologia di Calandratura
+  hierarchy, the Process Control badges, and all remaining categories.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 14 lines, removed 5 lines
+      366              );                                                
+      367            };                                                  
+      368                                                                
+      369 +          // Helper to sort options: selected first, then     
+          +unselected                                                    
+      370 +          const sortBySelected = (options) => {               
+      371 +            return [...options].sort((a, b) => {              
+      372 +              const aSelected = selections.includes(a) ? 0 :  
+          +1;                                                            
+      373 +              const bSelected = selections.includes(b) ? 0 :  
+          +1;                                                            
+      374 +              return aSelected - bSelected;                   
+      375 +            });                                               
+      376 +          };                                                  
+      377 +                                                              
+      378            return (                                            
+      379              <div className="grid grid-cols-1 md:grid-cols-2   
+           gap-6">                                                       
+      380                {/* Tecnologia di Calandratura */}              
+     ...
+      386                                                                
+      387                  {/* Level 1: Technology */}                   
+      388                  <div className="flex flex-wrap gap-2">        
+      389 -                  {category.options                           
+          -.map((option) => renderBadge(option, true))}                  
+      389 +                  {sortBySelected(category.options)           
+          +.map((option) => renderBadge(option, true))}                  
+      390                  </div>                                        
+      391                                                                
+      392                  {/* Level 2: Machine Family */}               
+     ...
+      394                    <div className="mt-3 pt-3 border-t          
+           border-gray-100">                                             
+      395                      <p className="text-xs font-semibold       
+           text-gray-500 uppercase tracking-wide mb-2">Machine           
+           Family</p>                                                    
+      396                      <div className="flex flex-wrap gap-2">    
+      397 -                      {hydraulicSelected &&                   
+          -level2['Hydraulic']                                           
+          -.map((option) => renderBadge(option, true))}                  
+      398 -                      {mceSelected && level2['MCE (Electric)']
+          -.map((option) => renderBadge(option, true))}                  
+      397 +                      {hydraulicSelected && sortBySelected(   
+          +level2['Hydraulic'])                                          
+          +.map((option) => renderBadge(option, true))}                  
+      398 +                      {mceSelected && sortBySelected(         
+          +level2['MCE (Electric)'])                                     
+          +.map((option) => renderBadge(option, true))}                  
+      399                        {!hydraulicSelected &&                  
+           level2['Hydraulic'].map((option) => renderBadge(option,       
+           false))}                                                      
+      400                        {!mceSelected && level2['MCE            
+           (Electric)'].map((option) => renderBadge(option, false))}     
+      401                      </div>                                    
+     ...
+      415                    <div className="mt-3 pt-3 border-t          
+           border-gray-100">                                             
+      416                      <p className="text-xs font-semibold       
+           text-gray-500 uppercase tracking-wide mb-2">Model</p>         
+      417                      <div className="flex flex-wrap gap-2">    
+      418 -                      {threeRollsSelected && level3['3-Rolls']
+          -.map((option) => renderBadge(option, true))}                  
+      419 -                      {fourRollsSelected && level3['4-Rolls'] 
+          -.map((option) => renderBadge(option, true))}                  
+      418 +                      {threeRollsSelected && sortBySelected(  
+          +level3['3-Rolls']).map((option) => renderBadge(option, true))}
+      419 +                      {fourRollsSelected && sortBySelected(   
+          +level3['4-Rolls']).map((option) => renderBadge(option, true))}
+      420                        {!threeRollsSelected &&                 
+           level3['3-Rolls'].map((option) => renderBadge(option,         
+           false))}                                                      
+      421                        {!fourRollsSelected &&                  
+           level3['4-Rolls'].map((option) => renderBadge(option,         
+           false))}                                                      
+      422                      </div>                                    
+
+● Now update Process Control badges to sort selected first:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 5 lines, removed 1 line
+      462                        </div>                                  
+      463                      </div>                                    
+      464                      <div className="flex flex-wrap gap-2">    
+      465 -                      {pcCategory.options.map((option) => {   
+      465 +                      {[...pcCategory.options].sort((a, b     
+          +) => {                                                        
+      466 +                        const aS =                            
+          +isSelected('platform_compatibility', a) ? 0 : 1;              
+      467 +                        const bS =                            
+          +isSelected('platform_compatibility', b) ? 0 : 1;              
+      468 +                        return aS - bS;                       
+      469 +                      }).map((option) => {                    
+      470                          const selected =                      
+           isSelected('platform_compatibility', option);                 
+      471                          return (                              
+      472                            <button                             
+
+● Now update the remaining categories to sort selected first:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 5 lines, removed 1 line
+      513                    </div>                                      
+      514                  </div>                                        
+      515                  <div className="flex flex-wrap gap-2">        
+      516 -                  {category.options.map((option) => {         
+      516 +                  {[...category.options].sort((a, b) => {     
+      517 +                    const aS = isSelected(categoryKey, a) ? 0 
+          + : 1;                                                         
+      518 +                    const bS = isSelected(categoryKey, b) ? 0 
+          + : 1;                                                         
+      519 +                    return aS - bS;                           
+      520 +                  }).map((option) => {                        
+      521                      const selected = isSelected(categoryKey,  
+           option);                                                      
+      522                      return (                                  
+      523                        <button                                 
+
+● Done. Selected/active badges will now appear first in all badge groups:
+
+  - Tecnologia di Calandratura (all 3 levels) - selected options sort to the
+  front within each level
+  - Process Control - selected options appear first
+  - All remaining categories (GUI, .NET, Retrofit, Hardware, OS) - selected
+  options appear first
+
+  The sort is stable relative to the original order for items with the same
+  selection state, so unselected items keep their defined order.
+
+✻ Cogitated for 3m 0s
+
+❯ actually i asked NOT to dinamically change the order but to leave the one 
+   the User sees when no selection apply                                    
+
+● Got it, reverting all the sorting changes to keep the original static order.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 5 lines, removed 14 lines
+      366              );                                                
+      367            };                                                  
+      368                                                                
+      369 -          // Helper to sort options: selected first, then     
+          -unselected                                                    
+      370 -          const sortBySelected = (options) => {               
+      371 -            return [...options].sort((a, b) => {              
+      372 -              const aSelected = selections.includes(a) ? 0 :  
+          -1;                                                            
+      373 -              const bSelected = selections.includes(b) ? 0 :  
+          -1;                                                            
+      374 -              return aSelected - bSelected;                   
+      375 -            });                                               
+      376 -          };                                                  
+      377 -                                                              
+      369            return (                                            
+      370              <div className="grid grid-cols-1 md:grid-cols-2   
+           gap-6">                                                       
+      371                {/* Tecnologia di Calandratura */}              
+     ...
+      395                                                                
+      396                  {/* Level 1: Technology */}                   
+      397                  <div className="flex flex-wrap gap-2">        
+      398 -                  {sortBySelected(category.options)           
+          -.map((option) => renderBadge(option, true))}                  
+      398 +                  {category.options                           
+          +.map((option) => renderBadge(option, true))}                  
+      399                  </div>                                        
+      400                                                                
+      401                  {/* Level 2: Machine Family */}               
+     ...
+      403                    <div className="mt-3 pt-3 border-t          
+           border-gray-100">                                             
+      404                      <p className="text-xs font-semibold       
+           text-gray-500 uppercase tracking-wide mb-2">Machine           
+           Family</p>                                                    
+      405                      <div className="flex flex-wrap gap-2">    
+      406 -                      {hydraulicSelected && sortBySelected(   
+          -level2['Hydraulic'])                                          
+          -.map((option) => renderBadge(option, true))}                  
+      407 -                      {mceSelected && sortBySelected(         
+          -level2['MCE (Electric)'])                                     
+          -.map((option) => renderBadge(option, true))}                  
+      406 +                      {hydraulicSelected &&                   
+          +level2['Hydraulic']                                           
+          +.map((option) => renderBadge(option, true))}                  
+      407 +                      {mceSelected && level2['MCE (Electric)']
+          +.map((option) => renderBadge(option, true))}                  
+      408                        {!hydraulicSelected &&                  
+           level2['Hydraulic'].map((option) => renderBadge(option,       
+           false))}                                                      
+      409                        {!mceSelected && level2['MCE            
+           (Electric)'].map((option) => renderBadge(option, false))}     
+      410                      </div>                                    
+     ...
+      424                    <div className="mt-3 pt-3 border-t          
+           border-gray-100">                                             
+      425                      <p className="text-xs font-semibold       
+           text-gray-500 uppercase tracking-wide mb-2">Model</p>         
+      426                      <div className="flex flex-wrap gap-2">    
+      427 -                      {threeRollsSelected && sortBySelected(  
+          -level3['3-Rolls']).map((option) => renderBadge(option, true))}
+      428 -                      {fourRollsSelected && sortBySelected(   
+          -level3['4-Rolls']).map((option) => renderBadge(option, true))}
+      427 +                      {threeRollsSelected && level3['3-Rolls']
+          +.map((option) => renderBadge(option, true))}                  
+      428 +                      {fourRollsSelected && level3['4-Rolls'] 
+          +.map((option) => renderBadge(option, true))}                  
+      429                        {!threeRollsSelected &&                 
+           level3['3-Rolls'].map((option) => renderBadge(option,         
+           false))}                                                      
+      430                        {!fourRollsSelected &&                  
+           level3['4-Rolls'].map((option) => renderBadge(option,         
+           false))}                                                      
+      431                      </div>                                    
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 5 lines
+      453                        </div>                                  
+      454                      </div>                                    
+      455                      <div className="flex flex-wrap gap-2">    
+      456 -                      {[...pcCategory.options].sort((a, b     
+          -) => {                                                        
+      457 -                        const aS =                            
+          -isSelected('platform_compatibility', a) ? 0 : 1;              
+      458 -                        const bS =                            
+          -isSelected('platform_compatibility', b) ? 0 : 1;              
+      459 -                        return aS - bS;                       
+      460 -                      }).map((option) => {                    
+      456 +                      {pcCategory.options.map((option) => {   
+      457                          const selected =                      
+           isSelected('platform_compatibility', option);                 
+      458                          return (                              
+      459                            <button                             
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 5 lines
+      500                    </div>                                      
+      501                  </div>                                        
+      502                  <div className="flex flex-wrap gap-2">        
+      503 -                  {[...category.options].sort((a, b) => {     
+      504 -                    const aS = isSelected(categoryKey, a) ? 0 
+          - : 1;                                                         
+      505 -                    const bS = isSelected(categoryKey, b) ? 0 
+          - : 1;                                                         
+      506 -                    return aS - bS;                           
+      507 -                  }).map((option) => {                        
+      503 +                  {category.options.map((option) => {         
+      504                      const selected = isSelected(categoryKey,  
+           option);                                                      
+      505                      return (                                  
+      506                        <button                                 
+
+● Reverted. The badge order now stays fixed as defined, regardless of selection
+  state.
+
+✻ Brewed for 41s
+
+❯ if i select "MCE (Electric)" then MCE-A and MCE-B become selectable BUT   
+  the also change their order, being put in front of all other 3            
+  non-selectable choices: i would like them to stay in their original       
+  order, that is at the end; do you fully understand my request?            
+
+● Yes, fully clear. When only MCE is selected, the current code renders
+  MCE-A/MCE-B first (enabled), then 3-Rolls/4-Rolls/Smart Line (disabled) —
+  shifting the order. The fix is to always render all Level 2 options in the
+  original defined order, just toggling enabled/disabled state.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 16 lines, removed 32 lines
+      390                  </div>                                        
+      391                                                                
+      392                  {/* Level 2: Machine Family */}               
+      393 -                {(hydraulicSelected || mceSelected) && (      
+      394 -                  <div className="mt-3 pt-3 border-t          
+          -border-gray-100">                                             
+      395 -                    <p className="text-xs font-semibold       
+          -text-gray-500 uppercase tracking-wide mb-2">Machine           
+          -Family</p>                                                    
+      396 -                    <div className="flex flex-wrap gap-2">    
+      397 -                      {hydraulicSelected &&                   
+          -level2['Hydraulic'].map((option) => renderBadge(option,       
+          -true))}                                                       
+      398 -                      {mceSelected && level2['MCE             
+          -(Electric)'].map((option) => renderBadge(option, true))}      
+      399 -                      {!hydraulicSelected &&                  
+          -level2['Hydraulic'].map((option) => renderBadge(option,       
+          -false))}                                                      
+      400 -                      {!mceSelected && level2['MCE            
+          -(Electric)'].map((option) => renderBadge(option, false))}     
+      401 -                    </div>                                    
+      393 +                <div className="mt-3 pt-3 border-t            
+          +border-gray-100">                                             
+      394 +                  <p className={`text-xs font-semibold        
+          +uppercase tracking-wide mb-2 ${(hydraulicSelected ||          
+          +mceSelected) ? 'text-gray-500' : 'text-gray-400'}`}>Machine   
+          +Family</p>                                                    
+      395 +                  <div className="flex flex-wrap gap-2">      
+      396 +                    {[...level2['Hydraulic'], ...level2['MCE  
+          +(Electric)']].map((option) => {                               
+      397 +                      const enabled =                         
+          +(level2['Hydraulic'].includes(option) && hydraulicSelected)   
+          +||                                                            
+      398 +                                      (level2['MCE            
+          +(Electric)'].includes(option) && mceSelected);                
+      399 +                      return renderBadge(option, enabled);    
+      400 +                    })}                                       
+      401                    </div>                                      
+      402 -                )}                                            
+      403 -                {!hydraulicSelected && !mceSelected && (      
+      404 -                  <div className="mt-3 pt-3 border-t          
+          -border-gray-100">                                             
+      405 -                    <p className="text-xs font-semibold       
+          -text-gray-400 uppercase tracking-wide mb-2">Machine           
+          -Family</p>                                                    
+      406 -                    <div className="flex flex-wrap gap-2">    
+      407 -                      {[...level2['Hydraulic'],               
+          -...level2['MCE (Electric)']].map((option) =>                  
+          -renderBadge(option, false))}                                  
+      408 -                    </div>                                    
+      409 -                  </div>                                      
+      410 -                )}                                            
+      402 +                </div>                                        
+      403                                                                
+      404                  {/* Level 3: Model */}                        
+      405 -                {(                                            
+          -threeRollsSelected || fourRollsSelected) && (                 
+      405 +                {(hydraulicSelected ||                        
+          +threeRollsSelected || fourRollsSelected) && (                 
+      406                    <div className="mt-3 pt-3 border-t          
+           border-gray-100">                                             
+      407 -                    <p className="text-xs font-semibold       
+          -text-gray-500 uppercase tracking-wide mb-2">Model</p>         
+      407 +                    <p className={`text-xs font-semibold      
+          +uppercase tracking-wide mb-2                                  
+          + ${(threeRollsSelected || fourRollsSelected) ? 'text-gray-500'
+          + : 'text-gray-400'}`}>Model</p>                               
+      408                      <div className="flex flex-wrap gap-2">    
+      409 -                      {threeRollsSelected &&                  
+          -level3['3-Rolls'].map((option) => renderBadge(option, true))} 
+      410 -                      {fourRollsSelected &&                   
+          -level3['4-Rolls'].map((option) => renderBadge(option, true))} 
+      411 -                      {!threeRollsSelected &&                 
+          -level3['3-Rolls'].map((option) => renderBadge(option,         
+          -false))}                                                      
+      412 -                      {!fourRollsSelected &&                  
+          -level3['4-Rolls'].map((option) => renderBadge(option,         
+          -false))}                                                      
+      409 +                      {[...level3['3-Rolls'],                 
+          +...level3['4-Rolls']].map((option) => {                       
+      410 +                        const enabled =                       
+          +(level3['3-Rolls'].includes(option) && threeRollsSelected) || 
+      411 +                                                              
+          +(level3['4-Rolls'].includes(option) && fourRollsSelected);    
+      412 +                        return renderBadge(option, enabled);  
+      413 +                      })}                                     
+      414                      </div>                                    
+      415                    </div>                                      
+      416                  )}                                            
+      417 -                {hydraulicSelected && !threeRollsSelected &&  
+          -!fourRollsSelected && (                                       
+      418 -                  <div className="mt-3 pt-3 border-t          
+          -border-gray-100">                                             
+      419 -                    <p className="text-xs font-semibold       
+          -text-gray-400 uppercase tracking-wide mb-2">Model</p>         
+      420 -                    <div className="flex flex-wrap gap-2">    
+      421 -                      {[...level3['3-Rolls'],                 
+          -...level3['4-Rolls']].map((option) => renderBadge(option,     
+          -false))}                                                      
+      422 -                    </div>                                    
+      423 -                  </div>                                      
+      424 -                )}                                            
+      417                </div>                                          
+      418                                                                
+      419                {/* Process Control - side by side */}          
+
+● Now all Level 2 and Level 3 badges always render in their original defined
+  order (3-Rolls, 4-Rolls, Smart Line, MCE-A, MCE-B for Level 2; MAV, MAV/AER,
+  MCO, MCA, MCB for Level 3) — only the enabled/disabled state changes based on
+  parent selection.
+
+❯ i would put Requisiti Hardware just below "Process Controll" since        
+  there's space to be padded due to the multi lines features of adjacent    
+  box "Tecnologia di Calandratura"; moreover it shall become not selectable 
+   by the User but, with the same graphics, you should select the proper    
+  label accordingly to the following rules: if PLC is selected then also    
+  "B&R :: CP1686" shall be also (automatically) selected; labels "ASEM ::   
+  PB5600" and "ASEM :: BM100" are mutually esclusive; label "ASEM ::        
+  PB5600" shall be selected if "iRoll eXtreme" or "SoftPLC" are either      
+  selected by the User; label "ASEM :: BM100" shall be selected if          
+  "SoftPLC" is not selected and neither is "iRoll Extreme", but it would    
+  need "iRoll Performance" to be active in addition to auto selec it; is    
+  this rule clear? is it logically consistent?                              
+
+● The rules are clear and logically consistent. The mutual exclusivity of ASEM
+  :: PB5600 and ASEM :: BM100 is naturally guaranteed by the conditions:
+
+  - PB5600: needs SoftPLC OR iRoll eXtreme
+  - BM100: needs NOT SoftPLC AND NOT iRoll eXtreme AND iRoll Performance
+
+  These can never both be true simultaneously. Let me implement this.
+
+● Read 1 file (ctrl+o to expand)
+
+● Now I'll make the changes: 1) Move Requisiti Hardware into the right column
+  below Process Control, 2) Make it auto-computed and non-interactive, 3) Add
+  auto-save when hardware selections change.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 98 lines, removed 37 lines
+      416                  )}                                            
+      417                </div>                                          
+      418                                                                
+      419 -              {/* Process Control - side by side */}          
+      420 -              {(() => {                                       
+      421 -                const pcCategory =                            
+          -categories.platform_compatibility;                            
+      422 -                const PcIcon = pcCategory.icon;               
+      423 -                const pcStyles =                              
+          -colorStyles[pcCategory.color];                                
+      424 -                return (                                      
+      425 -                  <div className="bg-white rounded-lg         
+          -shadow-sm border border-gray-200 p-6">                        
+      426 -                    <div className="flex items-center gap-3   
+          -mb-4">                                                        
+      427 -                      <div className="w-10 h-10 rounded-lg    
+          -bg-green-100 flex items-center justify-center">               
+      428 -                        <PcIcon className="w-5 h-5            
+          -text-green-600" />                                            
+      419 +              {/* Process Control + Requisiti Hardware -      
+          +stacked in right column */}                                   
+      420 +              <div className="flex flex-col gap-6">           
+      421 +                {/* Process Control */}                       
+      422 +                {(() => {                                     
+      423 +                  const pcCategory =                          
+          +categories.platform_compatibility;                            
+      424 +                  const PcIcon = pcCategory.icon;             
+      425 +                  const pcStyles =                            
+          +colorStyles[pcCategory.color];                                
+      426 +                  return (                                    
+      427 +                    <div className="bg-white rounded-lg       
+          +shadow-sm border border-gray-200 p-6">                        
+      428 +                      <div className="flex items-center gap-3 
+          + mb-4">                                                       
+      429 +                        <div className="w-10 h-10 rounded-lg  
+          +bg-green-100 flex items-center justify-center">               
+      430 +                          <PcIcon className="w-5 h-5          
+          +text-green-600" />                                            
+      431 +                        </div>                                
+      432 +                        <div>                                 
+      433 +                          <h3 className="text-lg              
+          +font-semibold text-gray-900">{pcCategory.title}</h3>          
+      434 +                          <p className="text-xs               
+          +text-gray-500">                                               
+      435 +                            {(specs.platform_compatibility || 
+          + []).length > 0                                               
+      436 +                              ?                               
+          +`${(specs.platform_compatibility || []).length}               
+          +selezionato/i`                                                
+      437 +                              : 'Nessuna selezione'}          
+      438 +                          </p>                                
+      439 +                        </div>                                
+      440                        </div>                                  
+      441 -                      <div>                                   
+      442 -                        <h3 className="text-lg font-semibold  
+          -text-gray-900">{pcCategory.title}</h3>                        
+      443 -                        <p className="text-xs text-gray-500"> 
+      444 -                          {(specs.platform_compatibility ||   
+          -[]).length > 0                                                
+      445 -                            ?                                 
+          -`${(specs.platform_compatibility || []).length}               
+          -selezionato/i`                                                
+      446 -                            : 'Nessuna selezione'}            
+      447 -                        </p>                                  
+      441 +                      <div className="flex flex-wrap gap-2">  
+      442 +                        {pcCategory.options.map((option) => { 
+      443 +                          const selected =                    
+          +isSelected('platform_compatibility', option);                 
+      444 +                          return (                            
+      445 +                            <button                           
+      446 +                              key={option}                    
+      447 +                              onClick={() =>                  
+          +toggleBadge('platform_compatibility', option)}                
+      448 +                              className={`px-4 py-2           
+          +rounded-lg text-sm font-medium border-2 transition-all        
+          +duration-200 ${                                               
+      449 +                                selected                      
+      450 +                                  ? pcStyles.active           
+      451 +                                  : `${pcStyles.inactive}     
+          +${pcStyles.hover}`                                            
+      452 +                              }`}                             
+      453 +                            >                                 
+      454 +                              {option}                        
+      455 +                            </button>                         
+      456 +                          );                                  
+      457 +                        })}                                   
+      458                        </div>                                  
+      459                      </div>                                    
+      460 -                    <div className="flex flex-wrap gap-2">    
+      461 -                      {pcCategory.options.map((option) => {   
+      462 -                        const selected =                      
+          -isSelected('platform_compatibility', option);                 
+      463 -                        return (                              
+      464 -                          <button                             
+      465 -                            key={option}                      
+      466 -                            onClick={() =>                    
+          -toggleBadge('platform_compatibility', option)}                
+      467 -                            className={`px-4 py-2 rounded-lg  
+          -text-sm font-medium border-2 transition-all duration-200 ${   
+      468 -                              selected                        
+      469 -                                ? pcStyles.active             
+      470 -                                : `${pcStyles.inactive}       
+          -${pcStyles.hover}`                                            
+      471 -                            }`}                               
+      472 -                          >                                   
+      473 -                            {option}                          
+      474 -                          </button>                           
+      475 -                        );                                    
+      476 -                      })}                                     
+      460 +                  );                                          
+      461 +                })()}                                         
+      462 +                                                              
+      463 +                {/* Requisiti Hardware - auto-computed */}    
+      464 +                {(() => {                                     
+      465 +                  const hwCategory =                          
+          +categories.hardware_requirements;                             
+      466 +                  const HwIcon = hwCategory.icon;             
+      467 +                  const hwStyles =                            
+          +colorStyles[hwCategory.color];                                
+      468 +                                                              
+      469 +                  const softplcSelected =                     
+          +(specs.platform_compatibility || []).includes('SoftPLC');     
+      470 +                  const plcSelected =                         
+          +(specs.platform_compatibility || []).includes('PLC');         
+      471 +                  const irollExtremeSelected =                
+          +(specs.gui_interface || []).includes('iRoll eXtreme');        
+      472 +                  const irollPerformanceSelected =            
+          +(specs.gui_interface || []).includes('iRoll Performance');    
+      473 +                                                              
+      474 +                  // Auto-selection rules                     
+      475 +                  const autoHw = [];                          
+      476 +                  if (softplcSelected ||                      
+          +irollExtremeSelected) {                                       
+      477 +                    autoHw.push('ASEM :: PB5600');            
+      478 +                  } else if (irollPerformanceSelected) {      
+      479 +                    autoHw.push('ASEM :: BM100');             
+      480 +                  }                                           
+      481 +                  if (plcSelected) {                          
+      482 +                    autoHw.push('B&R :: CP1686');             
+      483 +                  }                                           
+      484 +                                                              
+      485 +                  return (                                    
+      486 +                    <div className="bg-white rounded-lg       
+          +shadow-sm border border-gray-200 p-6">                        
+      487 +                      <div className="flex items-center gap-3 
+          + mb-4">                                                       
+      488 +                        <div className="w-10 h-10 rounded-lg  
+          +bg-orange-100 flex items-center justify-center">              
+      489 +                          <HwIcon className="w-5 h-5          
+          +text-orange-600" />                                           
+      490 +                        </div>                                
+      491 +                        <div>                                 
+      492 +                          <h3 className="text-lg              
+          +font-semibold text-gray-900">{hwCategory.title}</h3>          
+      493 +                          <p className="text-xs               
+          +text-gray-500">                                               
+      494 +                            {autoHw.length > 0                
+      495 +                              ? `${autoHw.length}             
+          +auto-selezionato/i`                                           
+      496 +                              : 'Nessuna selezione'}          
+      497 +                          </p>                                
+      498 +                        </div>                                
+      499 +                      </div>                                  
+      500 +                      <div className="flex flex-wrap gap-2">  
+      501 +                        {hwCategory.options.map((option) => { 
+      502 +                          const selected =                    
+          +autoHw.includes(option);                                      
+      503 +                          return (                            
+      504 +                            <div                              
+      505 +                              key={option}                    
+      506 +                              className={`px-4 py-2           
+          +rounded-lg text-sm font-medium border-2 ${                    
+      507 +                                selected                      
+      508 +                                  ? hwStyles.active           
+      509 +                                  : hwStyles.inactive         
+      510 +                              }`}                             
+      511 +                            >                                 
+      512 +                              {option}                        
+      513 +                            </div>                            
+      514 +                          );                                  
+      515 +                        })}                                   
+      516 +                      </div>                                  
+      517                      </div>                                    
+      518 -                  </div>                                      
+      519 -                );                                            
+      520 -              })()}                                           
+      518 +                  );                                          
+      519 +                })()}                                         
+      520 +              </div>                                          
+      521              </div>                                            
+      522            );                                                  
+      523          })()}                                                 
+
+● Now exclude hardware_requirements from the remaining categories loop (since
+  it's already rendered in the right column):
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      524                                                                
+      525          {/* Remaining categories */}                          
+      526          {Object.entries(categories)                           
+      527 -          .filter(([key]) => key !== 'calender_technology' && 
+          -key !== 'platform_compatibility')                             
+      527 +          .filter(([key]) => key !== 'calender_technology' && 
+          +key !== 'platform_compatibility'                              
+          + && key !== 'hardware_requirements')                          
+      528            .map(([categoryKey, category]) => {                 
+      529              const Icon = category.icon;                       
+      530              const styles = colorStyles[category.color];       
+
+● Now I need to auto-save the computed hardware selections so they persist in
+  the database. I'll add a useEffect that updates hardware_requirements whenever
+   the dependencies change.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 27 lines
+      153      }                                                         
+      154    }, [projectId]);                                            
+      155                                                                
+      156 +  // Auto-compute hardware_requirements based on Process      
+          +Control and GUI selections                                    
+      157 +  useEffect(() => {                                           
+      158 +    if (loading) return;                                      
+      159 +    const softplcSelected = (specs.platform_compatibility ||  
+          +[]).includes('SoftPLC');                                      
+      160 +    const plcSelected = (specs.platform_compatibility ||      
+          +[]).includes('PLC');                                          
+      161 +    const irollExtremeSelected = (specs.gui_interface ||      
+          +[]).includes('iRoll eXtreme');                                
+      162 +    const irollPerformanceSelected = (specs.gui_interface ||  
+          +[]).includes('iRoll Performance');                            
+      163 +                                                              
+      164 +    const autoHw = [];                                        
+      165 +    if (softplcSelected || irollExtremeSelected) {            
+      166 +      autoHw.push('ASEM :: PB5600');                          
+      167 +    } else if (irollPerformanceSelected) {                    
+      168 +      autoHw.push('ASEM :: BM100');                           
+      169 +    }                                                         
+      170 +    if (plcSelected) {                                        
+      171 +      autoHw.push('B&R :: CP1686');                           
+      172 +    }                                                         
+      173 +                                                              
+      174 +    const currentHw = specs.hardware_requirements || [];      
+      175 +    const changed = autoHw.length !== currentHw.length ||     
+          +autoHw.some((v, i) => v !== currentHw[i]);                    
+      176 +    if (changed) {                                            
+      177 +      const updatedSpecs = { ...specs, hardware_requirements: 
+          + autoHw };                                                    
+      178 +      setSpecs(updatedSpecs);                                 
+      179 +      saveTechSpecs(updatedSpecs);                            
+      180 +    }                                                         
+      181 +  }, [specs.platform_compatibility, specs.gui_interface,      
+          +loading]);                                                    
+      182 +                                                              
+      183    const loadTechSpecs = async () => {                         
+      184      try {                                                     
+      185        setLoading(true);                                       
+
+● Done. Here's what changed:
+
+  1. Requisiti Hardware is now placed below Process Control in the right column,
+   stacked to fill the space alongside the taller Tecnologia di Calandratura
+  box.
+  2. Non-interactive — badges are rendered as <div> elements (no click handler,
+  no hover effects), using the same visual style.
+  3. Auto-selection rules:
+    - ASEM :: PB5600 — auto-selected if SoftPLC OR iRoll eXtreme is active
+    - ASEM :: BM100 — auto-selected if iRoll Performance is active AND neither
+  SoftPLC nor iRoll eXtreme is active
+    - B&R :: CP1686 — auto-selected if PLC is active
+    - Mutual exclusivity of PB5600/BM100 is guaranteed by the conditions
+  4. Auto-persisted — a useEffect watches the dependencies and saves to DB
+  whenever the computed hardware changes.
+
+✻ Baked for 1m 11s
+
+❯ /usage 
+  ⎿  Status dialog dismissed
+
+❯ i would like to put the box related to the .NET version next to the       
+  Graphic User Interface, since there's space to be padded                  
+
+● Read 1 file (ctrl+o to expand)
+
+● I'll replace the generic remaining categories loop with a dedicated GUI + .NET
+   side-by-side row, then the rest as individual cards.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 46 lines, removed 1 line
+      549            );                                                  
+      550          })()}                                                 
+      551                                                                
+      552 +        {/* GUI + .NET side by side */}                       
+      553 +        <div className="grid grid-cols-1 md:grid-cols-2       
+          +gap-6">                                                       
+      554 +          {['gui_interface',                                  
+          +'dotnet_version'].map((categoryKey) => {                      
+      555 +            const category = categories[categoryKey];         
+      556 +            const Icon = category.icon;                       
+      557 +            const styles = colorStyles[category.color];       
+      558 +                                                              
+      559 +            return (                                          
+      560 +              <div key={categoryKey} className="bg-white      
+          +rounded-lg shadow-sm border border-gray-200 p-6">             
+      561 +                <div className="flex items-center gap-3       
+          +mb-4">                                                        
+      562 +                  <div className={`w-10 h-10 rounded-lg       
+          +bg-${category.color}-100 flex items-center justify-center`}>  
+      563 +                    <Icon className={`w-5 h-5                 
+          +text-${category.color}-600`} />                               
+      564 +                  </div>                                      
+      565 +                  <div>                                       
+      566 +                    <h3 className="text-lg font-semibold      
+          +text-gray-900">{category.title}</h3>                          
+      567 +                    <p className="text-xs text-gray-500">     
+      568 +                      {(specs[categoryKey] || []).length > 0  
+      569 +                        ? `${(specs[categoryKey] ||           
+          +[]).length} selezionato/i`                                    
+      570 +                        : 'Nessuna selezione'}                
+      571 +                    </p>                                      
+      572 +                  </div>                                      
+      573 +                </div>                                        
+      574 +                <div className="flex flex-wrap gap-2">        
+      575 +                  {category.options.map((option) => {         
+      576 +                    const selected = isSelected(categoryKey,  
+          +option);                                                      
+      577 +                    return (                                  
+      578 +                      <button                                 
+      579 +                        key={option}                          
+      580 +                        onClick={() =>                        
+          +toggleBadge(categoryKey, option)}                             
+      581 +                        className={`px-4 py-2 rounded-lg      
+          +text-sm font-medium border-2 transition-all duration-200 ${   
+      582 +                          selected                            
+      583 +                            ? styles.active                   
+      584 +                            : `${styles.inactive}             
+          +${styles.hover}`                                              
+      585 +                        }`}                                   
+      586 +                      >                                       
+      587 +                        {option}                              
+      588 +                      </button>                               
+      589 +                    );                                        
+      590 +                  })}                                         
+      591 +                </div>                                        
+      592 +              </div>                                          
+      593 +            );                                                
+      594 +          })}                                                 
+      595 +        </div>                                                
+      596 +                                                              
+      597          {/* Remaining categories */}                          
+      598          {Object.entries(categories)                           
+      599 -          .filter(([key]) => key !== 'calender_technology' && 
+          -key !== 'platform_compatibility' && key !==                   
+          -'hardware_requirements')                                      
+      599 +          .filter(([key]) => key !== 'calender_technology' && 
+          +key !== 'platform_compatibility' && key !==                   
+          +'hardware_requirements'                                       
+          + && key !== 'gui_interface' && key !== 'dotnet_version')      
+      600            .map(([categoryKey, category]) => {                 
+      601              const Icon = category.icon;                       
+      602              const styles = colorStyles[category.color];       
+
+● Done. Graphic User Interface and Versione .NET are now rendered side by side
+  in a 2-column grid, with the remaining categories (Compatibilità Retrofit,
+  Compatibilità OS) continuing below as full-width cards.
+
+✻ Churned for 30s
+
+❯ in the first row of the GUI i would only leave "iRoll Performance" and    
+  "iRoll eXtreme", moving all the others in the second row                  
+
+● I need to find the GUI rendering within the side-by-side section and split the
+   options into two rows.
+
+● Read 1 file (ctrl+o to expand)
+
+● I'll replace the generic loop for GUI with a dedicated rendering that splits
+  options into two rows, while keeping .NET as-is.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 80 lines, removed 16 lines
+      551                                                                
+      552          {/* GUI + .NET side by side */}                       
+      553          <div className="grid grid-cols-1 md:grid-cols-2       
+           gap-6">                                                       
+      554 -          {['gui_interface',                                  
+          -'dotnet_version'].map((categoryKey) => {                      
+      555 -            const category = categories[categoryKey];         
+      556 -            const Icon = category.icon;                       
+      557 -            const styles = colorStyles[category.color];       
+      554 +          {/* GUI - split into two rows */}                   
+      555 +          {(() => {                                           
+      556 +            const guiCategory = categories.gui_interface;     
+      557 +            const GuiIcon = guiCategory.icon;                 
+      558 +            const guiStyles = colorStyles[guiCategory.color]; 
+      559 +            const row1 = ['iRoll Performance', 'iRoll         
+          +eXtreme'];                                                    
+      560 +            const row2 = guiCategory.options.filter(o =>      
+          +!row1.includes(o));                                           
+      561                                                                
+      562              return (                                          
+      563 -              <div key={categoryKey}                          
+          -className="bg-white rounded-lg shadow-sm border               
+          -border-gray-200 p-6">                                         
+      563 +              <div                                            
+          +className="bg-white rounded-lg shadow-sm border               
+          +border-gray-200 p-6">                                         
+      564                  <div className="flex items-center gap-3       
+           mb-4">                                                        
+      565 -                  <div className={`w-10 h-10 rounded-lg bg-   
+          -${category.color}-100 flex items-center justify-center`}>     
+      566 -                    <Icon className={`w-5 h-5 text-           
+          -${category.color}-600`} />                                    
+      565 +                  <div className="w-10 h-10 rounded-lg bg-teal
+          +-100 flex items-center justify-center">                       
+      566 +                    <GuiIcon className="w-5 h-5 text-teal-600"
+          + />                                                           
+      567                    </div>                                      
+      568                    <div>                                       
+      569 -                    <h3 className="text-lg font-semibold      
+          -text-gray-900">{category.title}</h3>                          
+      569 +                    <h3 className="text-lg font-semibold      
+          +text-gray-900">{guiCategory.title}</h3>                       
+      570                      <p className="text-xs text-gray-500">     
+      571 -                      {(specs[categoryKey] || []).length > 0  
+      572 -                        ? `${(specs[categoryKey]              
+          - || []).length} selezionato/i`                                
+      571 +                      {(specs.gui_interface || []).length > 0 
+      572 +                        ? `${(specs.gui_interface             
+          + || []).length} selezionato/i`                                
+      573                          : 'Nessuna selezione'}                
+      574                      </p>                                      
+      575                    </div>                                      
+      576                  </div>                                        
+      577                  <div className="flex flex-wrap gap-2">        
+      578 -                  {category.options.map((option) => {         
+      579 -                    const selected = isSelected(categoryKey   
+          -, option);                                                    
+      578 +                  {row1.map((option) => {                     
+      579 +                    const selected = isSelected(              
+          +'gui_interface', option);                                     
+      580                      return (                                  
+      581                        <button                                 
+      582                          key={option}                          
+      583 -                        onClick={() => toggleBadge(categoryKey
+          -, option)}                                                    
+      583 +                        onClick={() => toggleBadge(           
+          +'gui_interface', option)}                                     
+      584                          className={`px-4 py-2 rounded-lg      
+           text-sm font-medium border-2 transition-all duration-200 ${   
+      585                            selected                            
+      586 -                            ? styles.active                   
+      587 -                            : `${styles.inactive} ${styles    
+          -.hover}`                                                      
+      586 +                            ? guiStyles.active                
+      587 +                            : `${guiStyles.inactive} ${       
+          +guiStyles.hover}`                                             
+      588                          }`}                                   
+      589                        >                                       
+      590                          {option}                              
+     ...
+      589                      );                                        
+      590                    })}                                         
+      591                  </div>                                        
+      592 +                <div className="flex flex-wrap gap-2 mt-2">   
+      593 +                  {row2.map((option) => {                     
+      594 +                    const selected =                          
+          +isSelected('gui_interface', option);                          
+      595 +                    return (                                  
+      596 +                      <button                                 
+      597 +                        key={option}                          
+      598 +                        onClick={() =>                        
+          +toggleBadge('gui_interface', option)}                         
+      599 +                        className={`px-4 py-2 rounded-lg      
+          +text-sm font-medium border-2 transition-all duration-200 ${   
+      600 +                          selected                            
+      601 +                            ? guiStyles.active                
+      602 +                            : `${guiStyles.inactive}          
+          +${guiStyles.hover}`                                           
+      603 +                        }`}                                   
+      604 +                      >                                       
+      605 +                        {option}                              
+      606 +                      </button>                               
+      607 +                    );                                        
+      608 +                  })}                                         
+      609 +                </div>                                        
+      610                </div>                                          
+      611              );                                                
+      612 -          })}                                                 
+      612 +          })()}                                               
+      613 +                                                              
+      614 +          {/* .NET */}                                        
+      615 +          {(() => {                                           
+      616 +            const dotnetCategory = categories.dotnet_version; 
+      617 +            const DotnetIcon = dotnetCategory.icon;           
+      618 +            const dotnetStyles =                              
+          +colorStyles[dotnetCategory.color];                            
+      619 +                                                              
+      620 +            return (                                          
+      621 +              <div className="bg-white rounded-lg shadow-sm   
+          +border border-gray-200 p-6">                                  
+      622 +                <div className="flex items-center gap-3       
+          +mb-4">                                                        
+      623 +                  <div className="w-10 h-10 rounded-lg        
+          +bg-purple-100 flex items-center justify-center">              
+      624 +                    <DotnetIcon className="w-5 h-5            
+          +text-purple-600" />                                           
+      625 +                  </div>                                      
+      626 +                  <div>                                       
+      627 +                    <h3 className="text-lg font-semibold      
+          +text-gray-900">{dotnetCategory.title}</h3>                    
+      628 +                    <p className="text-xs text-gray-500">     
+      629 +                      {(specs.dotnet_version || []).length >  
+          +0                                                             
+      630 +                        ? `${(specs.dotnet_version ||         
+          +[]).length} selezionato/i`                                    
+      631 +                        : 'Nessuna selezione'}                
+      632 +                    </p>                                      
+      633 +                  </div>                                      
+      634 +                </div>                                        
+      635 +                <div className="flex flex-wrap gap-2">        
+      636 +                  {dotnetCategory.options.map((option) => {   
+      637 +                    const selected =                          
+          +isSelected('dotnet_version', option);                         
+      638 +                    return (                                  
+      639 +                      <button                                 
+      640 +                        key={option}                          
+      641 +                        onClick={() =>                        
+          +toggleBadge('dotnet_version', option)}                        
+      642 +                        className={`px-4 py-2 rounded-lg      
+          +text-sm font-medium border-2 transition-all duration-200 ${   
+      643 +                          selected                            
+      644 +                            ? dotnetStyles.active             
+      645 +                            : `${dotnetStyles.inactive}       
+          +${dotnetStyles.hover}`                                        
+      646 +                        }`}                                   
+      647 +                      >                                       
+      648 +                        {option}                              
+      649 +                      </button>                               
+      650 +                    );                                        
+      651 +                  })}                                         
+      652 +                </div>                                        
+      653 +              </div>                                          
+      654 +            );                                                
+      655 +          })()}                                               
+      656          </div>                                                
+      657                                                                
+      658          {/* Remaining categories */}                          
+
+● Done. The GUI box now has two rows:
+  - Row 1: iRoll Performance, iRoll eXtreme
+  - Row 2: iRoll Easy, iRoll Plus, iRoll Aided, iRoll Aided Plus
+
+✻ Worked for 32s
+
+❯ now i want to add the power segmentation of the machines: i will expose   
+  it and then we will discuss it, so do not proceed until this debate will  
+  be closed; MCA can be split in the following: "A3", "A4", "A5" and "A6";  
+  MCB can be split as follows: "<=R" and ">=T"; MCB/PS can be segmented as  
+  follows: "<=K", "N>>R" and ">=T"; MAV is not split so it would be marked  
+  with a "*"; in fact, as per the Hydraulic 4-Rolls the "MCB/PS" shall be   
+  added to the current set (MCA and MCB); do not proceed if something is    
+  not 100% clear                                                            
+
+● I understand the structure so far. Before proceeding, I have a few
+  clarifications:
+
+  1. MCB/PS needs to be added as a new Level 3 option under 4-Rolls (alongside
+  MCA and MCB) — clear.
+  2. Power segmentation would be a Level 4 below the current Level 3 models:
+    - MCA → A3, A4, A5, A6
+    - MCB → <=R, >=T
+    - MCB/PS → <=K, N>>R, >=T
+    - MAV → marked with "*" (no split)
+  3. What about the other Level 3 models? Specifically:
+    - MAV/AER and MCO (under 3-Rolls) — do they have power segmentation too, or
+  are they like MAV (no split / "*")?
+    - MCE-A and MCE-B (under MCE Electric) — any power segmentation?
+  4. The "*" on MAV — does it mean "all segments apply" or simply "no
+  segmentation exists"? Should it visually show a badge with "*" or just a note?
+
+❯ q1: correct; q2: power segmentation is fine but i would rather put it on  
+  a brand new box so not to giltter the "Tecnologia di Calandratura" which  
+  i like a lot; q3: i would leave them empty for the moment; q4: "*" it     
+  means both, actually                                                      
+
+● Clear, let me implement:
+
+  1. Add MCB/PS to Level 3 under 4-Rolls
+  2. Create a new Power Segmentation box (separate from Tecnologia di
+  Calandratura)
+  3. Show selectable segments based on selected Level 3 models, with MAV showing
+   "*"
+  4. Leave MAV/AER, MCO, MCE-A, MCE-B empty for now
+
+● Read 1 file (ctrl+o to expand)
+
+● First, add power_segmentation to state and add Zap icon import:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      1  import React, { useState, useEffect } from 'react';             
+      2 -import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save,      
+        -Code2, Layout } from 'lucide-react';                            
+      2 +import { Cpu, RefreshCw, Server, HardDrive, Monitor, Save,      
+        +Code2, Layout, Zap } from 'lucide-react';                       
+      3                                                                  
+      4  const TechSpecs = ({ projectId }) => {                          
+      5    const [specs, setSpecs] = useState({                          
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 2 lines, removed 1 line
+       9      platform_compatibility: [],                                
+      10      calender_technology: [],                                   
+      11      hardware_requirements: [],                                 
+      12 -    os_compatibility: []                                       
+      12 +    os_compatibility: [],                                      
+      13 +    power_segmentation: []                                     
+      14    });                                                          
+      15    const [loading, setLoading] = useState(true);                
+      16    const [saveStatus, setSaveStatus] = useState('');            
+
+● Now add power_segmentation to the parsed specs loading:
+
+● Read 1 file (ctrl+o to expand)
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 2 lines, removed 1 line
+      201              retrofit_compatibility:                           
+           parsedSpecs.retrofit_compatibility || [],                     
+      202              platform_compatibility:                           
+           parsedSpecs.platform_compatibility || [],                     
+      203              hardware_requirements:                            
+           parsedSpecs.hardware_requirements || [],                      
+      204 -            os_compatibility: parsedSpecs.os_compatibility || 
+          -[]                                                            
+      204 +            os_compatibility: parsedSpecs.os_compatibility || 
+          +[],                                                           
+      205 +            power_segmentation:                               
+          +parsedSpecs.power_segmentation || []                          
+      206            });                                                 
+      207          } catch (e) {                                         
+      208            console.log('No valid tech specs found, using       
+           defaults');                                                   
+
+● Now add MCB/PS to Level 3 under 4-Rolls:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      366            };                                                  
+      367            const level3 = {                                    
+      368              '3-Rolls': ['MAV', 'MAV/AER', 'MCO'],             
+      369 -            '4-Rolls': ['MCA', 'MCB']                         
+      369 +            '4-Rolls': ['MCA', 'MCB', 'MCB/PS']               
+      370            };                                                  
+      371                                                                
+      372            // MCE branch options                               
+
+● Now I need to add a power_segmentation category definition and render the new
+  box. Let me find the right spot to insert it — after the Tecnologia/Process
+  Control grid:
+
+● Read 1 file (ctrl+o to expand)
+
+● Now add power_segmentation to the categories and add amber color style:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 6 lines
+       96          'LTSC 2021',                                          
+       97          'LTSC 2024'                                           
+       98        ]                                                       
+       99 +    },                                                        
+      100 +    power_segmentation: {                                     
+      101 +      title: 'Power Segmentation',                            
+      102 +      icon: Zap,                                              
+      103 +      color: 'amber',                                         
+      104 +      options: []                                             
+      105      }                                                         
+      106    };                                                          
+      107                                                                
+
+● Add amber color style:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 5 lines
+      141        active: 'bg-rose-100 text-rose-800 border-rose-400',    
+      142        inactive: 'bg-gray-100 text-gray-500 border-gray-300',  
+      143        hover: 'hover:bg-rose-50 hover:border-rose-300'         
+      144 +    },                                                        
+      145 +    amber: {                                                  
+      146 +      active: 'bg-amber-100 text-amber-800 border-amber-400', 
+      147 +      inactive: 'bg-gray-100 text-gray-500 border-gray-300',  
+      148 +      hover: 'hover:bg-amber-50 hover:border-amber-300'       
+      149      }                                                         
+      150    };                                                          
+      151                                                                
+
+● Now find the spot after the Tecnologia/Process Control grid to insert the
+  Power Segmentation box:
+
+● Read 1 file (ctrl+o to expand)
+
+● Now insert the Power Segmentation box between the Tecnologia grid and the GUI
+  grid:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 89 lines
+      562            );                                                  
+      563          })()}                                                 
+      564                                                                
+      565 +        {/* Power Segmentation */}                            
+      566 +        {(() => {                                             
+      567 +          const psCategory = categories.power_segmentation;   
+      568 +          const PsIcon = psCategory.icon;                     
+      569 +          const psStyles = colorStyles[psCategory.color];     
+      570 +          const calSelections = specs.calender_technology ||  
+          +[];                                                           
+      571 +                                                              
+      572 +          // Power segmentation definitions per model         
+      573 +          const segmentationMap = {                           
+      574 +            'MCA': ['A3', 'A4', 'A5', 'A6'],                  
+      575 +            'MCB': ['<=R', '>=T'],                            
+      576 +            'MCB/PS': ['<=K', 'N>>R', '>=T'],                 
+      577 +            'MAV': ['*']                                      
+      578 +          };                                                  
+      579 +                                                              
+      580 +          // Collect active models that have segmentation     
+      581 +          const activeModels =                                
+          +Object.keys(segmentationMap).filter(m =>                      
+          +calSelections.includes(m));                                   
+      582 +                                                              
+      583 +          return (                                            
+      584 +            <div className="bg-white rounded-lg shadow-sm     
+          +border border-gray-200 p-6">                                  
+      585 +              <div className="flex items-center gap-3 mb-4">  
+      586 +                <div className="w-10 h-10 rounded-lg          
+          +bg-amber-100 flex items-center justify-center">               
+      587 +                  <PsIcon className="w-5 h-5 text-amber-600"  
+          +/>                                                            
+      588 +                </div>                                        
+      589 +                <div>                                         
+      590 +                  <h3 className="text-lg font-semibold        
+          +text-gray-900">{psCategory.title}</h3>                        
+      591 +                  <p className="text-xs text-gray-500">       
+      592 +                    {(specs.power_segmentation || []).length  
+          +> 0                                                           
+      593 +                      ? `${(specs.power_segmentation ||       
+          +[]).length} selezionato/i`                                    
+      594 +                      : activeModels.length === 0             
+      595 +                        ? 'Seleziona un modello in Tecnologia 
+          + di Calandratura'                                             
+      596 +                        : 'Nessuna selezione'}                
+      597 +                  </p>                                        
+      598 +                </div>                                        
+      599 +              </div>                                          
+      600 +              {activeModels.length > 0 ? (                    
+      601 +                <div className="space-y-3">                   
+      602 +                  {activeModels.map((model) => {              
+      603 +                    const segments = segmentationMap[model];  
+      604 +                    return (                                  
+      605 +                      <div key={model}>                       
+      606 +                        <p className="text-xs font-semibold   
+          +text-gray-500 uppercase tracking-wide mb-2">{model}</p>       
+      607 +                        <div className="flex flex-wrap        
+          +gap-2">                                                       
+      608 +                          {segments.map((seg) => {            
+      609 +                            const segKey =                    
+          +`${model}::${seg}`;                                           
+      610 +                            const selected =                  
+          +(specs.power_segmentation || []).includes(segKey);            
+      611 +                            const isWildcard = seg === '*';   
+      612 +                            return (                          
+      613 +                              <button                         
+      614 +                                key={segKey}                  
+      615 +                                onClick={() => {              
+      616 +                                  if (isWildcard) return;     
+      617 +                                                              
+          +toggleBadge('power_segmentation', segKey);                    
+      618 +                                }}                            
+      619 +                                className={`px-4 py-2         
+          +rounded-lg text-sm font-medium border-2 transition-all        
+          +duration-200 ${                                               
+      620 +                                  isWildcard                  
+      621 +                                    ? 'bg-amber-50            
+          +text-amber-600 border-amber-300 cursor-default'               
+      622 +                                    : selected                
+      623 +                                      ? psStyles.active       
+      624 +                                      : `${psStyles.inactive} 
+          + ${psStyles.hover}`                                           
+      625 +                                }`}                           
+      626 +                              >                               
+      627 +                                {seg}                         
+      628 +                              </button>                       
+      629 +                            );                                
+      630 +                          })}                                 
+      631 +                        </div>                                
+      632 +                      </div>                                  
+      633 +                    );                                        
+      634 +                  })}                                         
+      635 +                </div>                                        
+      636 +              ) : (                                           
+      637 +                <div className="flex flex-wrap gap-2">        
+      638 +                                                              
+          +{Object.entries(segmentationMap).map(([model, segments]) =>   
+      639 +                    segments.map((seg) => (                   
+      640 +                      <div                                    
+      641 +                        key={`${model}::${seg}`}              
+      642 +                        className="px-4 py-2 rounded-lg       
+          +text-sm font-medium border-2 bg-gray-50 text-gray-300         
+          +border-gray-200 cursor-not-allowed"                           
+      643 +                      >                                       
+      644 +                        {seg}                                 
+      645 +                      </div>                                  
+      646 +                    ))                                        
+      647 +                  )}                                          
+      648 +                </div>                                        
+      649 +              )}                                              
+      650 +            </div>                                            
+      651 +          );                                                  
+      652 +        })()}                                                 
+      653 +                                                              
+      654          {/* GUI + .NET side by side */}                       
+      655          <div className="grid grid-cols-1 md:grid-cols-2       
+           gap-6">                                                       
+      656            {/* GUI - split into two rows */}                   
+
+● Now exclude power_segmentation from the remaining categories loop:
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      762                                                                
+      763          {/* Remaining categories */}                          
+      764          {Object.entries(categories)                           
+      765 -          .filter(([key]) => key !== 'calender_technology' && 
+          -key !== 'platform_compatibility' && key !==                   
+          -'hardware_requirements' && key !== 'gui_interface' && key !== 
+          -'dotnet_version')                                             
+      765 +          .filter(([key]) => key !== 'calender_technology' && 
+          +key !== 'platform_compatibility' && key !==                   
+          +'hardware_requirements' && key !== 'gui_interface' && key !== 
+          +'dotnet_version' && key !== 'power_segmentation')             
+      766            .map(([categoryKey, category]) => {                 
+      767              const Icon = category.icon;                       
+      768              const styles = colorStyles[category.color];       
+
+● Done. Here's what was implemented:
+
+  - MCB/PS added to Level 3 under 4-Rolls (alongside MCA and MCB)
+  - New "Power Segmentation" box placed between Tecnologia di Calandratura and
+  GUI rows, with amber/yellow color scheme and Zap icon
+  - Segments are grouped by model with labels:
+    - MCA: A3, A4, A5, A6
+    - MCB: <=R, >=T
+    - MCB/PS: <=K, N>>R, >=T
+    - MAV: * (auto-styled, non-clickable)
+  - When no models with segmentation are selected, all segment badges show as
+  disabled
+  - Selections stored as model::segment keys (e.g. MCA::A3) for uniqueness
+  - MAV/AER, MCO, MCE-A, MCE-B have no segmentation for now
+
+✻ Baked for 1m 55s
+
+❯ change the label "Tecnologia di Calandratura" with "Calandratura" 
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      20    // Badge definitions with colors and icons                   
+      21    const categories = {                                         
+      22      calender_technology: {                                     
+      23 -      title: 'Tecnologia di Calandratura',                     
+      23 +      title: 'Calandratura',                                   
+      24        icon: HardDrive,                                         
+      25        color: 'rose',                                           
+      26        options: [                                               
+
+● Done. The label now reads "Calandratura".
+
+❯ Power Segmentation should hold the same description as the other ones 
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 3 lines
+      591                    <p className="text-xs text-gray-500">       
+      592                      {(specs.power_segmentation || []).length  
+           > 0                                                           
+      593                        ? `${(specs.power_segmentation ||       
+           []).length} selezionato/i`                                    
+      594 -                      : activeModels.length === 0             
+      595 -                        ? 'Seleziona un modello in Tecnologia 
+          - di Calandratura'                                             
+      596 -                        : 'Nessuna selezione'}                
+      594 +                      : 'Nessuna selezione'}                  
+      595                    </p>                                        
+      596                  </div>                                        
+      597                </div>                                          
+
+● Done. Now it shows the same "X selezionato/i" / "Nessuna selezione" pattern as
+   all other boxes.
+
+❯ now i would like this brand new "Power Segmentation" to be shown only if  
+  there's any available selection to be done; do not proceed if it's not    
+  clear what im asking                                                      
+
+● Clear — you want the Power Segmentation box to be completely hidden when no
+  models with segmentation (MCA, MCB, MCB/PS, MAV) are selected in Calandratura.
+   It should only appear when at least one of those models is active.
+
+● Read 1 file (ctrl+o to expand)
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 36 lines, removed 49 lines
+      580            // Collect active models that have segmentation     
+      581            const activeModels =                                
+           Object.keys(segmentationMap).filter(m =>                      
+           calSelections.includes(m));                                   
+      582                                                                
+      583 +          if (activeModels.length === 0) return null;         
+      584 +                                                              
+      585            return (                                            
+      586              <div className="bg-white rounded-lg shadow-sm     
+           border border-gray-200 p-6">                                  
+      587                <div className="flex items-center gap-3 mb-4">  
+     ...
+      595                    </p>                                        
+      596                  </div>                                        
+      597                </div>                                          
+      598 -              {activeModels.length > 0 ? (                    
+      599 -                <div className="space-y-3">                   
+      600 -                  {activeModels.map((model) => {              
+      601 -                    const segments = segmentationMap[model];  
+      602 -                    return (                                  
+      603 -                      <div key={model}>                       
+      604 -                        <p className="text-xs font-semibold   
+          -text-gray-500 uppercase tracking-wide mb-2">{model}</p>       
+      605 -                        <div className="flex flex-wrap        
+          -gap-2">                                                       
+      606 -                          {segments.map((seg) => {            
+      607 -                            const segKey =                    
+          -`${model}::${seg}`;                                           
+      608 -                            const selected =                  
+          -(specs.power_segmentation || []).includes(segKey);            
+      609 -                            const isWildcard = seg === '*';   
+      610 -                            return (                          
+      611 -                              <button                         
+      612 -                                key={segKey}                  
+      613 -                                onClick={() => {              
+      614 -                                  if (isWildcard) return;     
+      615 -                                                              
+          -toggleBadge('power_segmentation', segKey);                    
+      616 -                                }}                            
+      617 -                                className={`px-4 py-2         
+          -rounded-lg text-sm font-medium border-2 transition-all        
+          -duration-200 ${                                               
+      618 -                                  isWildcard                  
+      619 -                                    ? 'bg-amber-50            
+          -text-amber-600 border-amber-300 cursor-default'               
+      620 -                                    : selected                
+      621 -                                      ? psStyles.active       
+      622 -                                      : `${psStyles.inactive} 
+          - ${psStyles.hover}`                                           
+      623 -                                }`}                           
+      624 -                              >                               
+      625 -                                {seg}                         
+      626 -                              </button>                       
+      627 -                            );                                
+      628 -                          })}                                 
+      629 -                        </div>                                
+      598 +              <div className="space-y-3">                     
+      599 +                {activeModels.map((model) => {                
+      600 +                  const segments = segmentationMap[model];    
+      601 +                  return (                                    
+      602 +                    <div key={model}>                         
+      603 +                      <p className="text-xs font-semibold     
+          +text-gray-500 uppercase tracking-wide mb-2">{model}</p>       
+      604 +                      <div className="flex flex-wrap gap-2">  
+      605 +                        {segments.map((seg) => {              
+      606 +                          const segKey = `${model}::${seg}`;  
+      607 +                          const selected =                    
+          +(specs.power_segmentation || []).includes(segKey);            
+      608 +                          const isWildcard = seg === '*';     
+      609 +                          return (                            
+      610 +                            <button                           
+      611 +                              key={segKey}                    
+      612 +                              onClick={() => {                
+      613 +                                if (isWildcard) return;       
+      614 +                                                              
+          +toggleBadge('power_segmentation', segKey);                    
+      615 +                              }}                              
+      616 +                              className={`px-4 py-2           
+          +rounded-lg text-sm font-medium border-2 transition-all        
+          +duration-200 ${                                               
+      617 +                                isWildcard                    
+      618 +                                  ? 'bg-amber-50              
+          +text-amber-600 border-amber-300 cursor-default'               
+      619 +                                  : selected                  
+      620 +                                    ? psStyles.active         
+      621 +                                    : `${psStyles.inactive}   
+          +${psStyles.hover}`                                            
+      622 +                              }`}                             
+      623 +                            >                                 
+      624 +                              {seg}                           
+      625 +                            </button>                         
+      626 +                          );                                  
+      627 +                        })}                                   
+      628                        </div>                                  
+      629 -                    );                                        
+      630 -                  })}                                         
+      631 -                </div>                                        
+      632 -              ) : (                                           
+      633 -                <div className="flex flex-wrap gap-2">        
+      634 -                                                              
+          -{Object.entries(segmentationMap).map(([model, segments]) =>   
+      635 -                    segments.map((seg) => (                   
+      636 -                      <div                                    
+      637 -                        key={`${model}::${seg}`}              
+      638 -                        className="px-4 py-2 rounded-lg       
+          -text-sm font-medium border-2 bg-gray-50 text-gray-300         
+          -border-gray-200 cursor-not-allowed"                           
+      639 -                      >                                       
+      640 -                        {seg}                                 
+      641 -                      </div>                                  
+      642 -                    ))                                        
+      643 -                  )}                                          
+      644 -                </div>                                        
+      645 -              )}                                              
+      629 +                    </div>                                    
+      630 +                  );                                          
+      631 +                })}                                           
+      632 +              </div>                                          
+      633              </div>                                            
+      634            );                                                  
+      635          })()}                                                 
+
+● Done. The Power Segmentation box now only appears when at least one model with
+   segmentation (MCA, MCB, MCB/PS, MAV) is selected in Calandratura. Otherwise
+  it's completely hidden.
+
+✻ Brewed for 32s
+
+❯ i would like to remove the star (dummy) selection for the MAV, which will 
+   then be acting as the "MAV/AER"                                          
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 2 lines
+      573            const segmentationMap = {                           
+      574              'MCA': ['A3', 'A4', 'A5', 'A6'],                  
+      575              'MCB': ['<=R', '>=T'],                            
+      576 -            'MCB/PS': ['<=K', 'N>>R', '>=T'],                 
+      577 -            'MAV': ['*']                                      
+      576 +            'MCB/PS': ['<=K', 'N>>R', '>=T']                  
+      577            };                                                  
+      578                                                                
+      579            // Collect active models that have segmentation     
+
+● Done. MAV (and MAV/AER) no longer appear in Power Segmentation — only MCA,
+  MCB, and MCB/PS have selectable segments.
+
+❯ in the "Riepilogo Specifiche Selezionate" i would place info about        
+  "Machine Family" and "Model" on a separate row (and not all together with 
+   the Calandratura)                                                        
+
+● Read 1 file (ctrl+o to expand)
+
+● I need to split the calender_technology selections into three rows:
+  Calandratura (Level 1), Machine Family (Level 2), and Model (Level 3).
+
+● Read 1 file (ctrl+o to expand)
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 32 lines
+      342                const selections = specs[categoryKey] || [];    
+      343                if (selections.length === 0) return null;       
+      344                                                                
+      345 +              // Split calender_technology into separate rows 
+      346 +              if (categoryKey === 'calender_technology') {    
+      347 +                const level1Options = new                     
+          +Set(category.options);                                        
+      348 +                const level2Options = new Set(['3-Rolls',     
+          +'4-Rolls', 'Smart Line', 'MCE-A', 'MCE-B']);                  
+      349 +                const level1 = selections.filter(s =>         
+          +level1Options.has(s));                                        
+      350 +                const level2 = selections.filter(s =>         
+          +level2Options.has(s));                                        
+      351 +                const level3 = selections.filter(s =>         
+          +!level1Options.has(s) && !level2Options.has(s));              
+      352 +                                                              
+      353 +                return (                                      
+      354 +                  <React.Fragment key={categoryKey}>          
+      355 +                    {level1.length > 0 && (                   
+      356 +                      <>                                      
+      357 +                        <div className="text-sm font-semibold 
+          + text-gray-700">{category.title}:</div>                       
+      358 +                        <div className="text-sm               
+          +text-gray-600">{level1.join(', ')}</div>                      
+      359 +                      </>                                     
+      360 +                    )}                                        
+      361 +                    {level2.length > 0 && (                   
+      362 +                      <>                                      
+      363 +                        <div className="text-sm font-semibold 
+          + text-gray-700">Machine Family:</div>                         
+      364 +                        <div className="text-sm               
+          +text-gray-600">{level2.join(', ')}</div>                      
+      365 +                      </>                                     
+      366 +                    )}                                        
+      367 +                    {level3.length > 0 && (                   
+      368 +                      <>                                      
+      369 +                        <div className="text-sm font-semibold 
+          + text-gray-700">Model:</div>                                  
+      370 +                        <div className="text-sm               
+          +text-gray-600">{level3.join(', ')}</div>                      
+      371 +                      </>                                     
+      372 +                    )}                                        
+      373 +                  </React.Fragment>                           
+      374 +                );                                            
+      375 +              }                                               
+      376 +                                                              
+      377                return (                                        
+      378                  <React.Fragment key={categoryKey}>            
+      379                    <div className="text-sm font-semibold       
+           text-gray-700">{category.title}:</div>                        
+
+● Done. The Riepilogo now shows Calandratura selections split into three
+  separate rows:
+
+  - Calandratura: Hydraulic, MCE (Electric)
+  - Machine Family: 3-Rolls, 4-Rolls, Smart Line, MCE-A, MCE-B
+  - Model: MCA, MCB, MCB/PS, MAV, MAV/AER, MCO
+
+  Each row only appears if there are selections at that level.
+
+❯ MCE-A and MCE-B, in this box we're talking about, shall be trated as a    
+  3-rd level info                                                           
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 1 line, removed 1 line
+      345                // Split calender_technology into separate rows 
+      346                if (categoryKey === 'calender_technology') {    
+      347                  const level1Options = new                     
+           Set(category.options);                                        
+      348 -                const level2Options = new Set(['3-Rolls',     
+          -'4-Rolls', 'Smart Line', 'MCE-A', 'MCE-B']);                  
+      348 +                const level2Options = new Set(['3-Rolls',     
+          +'4-Rolls', 'Smart Line']);                                    
+      349                  const level1 = selections.filter(s =>         
+           level1Options.has(s));                                        
+      350                  const level2 = selections.filter(s =>         
+           level2Options.has(s));                                        
+      351                  const level3 = selections.filter(s =>         
+           !level1Options.has(s) && !level2Options.has(s));              
+
+● Done. MCE-A and MCE-B now show under Model (3rd level) instead of Machine
+  Family.
+
+❯ .NET version shall be reported within brakets, next to the GUI info, such 
+   as: "iRoll Performance (.NET5)"                                          
+
+● Read 1 file (ctrl+o to expand)
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 19 lines
+      374                  );                                            
+      375                }                                               
+      376                                                                
+      377 +              // Skip dotnet_version as it's merged into GUI  
+      378 +              if (categoryKey === 'dotnet_version') return    
+          +null;                                                         
+      379 +                                                              
+      380 +              // Merge .NET version into GUI labels           
+      381 +              if (categoryKey === 'gui_interface') {          
+      382 +                const dotnetSelections = specs.dotnet_version 
+          + || [];                                                       
+      383 +                const dotnetSuffix = dotnetSelections.length  
+          +> 0                                                           
+      384 +                  ? ` (${dotnetSelections.join(', ')})`       
+      385 +                  : '';                                       
+      386 +                return (                                      
+      387 +                  <React.Fragment key={categoryKey}>          
+      388 +                    <div className="text-sm font-semibold     
+          +text-gray-700">{category.title}:</div>                        
+      389 +                    <div className="text-sm text-gray-600">   
+      390 +                      {selections.map(g =>                    
+          +`${g}${dotnetSuffix}`).join(', ')}                            
+      391 +                    </div>                                    
+      392 +                  </React.Fragment>                           
+      393 +                );                                            
+      394 +              }                                               
+      395 +                                                              
+      396                return (                                        
+      397                  <React.Fragment key={categoryKey}>            
+      398                    <div className="text-sm font-semibold       
+           text-gray-700">{category.title}:</div>                        
+
+● Done. In the Riepilogo, each selected GUI label now shows the selected .NET
+  versions in brackets, e.g. "iRoll Performance (.NET 5), iRoll eXtreme (.NET 5,
+   .NET 8)". The separate .NET version row is no longer shown.
+
+❯ what do you think about using the pipe as a separting symbols to list     
+  multiple choosen items? would it be more readable than just using the     
+  comma?                                                                    
+
+● I think the pipe | would work well here — it creates a clearer visual
+  separation between items, especially when labels themselves contain commas or
+  are multi-word. For example:
+
+  - Comma: iRoll Performance (.NET 5), iRoll eXtreme (.NET 5)
+  - Pipe: iRoll Performance (.NET 5) | iRoll eXtreme (.NET 5)
+
+  The pipe reads more like distinct options being listed, which matches the
+  nature of these selections. I'd go with it. Want me to apply it?
+
+❯ yes, do it 
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 6 lines, removed 6 lines
+      355                      {level1.length > 0 && (                   
+      356                        <>                                      
+      357                          <div className="text-sm font-semibold 
+            text-gray-700">{category.title}:</div>                       
+      358 -                        <div className="text-sm               
+          -text-gray-600">{level1.join(', ')}</div>                      
+      358 +                        <div className="text-sm               
+          +text-gray-600">{level1.join(' | ')}</div>                     
+      359                        </>                                     
+      360                      )}                                        
+      361                      {level2.length > 0 && (                   
+      362                        <>                                      
+      363                          <div className="text-sm font-semibold 
+            text-gray-700">Machine Family:</div>                         
+      364 -                        <div className="text-sm               
+          -text-gray-600">{level2.join(', ')}</div>                      
+      364 +                        <div className="text-sm               
+          +text-gray-600">{level2.join(' | ')}</div>                     
+      365                        </>                                     
+      366                      )}                                        
+      367                      {level3.length > 0 && (                   
+      368                        <>                                      
+      369                          <div className="text-sm font-semibold 
+            text-gray-700">Model:</div>                                  
+      370 -                        <div className="text-sm               
+          -text-gray-600">{level3.join(', ')}</div>                      
+      370 +                        <div className="text-sm               
+          +text-gray-600">{level3.join(' | ')}</div>                     
+      371                        </>                                     
+      372                      )}                                        
+      373                    </React.Fragment>                           
+     ...
+      381                if (categoryKey === 'gui_interface') {          
+      382                  const dotnetSelections = specs.dotnet_version 
+            || [];                                                       
+      383                  const dotnetSuffix = dotnetSelections.length  
+           > 0                                                           
+      384 -                  ? ` (${dotnetSelections.join(', ')})`       
+      384 +                  ? ` (${dotnetSelections.join(' | ')})`      
+      385                    : '';                                       
+      386                  return (                                      
+      387                    <React.Fragment key={categoryKey}>          
+      388                      <div className="text-sm font-semibold     
+           text-gray-700">{category.title}:</div>                        
+      389                      <div className="text-sm text-gray-600">   
+      390 -                      {selections.map(g =>                    
+          -`${g}${dotnetSuffix}`).join(', ')}                            
+      390 +                      {selections.map(g =>                    
+          +`${g}${dotnetSuffix}`).join(' | ')}                           
+      391                      </div>                                    
+      392                    </React.Fragment>                           
+      393                  );                                            
+     ...
+      396                return (                                        
+      397                  <React.Fragment key={categoryKey}>            
+      398                    <div className="text-sm font-semibold       
+           text-gray-700">{category.title}:</div>                        
+      399 -                  <div className="text-sm                     
+          -text-gray-600">{selections.join(', ')}</div>                  
+      399 +                  <div className="text-sm                     
+          +text-gray-600">{selections.join(' | ')}</div>                 
+      400                  </React.Fragment>                             
+      401                );                                              
+      402              })}                                               
+
+● Done. All summary items now use | as separator throughout the Riepilogo.
+
+❯ if multiple segments are selected for the same machine family type, then  
+  this shall be aggregated, for instance: MCA::A4 | MCA::A5 shall become    
+  MCA :: A4+A5                                                              
+
+● Read 1 file (ctrl+o to expand)
+
+● I need to add special handling for power_segmentation to aggregate by model.
+  The stored keys are like MCA::A4, MCA::A5, so I'll group by the model prefix
+  and join segments with +.
+
+● Update(frontend\src\components\TechSpecs.jsx)
+  ⎿  Added 19 lines
+      377                // Skip dotnet_version as it's merged into GUI  
+      378                if (categoryKey === 'dotnet_version') return    
+           null;                                                         
+      379                                                                
+      380 +              // Aggregate power_segmentation by model        
+      381 +              if (categoryKey === 'power_segmentation') {     
+      382 +                const grouped = {};                           
+      383 +                selections.forEach(s => {                     
+      384 +                  const [model, seg] = s.split('::');         
+      385 +                  if (!grouped[model]) grouped[model] = [];   
+      386 +                  grouped[model].push(seg);                   
+      387 +                });                                           
+      388 +                const display = Object.entries(grouped)       
+      389 +                  .map(([model, segs]) => `${model} ::        
+          +${segs.join('+')}`)                                           
+      390 +                  .join(' | ');                               
+      391 +                return (                                      
+      392 +                  <React.Fragment key={categoryKey}>          
+      393 +                    <div className="text-sm font-semibold     
+          +text-gray-700">{category.title}:</div>                        
+      394 +                    <div className="text-sm                   
+          +text-gray-600">{display}</div>                                
+      395 +                  </React.Fragment>                           
+      396 +                );                                            
+      397 +              }                                               
+      398 +                                                              
+      399                // Merge .NET version into GUI labels           
+      400                if (categoryKey === 'gui_interface') {          
+      401                  const dotnetSelections = specs.dotnet_version 
+            || [];                                                       
+
+● Done. Power segmentation selections are now aggregated by model in the
+  Riepilogo, e.g. MCA :: A4+A5 | MCB :: <=R+>=T.

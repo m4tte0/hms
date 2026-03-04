@@ -14,6 +14,7 @@ import Knowledge from './components/Knowledge';
 import Attachments from './components/Attachments';
 import Issues from './components/Issues';
 import StatusReport from './components/StatusReport';
+import SchedaTecnica from './components/SchedaTecnica';
 import OverallCalendar from './components/OverallCalendar';
 import { projectsAPI, checklistAPI } from './services/api';
 
@@ -34,6 +35,9 @@ function App() {
 
   // Report modal state
   const [showReport, setShowReport] = useState(false);
+
+  // Scheda Tecnica modal state
+  const [showSchedaTecnica, setShowSchedaTecnica] = useState(false);
 
   // Project Settings modal state
   const [showProjectSettings, setShowProjectSettings] = useState(false);
@@ -587,6 +591,17 @@ function App() {
 
                           <button
                             onClick={() => {
+                              setShowSchedaTecnica(true);
+                              setShowActionsMenu(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                          >
+                            <Cpu className="w-4 h-4 text-secondary-600 flex-shrink-0" />
+                            <span className="font-medium whitespace-nowrap">Scheda Tecnica</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
                               setShowReport(true);
                               setShowActionsMenu(false);
                             }}
@@ -781,6 +796,14 @@ function App() {
           </div>
         </main>
       </div>
+
+      {/* Scheda Tecnica Modal */}
+      {showSchedaTecnica && currentProject && (
+        <SchedaTecnica
+          projectId={currentProject.id}
+          onClose={() => setShowSchedaTecnica(false)}
+        />
+      )}
 
       {/* Status Report Modal */}
       {showReport && currentProject && (
