@@ -499,7 +499,7 @@ const StatusReport = ({ projectId, onClose }) => {
                   <Clock className="w-4 h-4 text-slate-600" />
                   <span>Linea Temporale</span>
                 </div>
-                <span className={`text-xs font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                <span className={`text-xs font-semibold print:hidden ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
                   {project.daysRemaining !== null ? `${project.daysRemaining} giorni rimanenti` : ''}
                 </span>
               </h4>
@@ -594,7 +594,7 @@ const StatusReport = ({ projectId, onClose }) => {
               })()}
 
               {/* Status Indicator */}
-              <div className={`mt-3 p-2 rounded ${project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? 'bg-emerald-50' : 'bg-amber-50'}`}>
+              <div className={`mt-3 p-2 rounded print:hidden ${project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? 'bg-emerald-50' : 'bg-amber-50'}`}>
                 <div className="flex items-center gap-2">
                   {project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? (
                     <>
