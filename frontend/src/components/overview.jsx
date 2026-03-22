@@ -19,15 +19,17 @@ const Overview = ({ project, setProject }) => {
     return true;
   });
   const [phaseNames, setPhaseNames] = useState({
-    'Phase 1': 'Phase 1: Pre-Handover Assessment',
-    'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
-    'Phase 3': 'Phase 3: Final Sign-Offs'
+    'Phase 1': 'Fase 1: Valutazione pre-consegna',
+    'Phase 2': 'Fase 2: Sessioni di trasferimento know-how',
+    'Phase 3': 'Fase 3: Approvazioni finali'
   });
   const [phaseDates, setPhaseDates] = useState({});
   const [editingPhase, setEditingPhase] = useState(null);
   const [phaseEditData, setPhaseEditData] = useState({ startDate: '', endDate: '' });
   const [newContact, setNewContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
+  const [newContactCustomDept, setNewContactCustomDept] = useState('');
   const [editContact, setEditContact] = useState({ name: '', role: '', department: '', email: '', phone: '' });
+  const [editContactCustomDept, setEditContactCustomDept] = useState('');
   const [saving, setSaving] = useState(false);
 
   const descriptionRef = useRef(null);
@@ -105,7 +107,7 @@ const Overview = ({ project, setProject }) => {
       setEditingPhase(null);
     } catch (error) {
       console.error('Error saving phase dates:', error);
-      alert('Failed to save phase dates');
+      alert('Impossibile salvare le date della fase');
     } finally {
       setSaving(false);
     }
@@ -160,26 +162,28 @@ const Overview = ({ project, setProject }) => {
   };
 
   const handleAddContact = async () => {
-    if (!newContact.name || !newContact.role || !newContact.department) {
-      alert('Please fill in Name, Role, and Department fields');
+    const deptValue = newContact.department === 'Altro' ? newContactCustomDept.trim() : newContact.department;
+    if (!newContact.name || !newContact.role || !deptValue) {
+      alert('Compila i campi Nome, Ruolo e Reparto');
       return;
     }
     try {
       setSaving(true);
-      await teamContactsAPI.addContact(project.id, newContact);
+      await teamContactsAPI.addContact(project.id, { ...newContact, department: deptValue });
       setNewContact({ name: '', role: '', department: '', email: '', phone: '' });
+      setNewContactCustomDept('');
       setShowAddForm(false);
       await loadTeamContacts();
     } catch (error) {
       console.error('Error adding team contact:', error);
-      alert('Failed to add team member');
+      alert('Impossibile aggiungere il membro del team');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteContact = async (contactId) => {
-    if (!confirm('Are you sure you want to remove this team member?')) return;
+    if (!confirm('Sei sicuro di voler rimuovere questo membro del team?')) return;
     try {
       // Check if the deleted member is a lead
       const memberToDelete = teamContacts.find(c => c.id === contactId);
@@ -188,7 +192,7 @@ const Overview = ({ project, setProject }) => {
         if (project.rd_lead === memberIdentifier && memberToDelete.department === 'R&D') {
           handleChange('rd_lead', '');
         }
-        if (project.automation_lead === memberIdentifier && memberToDelete.department === 'Automation') {
+        if (project.automation_lead === memberIdentifier && memberToDelete.department === 'Automazione') {
           handleChange('automation_lead', '');
         }
       }
@@ -197,7 +201,7 @@ const Overview = ({ project, setProject }) => {
       await loadTeamContacts();
     } catch (error) {
       console.error('Error deleting team contact:', error);
-      alert('Failed to delete team member');
+      alert('Impossibile eliminare il membro del team');
     }
   };
 
@@ -205,31 +209,36 @@ const Overview = ({ project, setProject }) => {
     const memberIdentifier = `${contact.name} (${contact.role})`;
     if (contact.department === 'R&D') {
       handleChange('rd_lead', memberIdentifier);
-    } else if (contact.department === 'Automation') {
+    } else if (contact.department === 'Automazione') {
       handleChange('automation_lead', memberIdentifier);
     }
   };
 
   const handleEditClick = (contact) => {
     setEditingContact(contact.id);
-    setEditContact({ name: contact.name, role: contact.role, department: contact.department, email: contact.email || '', phone: contact.phone || '' });
+    const standardDepts = ['R&D', 'Automazione', 'Ufficio Meccanico', 'Collaudo'];
+    const isStandard = standardDepts.includes(contact.department);
+    setEditContact({ name: contact.name, role: contact.role, department: isStandard ? contact.department : 'Altro', email: contact.email || '', phone: contact.phone || '' });
+    setEditContactCustomDept(isStandard ? '' : contact.department);
     setShowAddForm(false);
   };
 
   const handleUpdateContact = async () => {
-    if (!editContact.name || !editContact.role || !editContact.department) {
-      alert('Please fill in Name, Role, and Department fields');
+    const deptValue = editContact.department === 'Altro' ? editContactCustomDept.trim() : editContact.department;
+    if (!editContact.name || !editContact.role || !deptValue) {
+      alert('Compila i campi Nome, Ruolo e Reparto');
       return;
     }
     try {
       setSaving(true);
-      await teamContactsAPI.updateContact(project.id, editingContact, editContact);
+      await teamContactsAPI.updateContact(project.id, editingContact, { ...editContact, department: deptValue });
       setEditingContact(null);
       setEditContact({ name: '', role: '', department: '', email: '', phone: '' });
+      setEditContactCustomDept('');
       await loadTeamContacts();
     } catch (error) {
       console.error('Error updating team contact:', error);
-      alert('Failed to update team member');
+      alert('Impossibile aggiornare il membro del team');
     } finally {
       setSaving(false);
     }
@@ -238,6 +247,7 @@ const Overview = ({ project, setProject }) => {
   const handleCancelEdit = () => {
     setEditingContact(null);
     setEditContact({ name: '', role: '', department: '', email: '', phone: '' });
+    setEditContactCustomDept('');
   };
 
   const calculateProjectScore = (priority, complexity) => {
@@ -362,9 +372,9 @@ const Overview = ({ project, setProject }) => {
 
   // Dynamic phases based on checklist data and custom phase names
   const phases = [
-    { id: 'Phase 1', name: phaseNames['Phase 1'], duration: '2-4 weeks', status: calculatePhaseStatus('Phase 1'), progress: calculatePhaseProgress('Phase 1'), activities: 'Prerequisites completion, documentation review, initial assessment', criteria: 'All technical and documentation requirements met' },
-    { id: 'Phase 2', name: phaseNames['Phase 2'], duration: '2-6 weeks', status: calculatePhaseStatus('Phase 2'), progress: calculatePhaseProgress('Phase 2'), activities: 'Training sessions, hands-on activities, shadow support', criteria: 'Team demonstrates competency in system operation' },
-    { id: 'Phase 3', name: phaseNames['Phase 3'], duration: '1-2 weeks', status: calculatePhaseStatus('Phase 3'), progress: calculatePhaseProgress('Phase 3'), activities: 'Approvals, documentation handover, transition activities', criteria: 'All sign-offs completed and access transferred' },
+    { id: 'Phase 1', name: phaseNames['Phase 1'], duration: '2-4 settimane', status: calculatePhaseStatus('Phase 1'), progress: calculatePhaseProgress('Phase 1'), activities: 'Completamento prerequisiti, revisione documentazione, valutazione iniziale', criteria: 'Tutti i requisiti tecnici e documentali soddisfatti' },
+    { id: 'Phase 2', name: phaseNames['Phase 2'], duration: '2-6 settimane', status: calculatePhaseStatus('Phase 2'), progress: calculatePhaseProgress('Phase 2'), activities: 'Sessioni di formazione, attività pratiche, supporto in affiancamento', criteria: 'Il team dimostra competenza nell\'operatività del sistema' },
+    { id: 'Phase 3', name: phaseNames['Phase 3'], duration: '1-2 settimane', status: calculatePhaseStatus('Phase 3'), progress: calculatePhaseProgress('Phase 3'), activities: 'Approvazioni, consegna documentazione, attività di transizione', criteria: 'Tutte le approvazioni completate e accessi trasferiti' },
   ];
 
   return (
@@ -388,7 +398,7 @@ const Overview = ({ project, setProject }) => {
               <button
                 onClick={() => setShowNextEvent(false)}
                 className="absolute top-2 right-2 p-1 text-secondary-400 hover:text-secondary-600 hover:bg-white hover:bg-opacity-60 rounded-full transition-colors"
-                title="Dismiss"
+                title="Chiudi"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -397,7 +407,7 @@ const Overview = ({ project, setProject }) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Calendar className="w-4 h-4 text-primary-600" />
-                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
+                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Prossimo evento in arrivo</h3>
                   </div>
                   <h2 className="text-base font-bold text-secondary-900 mb-2">{nextSession.session_topic}</h2>
 
@@ -405,8 +415,8 @@ const Overview = ({ project, setProject }) => {
                     <div className="flex items-center gap-1.5 text-secondary-700">
                       <Calendar className="w-3.5 h-3.5 text-primary-600" />
                       <div>
-                        <div className="text-xs text-secondary-500">Date</div>
-                        <div className="text-sm font-semibold">
+                        <div className="text-xs text-secondary-500">Data</div>
+                        <div className="font-semibold">
                           {sessionDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
                       </div>
@@ -415,8 +425,8 @@ const Overview = ({ project, setProject }) => {
                     <div className="flex items-center gap-1.5 text-secondary-700">
                       <Clock className="w-3.5 h-3.5 text-primary-600" />
                       <div>
-                        <div className="text-xs text-secondary-500">Time & Duration</div>
-                        <div className="text-sm font-semibold">
+                        <div className="text-xs text-secondary-500">Ora e durata</div>
+                        <div className="font-semibold">
                           {nextSession.start_time && <span className="text-primary-600">{nextSession.start_time}</span>}
                           {nextSession.start_time && nextSession.duration && <span className="text-secondary-400 mx-1">•</span>}
                           {nextSession.duration && <span>{nextSession.duration} h</span>}
@@ -428,8 +438,8 @@ const Overview = ({ project, setProject }) => {
                       <div className="flex items-start gap-1.5 text-secondary-700">
                         <Users className="w-3.5 h-3.5 text-primary-600 mt-0.5" />
                         <div>
-                          <div className="text-xs text-secondary-500 mb-0.5">Attendees</div>
-                          <div className="text-sm font-semibold">
+                          <div className="text-xs text-secondary-500 mb-0.5">Partecipanti</div>
+                          <div className="font-semibold">
                             {nextSession.attendees.split(',').map((attendee, index) => (
                               <div key={index}>{attendee.trim()}</div>
                             ))}
@@ -450,7 +460,7 @@ const Overview = ({ project, setProject }) => {
                   <div className="bg-primary-600 text-white rounded px-3 py-2 min-w-[60px]">
                     <div className="text-2xl font-bold">{daysUntil}</div>
                     <div className="text-xs uppercase tracking-wide">
-                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
+                      {daysUntil === 0 ? 'Oggi' : daysUntil === 1 ? 'Giorno' : 'Giorni'}
                     </div>
                   </div>
                   <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium border mt-2 ${getStatusColor(nextSession.status)}`}>
@@ -471,7 +481,7 @@ const Overview = ({ project, setProject }) => {
           className="flex items-center justify-between cursor-pointer px-4 py-3 bg-gradient-to-r from-primary-100 to-primary-200 hover:from-primary-200 hover:to-primary-300 transition-colors border-b-2 border-primary-300"
           onClick={() => setShowProjectDetails(!showProjectDetails)}
         >
-          <h2 className="text-base font-semibold text-secondary-900">Project Details</h2>
+          <h2 className="text-base font-semibold text-secondary-900">Dettagli progetto</h2>
           {showProjectDetails ? (
             <ChevronUp className="w-5 h-5 text-secondary-700" />
           ) : (
@@ -482,17 +492,17 @@ const Overview = ({ project, setProject }) => {
         {showProjectDetails && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
             <div>
-              <label className="block text-sm font-semibold text-secondary-900 mb-1">Machine Family</label>
+              <label className="block font-semibold text-secondary-900 mb-1">Famiglia macchina</label>
               <input
                 type="text"
                 value={project.machine_family || ''}
                 onChange={(e) => handleChange('machine_family', e.target.value)}
-                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter machine family"
+                className="w-full px-2.5 py-1.5 bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Inserisci la famiglia macchina"
               />
             </div>
             <div>
-              <div className="block text-sm font-semibold text-secondary-900 mb-1 invisible">Deliverable</div>
+              <div className="block font-semibold text-secondary-900 mb-1 invisible">Deliverable</div>
               <label className="flex items-center gap-2 cursor-pointer px-2.5 py-1.5">
                 <input
                   type="checkbox"
@@ -500,11 +510,11 @@ const Overview = ({ project, setProject }) => {
                   onChange={(e) => handleChange('deliverable', e.target.checked)}
                   className="w-4 h-4 text-primary-600 border-primary-400 rounded focus:ring-2 focus:ring-primary-500"
                 />
-                <span className="text-sm font-medium text-secondary-900">Deliverable (Voce a Listino)</span>
+                <span className="font-medium text-secondary-900">Deliverable (Voce a Listino)</span>
               </label>
             </div>
             <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-secondary-900 mb-1">Description</label>
+              <label className="block font-semibold text-secondary-900 mb-1">Descrizione</label>
               <textarea
                 ref={descriptionRef}
                 value={project.description || ''}
@@ -513,14 +523,14 @@ const Overview = ({ project, setProject }) => {
                   handleTextareaResize(e);
                 }}
                 onInput={handleTextareaResize}
-                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
-                placeholder="Provide a detailed description of the project"
+                className="w-full px-2.5 py-1.5 bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                placeholder="Fornisci una descrizione dettagliata del progetto"
                 rows="2"
                 style={{ minHeight: '60px' }}
               />
             </div>
             <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-secondary-900 mb-1">Context and Usage</label>
+              <label className="block font-semibold text-secondary-900 mb-1">Contesto e utilizzo</label>
               <textarea
                 ref={contextUsageRef}
                 value={project.context_usage || ''}
@@ -529,8 +539,8 @@ const Overview = ({ project, setProject }) => {
                   handleTextareaResize(e);
                 }}
                 onInput={handleTextareaResize}
-                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
-                placeholder="Describe the context and usage scenarios for this project"
+                className="w-full px-2.5 py-1.5 bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                placeholder="Descrivi il contesto e gli scenari d'uso per questo progetto"
                 rows="2"
                 style={{ minHeight: '60px' }}
               />
@@ -549,11 +559,11 @@ const Overview = ({ project, setProject }) => {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4 text-secondary-700" />
-                        <h3 className="text-sm font-semibold text-secondary-900">Project Timeline</h3>
+                        <h3 className="font-semibold text-secondary-900">Cronologia del progetto</h3>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-secondary-600">
                         <span className={`font-semibold ${timeline.remainingDays < 0 ? 'text-danger-600' : timeline.remainingDays < 7 ? 'text-warning-600' : 'text-success-600'}`}>
-                          {timeline.remainingDays} days remaining
+                          {timeline.remainingDays} giorni rimanenti
                         </span>
                       </div>
                     </div>
@@ -699,7 +709,7 @@ const Overview = ({ project, setProject }) => {
                           <div className="w-3 h-3 bg-danger-600 rounded-full border-2 border-white shadow-md"></div>
                           {/* TODAY label */}
                           <div className="mt-1 px-2 py-0.5 bg-danger-600 text-white text-xs font-bold rounded whitespace-nowrap">
-                            TODAY
+                            OGGI
                           </div>
                         </div>
                       </div>
@@ -707,20 +717,20 @@ const Overview = ({ project, setProject }) => {
                       {/* Date Labels */}
                       <div className="flex justify-between items-center mt-8 text-xs">
                         <div className="text-left">
-                          <div className="text-secondary-500 font-medium">Start</div>
-                          <div className="text-sm font-semibold text-secondary-900">
+                          <div className="text-secondary-500 font-medium">Inizio</div>
+                          <div className="font-semibold text-secondary-900">
                             {timeline.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </div>
                         </div>
                         <div className="text-center bg-success-50 px-3 py-1 rounded">
-                          <div className="text-secondary-500 font-medium">Duration</div>
-                          <div className="text-sm font-semibold text-secondary-900">
-                            {timeline.totalDays} days
+                          <div className="text-secondary-500 font-medium">Durata</div>
+                          <div className="font-semibold text-secondary-900">
+                            {timeline.totalDays} giorni
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-secondary-500 font-medium">Target</div>
-                          <div className="text-sm font-semibold text-secondary-900">
+                          <div className="text-secondary-500 font-medium">Data target</div>
+                          <div className="font-semibold text-secondary-900">
                             {timeline.end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </div>
                         </div>
@@ -734,14 +744,14 @@ const Overview = ({ project, setProject }) => {
                           <>
                             <CheckCircle className="w-4 h-4 text-success-600 flex-shrink-0" />
                             <span className="text-xs font-medium text-success-800">
-                              On Track - Work progress is ahead of schedule
+                              In linea - L'avanzamento del lavoro è in anticipo sul programma
                             </span>
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
                             <span className="text-xs font-medium text-warning-800">
-                              Behind Schedule - Work progress is {timeline.timeProgress - overallProgress}% behind timeline
+                              In ritardo - L'avanzamento del lavoro è indietro del {timeline.timeProgress - overallProgress}% rispetto alla pianificazione
                             </span>
                           </>
                         )}
@@ -758,36 +768,36 @@ const Overview = ({ project, setProject }) => {
       {/* Project Information and Quick Stats Side-by-Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
-          <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Project Information</h2>
+          <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Informazioni progetto</h2>
           <div className="space-y-3">
             <div className="flex flex-col md:flex-row gap-3">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name</label>
-                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded text-sm font-semibold text-secondary-900">
-                  {project.project_name || 'Not set'}
+                <label className="block font-medium text-secondary-700 mb-1">Nome progetto</label>
+                <div className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded font-semibold text-secondary-900">
+                  {project.project_name || 'Non impostato'}
                 </div>
               </div>
               <div className="flex-shrink-0 md:mt-1.5">
-                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Start Date</label>
+                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Data inizio</label>
                 <div className="px-2.5 py-2 bg-secondary-50 border border-secondary-200 rounded text-xs text-secondary-900 whitespace-nowrap">
-                  {project.start_date ? new Date(project.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+                  {project.start_date ? new Date(project.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Non impostata'}
                 </div>
               </div>
               <div className="flex-shrink-0 md:mt-1.5">
-                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Target Date</label>
+                <label className="block text-xs font-medium text-secondary-700 mb-1 text-center">Data target</label>
                 <div className="px-2.5 py-2 bg-secondary-50 border border-secondary-200 rounded text-xs text-secondary-900 whitespace-nowrap">
-                  {project.target_date ? new Date(project.target_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not set'}
+                  {project.target_date ? new Date(project.target_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Non impostata'}
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">R&D Project Lead</label>
+                <label className="block font-medium text-secondary-700 mb-1">Responsabile progetto R&D</label>
                 {project.rd_lead ? (
                   <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
                     <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-secondary-900">
+                      <span className="font-semibold text-secondary-900">
                         {project.rd_lead.split(' (')[0]}
                       </span>
                       <span className="text-xs text-secondary-600">
@@ -798,17 +808,17 @@ const Overview = ({ project, setProject }) => {
                 ) : (
                   <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
                     <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
-                    <span className="text-xs text-warning-700">No R&D team lead assigned</span>
+                    <span className="text-xs text-warning-700">Nessun responsabile R&D assegnato</span>
                   </div>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Automation Team Lead</label>
+                <label className="block font-medium text-secondary-700 mb-1">Responsabile team Automation</label>
                 {project.automation_lead ? (
                   <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-300 rounded">
                     <Star className="w-4 h-4 text-warning-600 fill-warning-600 flex-shrink-0" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-secondary-900">
+                      <span className="font-semibold text-secondary-900">
                         {project.automation_lead.split(' (')[0]}
                       </span>
                       <span className="text-xs text-secondary-600">
@@ -819,7 +829,7 @@ const Overview = ({ project, setProject }) => {
                 ) : (
                   <div className="flex items-center gap-2 px-3 py-2 bg-warning-50 border border-warning-300 rounded">
                     <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
-                    <span className="text-xs text-warning-700">No Automation team lead assigned</span>
+                    <span className="text-xs text-warning-700">Nessun responsabile Automation assegnato</span>
                   </div>
                 )}
               </div>
@@ -831,88 +841,100 @@ const Overview = ({ project, setProject }) => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-secondary-700" />
-                <h3 className="text-sm font-semibold text-secondary-900">Team Composition</h3>
+                <h3 className="font-semibold text-secondary-900">Composizione del team</h3>
               </div>
               <button onClick={() => setShowAddForm(!showAddForm)} className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-600 text-white text-xs rounded hover:bg-primary-700 transition-colors">
                 {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                {showAddForm ? 'Cancel' : 'Add Member'}
+                {showAddForm ? 'Annulla' : 'Aggiungi membro'}
               </button>
             </div>
             {showAddForm && (
               <div className="bg-primary-50 border border-primary-200 rounded p-3 mb-3">
-                <h4 className="text-sm font-semibold text-primary-900 mb-2">Add New Team Member</h4>
+                <h4 className="font-semibold text-primary-900 mb-2">Aggiungi nuovo membro del team</h4>
                 <div className="grid grid-cols-1 gap-2">
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Name <span className="text-danger-500">*</span></label>
-                    <input type="text" value={newContact.name} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="John Doe" />
+                    <label className="block font-medium text-secondary-700 mb-0.5">Nome <span className="text-danger-500">*</span></label>
+                    <input type="text" value={newContact.name} onChange={(e) => setNewContact({ ...newContact, name: e.target.value })} className="w-full px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Mario Rossi" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Role <span className="text-danger-500">*</span></label>
-                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, role: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Project Lead" />
+                    <label className="block font-medium text-secondary-700 mb-0.5">Ruolo <span className="text-danger-500">*</span></label>
+                    <input type="text" value={newContact.role} onChange={(e) => setNewContact({ ...newContact, role: e.target.value })} className="w-full px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Responsabile progetto" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Department <span className="text-danger-500">*</span></label>
-                    <select value={newContact.department} onChange={(e) => setNewContact({ ...newContact, department: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
-                      <option value="">Select Department</option>
+                    <label className="block font-medium text-secondary-700 mb-0.5">Reparto <span className="text-danger-500">*</span></label>
+                    <select value={newContact.department} onChange={(e) => setNewContact({ ...newContact, department: e.target.value })} className="w-full px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500">
+                      <option value="">Seleziona reparto</option>
                       <option value="R&D">R&D</option>
-                      <option value="Automation">Automation</option>
+                      <option value="Automazione">Automazione</option>
+                      <option value="Ufficio Meccanico">Ufficio Meccanico</option>
+                      <option value="Collaudo">Collaudo</option>
+                      <option value="Altro">Altro</option>
                     </select>
+                    {newContact.department === 'Altro' && (
+                      <input type="text" value={newContactCustomDept} onChange={(e) => setNewContactCustomDept(e.target.value)} className="w-full mt-1.5 px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Specifica il reparto..." />
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Email</label>
-                    <input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="john.doe@company.com" />
+                    <label className="block font-medium text-secondary-700 mb-0.5">Email</label>
+                    <input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} className="w-full px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="mario.rossi@azienda.com" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-0.5">Phone</label>
-                    <input type="tel" value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="+1-555-0123" />
+                    <label className="block font-medium text-secondary-700 mb-0.5">Telefono</label>
+                    <input type="tel" value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} className="w-full px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="+39-02-0000000" />
                   </div>
                 </div>
                 <div className="flex gap-2 mt-2">
-                  <button onClick={handleAddContact} disabled={saving} className="px-3 py-1.5 text-sm bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Adding...' : 'Add Team Member'}</button>
-                  <button onClick={() => { setShowAddForm(false); setNewContact({ name: '', role: '', department: '', email: '', phone: '' }); }} className="px-3 py-1.5 text-sm bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors">Cancel</button>
+                  <button onClick={handleAddContact} disabled={saving} className="px-3 py-1.5 bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Aggiunta...' : 'Aggiungi membro'}</button>
+                  <button onClick={() => { setShowAddForm(false); setNewContact({ name: '', role: '', department: '', email: '', phone: '' }); setNewContactCustomDept(''); }} className="px-3 py-1.5 bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors">Annulla</button>
                 </div>
               </div>
             )}
             {loading ? (
-              <div className="text-xs text-secondary-500 py-3">Loading team members...</div>
+              <div className="text-xs text-secondary-500 py-3">Caricamento membri del team...</div>
             ) : teamContacts.length === 0 ? (
-              <div className="text-xs text-secondary-500 py-3">No team members added yet. Click "Add Member" to get started.</div>
+              <div className="text-xs text-secondary-500 py-3">Nessun membro del team aggiunto. Clicca "Aggiungi membro" per iniziare.</div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {teamContacts.map((contact) => (
                   <div key={contact.id} className="bg-secondary-50 rounded p-3 border border-secondary-200 relative group">
                     {editingContact === contact.id ? (
                       <div>
-                        <h4 className="text-sm font-semibold text-secondary-900 mb-2">Edit Team Member</h4>
+                        <h4 className="font-semibold text-secondary-900 mb-2">Modifica membro del team</h4>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
-                            <input type="text" value={editContact.name} onChange={(e) => setEditContact({ ...editContact, name: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label className="block font-medium text-gray-700 mb-1">Nome <span className="text-red-500">*</span></label>
+                            <input type="text" value={editContact.name} onChange={(e) => setEditContact({ ...editContact, name: e.target.value })} className="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Role <span className="text-red-500">*</span></label>
-                            <input type="text" value={editContact.role} onChange={(e) => setEditContact({ ...editContact, role: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label className="block font-medium text-gray-700 mb-1">Ruolo <span className="text-red-500">*</span></label>
+                            <input type="text" value={editContact.role} onChange={(e) => setEditContact({ ...editContact, role: e.target.value })} className="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Department <span className="text-red-500">*</span></label>
-                            <select value={editContact.department} onChange={(e) => setEditContact({ ...editContact, department: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                              <option value="">Select Department</option>
+                            <label className="block font-medium text-gray-700 mb-1">Reparto <span className="text-red-500">*</span></label>
+                            <select value={editContact.department} onChange={(e) => setEditContact({ ...editContact, department: e.target.value })} className="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              <option value="">Seleziona reparto</option>
                               <option value="R&D">R&D</option>
-                              <option value="Automation">Automation</option>
+                              <option value="Automazione">Automazione</option>
+                              <option value="Ufficio Meccanico">Ufficio Meccanico</option>
+                              <option value="Collaudo">Collaudo</option>
+                              <option value="Altro">Altro</option>
                             </select>
+                            {editContact.department === 'Altro' && (
+                              <input type="text" value={editContactCustomDept} onChange={(e) => setEditContactCustomDept(e.target.value)} className="w-full mt-1.5 px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specifica il reparto..." />
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" value={editContact.email} onChange={(e) => setEditContact({ ...editContact, email: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label className="block font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" value={editContact.email} onChange={(e) => setEditContact({ ...editContact, email: e.target.value })} className="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="mario.rossi@azienda.com" />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="tel" value={editContact.phone} onChange={(e) => setEditContact({ ...editContact, phone: e.target.value })} className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <label className="block font-medium text-gray-700 mb-1">Telefono</label>
+                            <input type="tel" value={editContact.phone} onChange={(e) => setEditContact({ ...editContact, phone: e.target.value })} className="w-full px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                           </div>
                         </div>
                         <div className="flex gap-2 mt-3">
-                          <button onClick={handleUpdateContact} disabled={saving} className="flex-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
-                          <button onClick={handleCancelEdit} className="flex-1 px-3 py-1.5 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">Cancel</button>
+                          <button onClick={handleUpdateContact} disabled={saving} className="flex-1 px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50">{saving ? 'Salvataggio...' : 'Salva'}</button>
+                          <button onClick={handleCancelEdit} className="flex-1 px-3 py-1.5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">Annulla</button>
                         </div>
                       </div>
                     ) : (
@@ -920,7 +942,7 @@ const Overview = ({ project, setProject }) => {
                         {(() => {
                           const memberIdentifier = `${contact.name} (${contact.role})`;
                           const isRDLead = contact.department === 'R&D' && project.rd_lead === memberIdentifier;
-                          const isAutomationLead = contact.department === 'Automation' && project.automation_lead === memberIdentifier;
+                          const isAutomationLead = contact.department === 'Automazione' && project.automation_lead === memberIdentifier;
                           const isLead = isRDLead || isAutomationLead;
 
                           return (
@@ -933,19 +955,19 @@ const Overview = ({ project, setProject }) => {
                                       ? 'bg-warning-100 text-warning-600 hover:bg-warning-200 opacity-100'
                                       : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200 opacity-0 group-hover:opacity-100'
                                   }`}
-                                  title={isLead ? `Current ${contact.department} Lead` : `Set as ${contact.department} Lead`}
+                                  title={isLead ? `Responsabile ${contact.department} attuale` : `Imposta come responsabile ${contact.department}`}
                                 >
                                   <Star className={`w-3.5 h-3.5 ${isLead ? 'fill-warning-600' : ''}`} />
                                 </button>
-                                <button onClick={() => handleEditClick(contact)} className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-all opacity-0 group-hover:opacity-100" title="Edit team member"><Edit className="w-3.5 h-3.5" /></button>
-                                <button onClick={() => handleDeleteContact(contact.id)} className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-all opacity-0 group-hover:opacity-100" title="Remove team member"><Trash2 className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => handleEditClick(contact)} className="p-1 bg-primary-100 text-primary-600 rounded hover:bg-primary-200 transition-all opacity-0 group-hover:opacity-100" title="Modifica membro del team"><Edit className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => handleDeleteContact(contact.id)} className="p-1 bg-danger-100 text-danger-600 rounded hover:bg-danger-200 transition-all opacity-0 group-hover:opacity-100" title="Rimuovi membro del team"><Trash2 className="w-3.5 h-3.5" /></button>
                               </div>
                               <div className="flex items-start justify-between">
                                 <div className="flex-1 pr-6">
-                                  <h4 className="text-sm font-semibold text-secondary-900">{contact.name}</h4>
+                                  <h4 className="font-semibold text-secondary-900">{contact.name}</h4>
                                   <p className="text-xs text-secondary-600 mt-0.5">{contact.role}</p>
                                   <div className="mt-1.5 space-y-0.5">
-                                    <p className="text-xs text-secondary-500"><span className="font-medium">Department:</span> {contact.department}</p>
+                                    <p className="text-xs text-secondary-500"><span className="font-medium">Reparto:</span> {contact.department}</p>
                                     {contact.email && <p className="text-xs text-primary-600"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
                                     {contact.phone && <p className="text-xs text-secondary-500">{contact.phone}</p>}
                                   </div>
@@ -966,9 +988,9 @@ const Overview = ({ project, setProject }) => {
 
       {/* Project Metrics Summary */}
       <div className="bg-gradient-to-br from-white to-secondary-50 rounded shadow-md border-2 border-secondary-200 p-4">
-        <h2 className="text-sm font-semibold text-secondary-900 mb-3 flex items-center gap-2">
+        <h2 className="font-semibold text-secondary-900 mb-3 flex items-center gap-2">
           <div className="w-1 h-5 bg-primary-500 rounded-full"></div>
-          Project Metrics & Progress
+          Metriche e avanzamento progetto
         </h2>
         <div className="flex flex-wrap items-center gap-3">
           {/* Task Statistics */}
@@ -977,8 +999,8 @@ const Overview = ({ project, setProject }) => {
               <Circle className="w-4 h-4 text-secondary-600" />
             </div>
             <div>
-              <div className="text-sm font-bold text-secondary-600">{getNotStartedTasksCount()}</div>
-              <div className="text-xs text-secondary-500">Not Started</div>
+              <div className="font-bold text-secondary-600">{getNotStartedTasksCount()}</div>
+              <div className="text-xs text-secondary-500">Non iniziato</div>
             </div>
           </div>
 
@@ -987,8 +1009,8 @@ const Overview = ({ project, setProject }) => {
               <Clock className="w-4 h-4 text-warning-600" />
             </div>
             <div>
-              <div className="text-sm font-bold text-warning-600">{getInProgressTasksCount()}</div>
-              <div className="text-xs text-secondary-500">In Progress</div>
+              <div className="font-bold text-warning-600">{getInProgressTasksCount()}</div>
+              <div className="text-xs text-secondary-500">In corso</div>
             </div>
           </div>
 
@@ -997,17 +1019,17 @@ const Overview = ({ project, setProject }) => {
               <CheckCircle className="w-4 h-4 text-success-600" />
             </div>
             <div>
-              <div className="text-sm font-bold text-success-600">{getCompletedTasksCount()}</div>
-              <div className="text-xs text-secondary-500">Completed</div>
+              <div className="font-bold text-success-600">{getCompletedTasksCount()}</div>
+              <div className="text-xs text-secondary-500">Completate</div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg border-2 border-primary-300 shadow-sm">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-500">
-              <span className="text-sm font-bold text-white">{calculateOverallProgress()}%</span>
+              <span className="font-bold text-white">{calculateOverallProgress()}%</span>
             </div>
             <div>
-              <div className="text-xs text-primary-700 font-medium">Overall Progress</div>
+              <div className="text-xs text-primary-700 font-medium">Avanzamento complessivo</div>
             </div>
           </div>
 
@@ -1018,23 +1040,23 @@ const Overview = ({ project, setProject }) => {
           <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-secondary-200 shadow-sm">
             <AlertCircle className="w-5 h-5 text-primary-600" />
             <div>
-              <div className="text-xs text-secondary-500">Priority</div>
-              <div className="text-sm font-semibold text-secondary-900">{project.business_priority || 'Media'}</div>
+              <div className="text-xs text-secondary-500">Priorità</div>
+              <div className="font-semibold text-secondary-900">{project.business_priority || 'Media'}</div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-secondary-200 shadow-sm">
             <Layers className="w-5 h-5 text-secondary-600" />
             <div>
-              <div className="text-xs text-secondary-500">Complexity</div>
-              <div className="text-sm font-semibold text-secondary-900">{project.complexity_level || 'Media'}</div>
+              <div className="text-xs text-secondary-500">Complessità</div>
+              <div className="font-semibold text-secondary-900">{project.complexity_level || 'Media'}</div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
-        <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Handover Process Overview</h2>
+        <h2 className="text-base font-semibold text-secondary-900 mb-3 pb-2 border-b border-secondary-200">Panoramica del processo di consegna</h2>
         <div className="space-y-2">
           {phases.map((phase, index) => (
             <div key={index} className={`p-3 rounded border transition-all group ${
@@ -1042,7 +1064,7 @@ const Overview = ({ project, setProject }) => {
                 phase.status === 'progress' ? 'bg-warning-50 border-warning-200' : 'bg-secondary-50 border-secondary-200'
               }`}>
               <div className="flex items-start gap-3">
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                     phase.status === 'complete' ? 'bg-success-500 text-white' :
                     phase.status === 'progress' ? 'bg-warning-500 text-white' : 'bg-secondary-300 text-secondary-600'
                   }`}>
@@ -1052,24 +1074,24 @@ const Overview = ({ project, setProject }) => {
                   {editingPhase === phase.id ? (
                     // Edit Mode
                     <div className="bg-white p-3 rounded border border-primary-300">
-                      <h4 className="text-sm font-semibold text-secondary-900 mb-3">Edit Phase Dates</h4>
+                      <h4 className="font-semibold text-secondary-900 mb-3">Modifica date della fase</h4>
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                          <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
+                          <label className="block font-medium text-secondary-700 mb-1">Data inizio</label>
                           <input
                             type="date"
                             value={phaseEditData.startDate || ''}
                             onChange={(e) => setPhaseEditData({ ...phaseEditData, startDate: e.target.value })}
-                            className="w-full px-2 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full px-2 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-secondary-700 mb-1">End Date</label>
+                          <label className="block font-medium text-secondary-700 mb-1">Data fine</label>
                           <input
                             type="date"
                             value={phaseEditData.endDate || ''}
                             onChange={(e) => setPhaseEditData({ ...phaseEditData, endDate: e.target.value })}
-                            className="w-full px-2 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            className="w-full px-2 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                         </div>
                       </div>
@@ -1079,13 +1101,13 @@ const Overview = ({ project, setProject }) => {
                           disabled={saving}
                           className="px-3 py-1.5 text-xs bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50"
                         >
-                          {saving ? 'Saving...' : 'Save'}
+                          {saving ? 'Salvataggio...' : 'Salva'}
                         </button>
                         <button
                           onClick={handleCancelPhaseEdit}
                           className="px-3 py-1.5 text-xs bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors"
                         >
-                          Cancel
+                          Annulla
                         </button>
                       </div>
                     </div>
@@ -1094,11 +1116,11 @@ const Overview = ({ project, setProject }) => {
                     <>
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-semibold text-secondary-900">{phase.name}</h3>
+                          <h3 className="font-semibold text-secondary-900">{phase.name}</h3>
                           <button
                             onClick={() => handleEditPhaseClick(phase.id)}
                             className="opacity-0 group-hover:opacity-100 p-1 text-primary-600 hover:bg-primary-100 rounded transition-all"
-                            title="Edit phase dates"
+                            title="Modifica date della fase"
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
@@ -1116,12 +1138,12 @@ const Overview = ({ project, setProject }) => {
                           <Calendar className="w-3.5 h-3.5" />
                           {phaseDates[phase.id].startDate && (
                             <span>
-                              <span className="font-medium">Start:</span> {new Date(phaseDates[phase.id].startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              <span className="font-medium">Inizio:</span> {new Date(phaseDates[phase.id].startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
                           )}
                           {phaseDates[phase.id].endDate && (
                             <span>
-                              <span className="font-medium">End:</span> {new Date(phaseDates[phase.id].endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              <span className="font-medium">Fine:</span> {new Date(phaseDates[phase.id].endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
                           )}
                         </div>
@@ -1135,11 +1157,11 @@ const Overview = ({ project, setProject }) => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="font-medium text-secondary-700">Key Activities:</span>
+                          <span className="font-medium text-secondary-700">Attività principali:</span>
                           <p className="text-secondary-600 mt-0.5">{phase.activities}</p>
                         </div>
                         <div>
-                          <span className="font-medium text-secondary-700">Success Criteria:</span>
+                          <span className="font-medium text-secondary-700">Criteri di successo:</span>
                           <p className="text-secondary-600 mt-0.5">{phase.criteria}</p>
                         </div>
                       </div>

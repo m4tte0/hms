@@ -249,6 +249,66 @@ function initializeDatabase() {
       )
     `);
 
+    // Phase dates table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS phase_dates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        phase_id TEXT NOT NULL,
+        start_date DATE,
+        end_date DATE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+        UNIQUE(project_id, phase_id)
+      )
+    `);
+
+    // Newsletter subscriptions table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        email TEXT NOT NULL,
+        subscribed INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+        UNIQUE(project_id, email)
+      )
+    `);
+
+    // Newsletter settings table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS newsletter_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL UNIQUE,
+        enabled INTEGER DEFAULT 1,
+        include_metrics INTEGER DEFAULT 1,
+        include_tasks INTEGER DEFAULT 1,
+        include_issues INTEGER DEFAULT 1,
+        include_team_changes INTEGER DEFAULT 1,
+        include_attachments INTEGER DEFAULT 1,
+        include_upcoming_events INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Newsletter history table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS newsletter_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER NOT NULL,
+        recipient_email TEXT NOT NULL,
+        subject TEXT,
+        sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        status TEXT DEFAULT 'sent',
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+      )
+    `);
+
     // Add complexity_level and project_score columns if they don't exist
     db.run(`
       ALTER TABLE projects ADD COLUMN complexity_level TEXT DEFAULT 'Media'
@@ -316,6 +376,38 @@ function initializeDatabase() {
       }
     });
 
+    db.run(`
+      ALTER TABLE projects ADD COLUMN machine_family TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding machine_family column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN description TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding description column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN context_usage TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding context_usage column:', err.message);
+      }
+    });
+
+    db.run(`
+      ALTER TABLE projects ADD COLUMN deliverable TEXT
+    `, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding deliverable column:', err.message);
+      }
+    });
+
     // Create indexes for better performance
     db.run('CREATE INDEX IF NOT EXISTS idx_project_handover_id ON projects(handover_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_checklist_project ON checklist_items(project_id)');
@@ -326,6 +418,9 @@ function initializeDatabase() {
     db.run('CREATE INDEX IF NOT EXISTS idx_attachments_project ON attachments(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_features_project ON features(project_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_criticalities_project ON project_criticalities(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_phase_dates_project ON phase_dates(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_newsletter_subs_project ON newsletter_subscriptions(project_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_newsletter_history_project ON newsletter_history(project_id)');
 
     console.log('Database initialized successfully');
   });

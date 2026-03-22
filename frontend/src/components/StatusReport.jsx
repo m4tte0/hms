@@ -21,25 +21,20 @@ const StatusReport = ({ projectId, onClose }) => {
       setReportData(response.data);
     } catch (err) {
       console.error('Error loading report:', err);
-      setError('Failed to load report data');
+      setError('Errore nel caricamento dei dati del report');
     } finally {
       setLoading(false);
     }
   };
 
   const handlePrint = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const name = (reportData?.project?.project_name || 'Project').replace(/[^a-zA-Z0-9À-ÿ\-_ ]/g, '').trim().replace(/\s+/g, '_');
-    const id = reportData?.project?.handover_id || reportData?.project?.id || '';
-    const originalTitle = document.title;
-    document.title = `${name}_${id}_${today}`;
+    // Trigger browser print dialog
     window.print();
-    document.title = originalTitle;
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return 'N/D';
+    return new Date(dateString).toLocaleDateString('it-IT', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -95,7 +90,7 @@ const StatusReport = ({ projectId, onClose }) => {
         <div className="bg-white rounded-lg p-8 max-w-md">
           <div className="flex items-center space-x-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="text-lg">Generating report...</span>
+            <span className="text-lg">Caricamento report...</span>
           </div>
         </div>
       </div>
@@ -111,7 +106,7 @@ const StatusReport = ({ projectId, onClose }) => {
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
           >
-            Close
+            Chiudi
           </button>
         </div>
       </div>
@@ -120,7 +115,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
   if (!reportData) return null;
 
-  const { project, statistics, teamContacts, checklistByPhase, knowledgeSessions, issues, attachments, phaseNames, features } = reportData;
+  const { project, statistics, teamContacts, checklistByPhase, knowledgeSessions, issues, attachments, phaseNames, features, criticalities } = reportData;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto p-4">
@@ -129,7 +124,7 @@ const StatusReport = ({ projectId, onClose }) => {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center print:hidden">
           <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6" />
-            <h2 className="text-2xl font-bold">Handover Status Report</h2>
+            <h2 className="text-2xl font-bold">Report di Stato Handover</h2>
           </div>
           <div className="flex space-x-2">
             <button
@@ -137,7 +132,7 @@ const StatusReport = ({ projectId, onClose }) => {
               className="flex items-center space-x-2 px-4 py-2 bg-white text-blue-600 rounded hover:bg-blue-50 transition"
             >
               <Printer className="w-4 h-4" />
-              <span>Print</span>
+              <span>Stampa</span>
             </button>
             <button
               onClick={onClose}
@@ -150,35 +145,12 @@ const StatusReport = ({ projectId, onClose }) => {
 
         {/* Report Content */}
         <div ref={reportRef} className="report-content flex-1 overflow-auto p-8 print:p-4">
-
-          {/* Per-page header — visible only in print, fixed so it repeats on every page */}
-          <div className="report-page-header hidden print:flex items-center justify-between">
-            <span className="font-semibold text-slate-700">{project.project_name || 'Handover Report'}</span>
-            <span className="text-slate-500">{project.handover_id || ''}</span>
-          </div>
-
-          {/* Per-page footer — visible only in print */}
-          <div className="report-page-footer hidden print:flex">
-            <span className="text-slate-400" style={{flex: 1}}>
-              {new Date().toISOString().replace('T', ' ').slice(0, 16)}
-            </span>
-            <span className="text-slate-600 font-medium">
-              {`${(project.project_name || '').replace(/\s+/g, '_')}_${project.handover_id || ''}_${new Date().toISOString().split('T')[0]}`}
-            </span>
-            <span className="footer-page-num" style={{flex: 1}}></span>
-          </div>
-
           {/* Frontispiece - Cover Page for Print */}
-          <div className="hidden print:flex print:flex-col print:justify-center print:items-center print:min-h-screen print:page-break-after-always text-center">
-            {/* Top spacing */}
-            <div className="flex-1"></div>
-
-            {/* Main content */}
-            <div className="flex-1 flex flex-col justify-center">
-              {/* Document Type - hidden in print */}
-              <div className="mb-8 print:hidden">
+          <div className="hidden print:flex print:flex-col print:page-break-after-always text-center">
+            {/* Document Type */}
+              <div className="mb-4">
                 <div className="inline-block px-6 py-2 border-2 border-slate-300 rounded-lg">
-                  <p className="text-sm uppercase tracking-widest text-slate-600 font-semibold">
+                  <p className="uppercase tracking-widest text-slate-600 font-semibold">
                     Handover Management System
                   </p>
                 </div>
@@ -190,101 +162,141 @@ const StatusReport = ({ projectId, onClose }) => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-xl font-semibold text-purple-700 mb-12">
-                Status Report
+              <p className="text-xl text-slate-600 mb-5">
+                Report di Rilascio Progetto
               </p>
 
               {/* Divider */}
-              <div className="w-32 h-1 bg-slate-600 mx-auto mb-12"></div>
+              <div className="w-32 h-1 bg-slate-600 mx-auto mb-5"></div>
 
               {/* Metadata */}
-              <div className="space-y-4 text-slate-700">
+              <div className="space-y-2 text-slate-700">
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">ID Progetto</p>
-                  <p className="text-lg font-semibold">{project.handover_id || 'N/A'}</p>
+                  <p className="uppercase tracking-wide text-slate-500 mb-1">ID Progetto</p>
+                  <p className="text-lg font-semibold">{project.handover_id || 'N/D'}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Data di Inizio</p>
-                  <p className="text-lg font-semibold">{formatDate(project.start_date)}</p>
+                  <p className="uppercase tracking-wide text-slate-500 mb-1">Date Rilascio</p>
+                  <p className="text-lg font-semibold">{formatDate(project.start_date)} — {formatDate(project.target_date)}</p>
                 </div>
+              </div>
 
-                <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-1">Data di Generazione</p>
-                  <p className="text-lg font-semibold">{formatDate(new Date().toISOString())}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm uppercase tracking-wide text-blue-600 mb-2">Team</p>
-                  {teamContacts.length > 0 ? (
-                    <div className="space-y-1">
-                      {teamContacts.map((member, idx) => (
-                        <p key={idx} className="text-base font-semibold">
-                          {member.name}
-                          {member.role && <span className="text-sm font-normal text-slate-500 ml-2">— {member.role}</span>}
-                        </p>
+              {/* Team nel frontespizio - R&D a sinistra, altri a destra */}
+              {teamContacts.length > 0 && (() => {
+                const rdLeadName = project.rd_lead?.toLowerCase();
+                const automationLeadName = project.automation_lead?.toLowerCase();
+                const rdContacts = teamContacts
+                  .filter(c => c.department === 'R&D')
+                  .sort((a, b) => {
+                    const aIsLead = a.name?.toLowerCase() === rdLeadName;
+                    const bIsLead = b.name?.toLowerCase() === rdLeadName;
+                    if (aIsLead && !bIsLead) return -1;
+                    if (!aIsLead && bIsLead) return 1;
+                    return 0;
+                  });
+                const otherContacts = teamContacts
+                  .filter(c => c.department !== 'R&D')
+                  .sort((a, b) => {
+                    const aIsLead = a.name?.toLowerCase() === automationLeadName;
+                    const bIsLead = b.name?.toLowerCase() === automationLeadName;
+                    if (aIsLead && !bIsLead) return -1;
+                    if (!aIsLead && bIsLead) return 1;
+                    return 0;
+                  });
+                const renderCoverTable = (contacts) => (
+                  <table className="w-full text-xs border border-slate-300 mt-1">
+                    <thead className="bg-slate-100">
+                      <tr>
+                        <th className="px-2 py-1 text-left font-semibold text-slate-600">Reparto</th>
+                        <th className="px-2 py-1 text-left font-semibold text-slate-600">Ruolo</th>
+                        <th className="px-2 py-1 text-left font-semibold text-slate-600">Nome</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contacts.map((c, i) => (
+                        <tr key={i} className="border-t border-slate-200">
+                          <td className="px-2 py-1 text-slate-700">{c.department}</td>
+                          <td className="px-2 py-1 text-slate-700">{c.role}</td>
+                          <td className="px-2 py-1 font-medium text-slate-800">{c.name}</td>
+                        </tr>
                       ))}
+                    </tbody>
+                  </table>
+                );
+                return (
+                  <div className="mt-4 w-full text-left">
+                    <div className="w-32 h-0.5 bg-slate-300 mb-4"></div>
+                    <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold mb-3">Composizione del Team</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        {rdContacts.length > 0 ? renderCoverTable(rdContacts) : <p className="text-xs text-slate-400 italic">Nessun membro R&amp;D</p>}
+                      </div>
+                      <div>
+                        {otherContacts.length > 0 ? renderCoverTable(otherContacts) : <p className="text-xs text-slate-400 italic">Nessun altro membro</p>}
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-lg font-semibold">{project.automation_lead || project.rd_lead || 'Project Team'}</p>
-                  )}
+                  </div>
+                );
+              })()}
+
+            {/* Funzioni progettate e collaudate nel frontespizio */}
+            {project.funzioni_progettate && (
+              <div className="mt-4 w-full text-left">
+                <div className="w-full h-0.5 bg-slate-200 mb-3"></div>
+                <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold mb-2">Funzioni progettate e collaudate</p>
+                <div
+                  className="text-xs text-slate-700 leading-relaxed ql-editor-readonly"
+                  dangerouslySetInnerHTML={{ __html: project.funzioni_progettate }}
+                />
+              </div>
+            )}
+
+            {/* TOC nel frontespizio */}
+            <div className="mt-5 w-full text-left">
+              <div className="w-full h-0.5 bg-slate-200 mb-2"></div>
+              <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold mb-2">Indice</p>
+              <div className="flex flex-col gap-0">
+                <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">1. Riepilogo Progetto</span>
                 </div>
+                {features && features.length > 0 && (
+                  <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                    <span className="font-medium text-slate-700">2. Specifiche Funzionalità</span>
+                  </div>
+                )}
+                {(project.osservazioni_note || project.azioni_correttive || (criticalities && criticalities.length > 0)) && (
+                  <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                    <span className="font-medium text-slate-700">3. Osservazioni, Note e Criticità</span>
+                  </div>
+                )}
+                <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">4. Panoramica Processo Handover</span>
+                </div>
+                <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                  <span className="font-medium text-slate-700">5. Dettaglio Stato Checklist</span>
+                </div>
+                {issues.length > 0 && (
+                  <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                    <span className="font-medium text-slate-700">6. Problemi e Rischi</span>
+                  </div>
+                )}
+                {attachments.length > 0 && (
+                  <div className="flex items-center py-0.5 border-b border-dotted border-slate-300">
+                    <span className="font-medium text-slate-700">7. Allegati e Documentazione</span>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Bottom spacer */}
-            <div className="flex-1"></div>
-          </div>
-
-          {/* Table of Contents */}
-          <div className="mb-6 print-page-break-before">
-            <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b-2 border-slate-600 pb-2">
-              Indice
-            </h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                <span className="font-medium text-slate-700">1. Informazioni Progetto</span>
-              </div>
-              {teamContacts.length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">2. Composizione del Team</span>
-                </div>
-              )}
-              {features && features.length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">3. Specifiche Funzionalità</span>
-                </div>
-              )}
-              {Object.keys(checklistByPhase).length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">4. Dettaglio Checklist</span>
-                </div>
-              )}
-              {knowledgeSessions.length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">5. Calendario Sessioni</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300 print:hidden">
-                <span className="font-medium text-slate-700">6. Avanzamento Progetto</span>
-              </div>
-              {issues.length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">7. Criticità</span>
-                </div>
-              )}
-              {attachments.length > 0 && (
-                <div className="flex items-center justify-between py-1 border-b border-dotted border-slate-300">
-                  <span className="font-medium text-slate-700">8. Allegati e Documentazione</span>
-                </div>
-              )}
-            </div>
+            <p className="text-xs text-slate-500 mt-4">
+              Generato il {formatDate(new Date().toISOString())}
+            </p>
           </div>
 
           {/* COMPACT HEADER: Sections 1-4 Combined */}
-          <section className="mb-6 page-break-inside-avoid print-page-break-before">
+          <section className="mb-6 page-break-inside-avoid">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-slate-600 pb-2">
-              Informazioni Progetto
+              Riepilogo Progetto
             </h3>
 
             {/* Two-column layout for compact display */}
@@ -294,42 +306,42 @@ const StatusReport = ({ projectId, onClose }) => {
               <div className="space-y-4">
                 {/* Project Information */}
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                  <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Informazioni Progetto
                   </h4>
                   <div className="space-y-2">
                     <div className="flex flex-col md:flex-row gap-2">
                       <div className="flex-1">
                         <label className="block text-xs font-medium text-slate-600 mb-0.5">Nome Progetto</label>
-                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-900">
-                          {project.project_name || 'N/A'}
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded font-semibold text-slate-900">
+                          {project.project_name || 'N/D'}
                         </div>
                       </div>
                       <div className="flex-shrink-0">
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">ID</label>
-                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
-                          {project.handover_id || 'N/A'}
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">ID Handover</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-slate-700">
+                          {project.handover_id || 'N/D'}
                         </div>
                       </div>
                       <div className="flex-shrink-0 print:hidden">
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Status</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Stato</label>
                         <div className="px-2 py-1.5">
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
-                            {project.status || 'Active'}
+                            {project.status || 'Attivo'}
                           </span>
                         </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 print:hidden">
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Current Phase</label>
-                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
-                          {project.current_phase || 'Phase 1'}
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Fase Corrente</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-slate-700">
+                          {project.current_phase || 'Fase 1'}
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Project Score</label>
-                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm font-semibold text-slate-700">
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Punteggio Progetto</label>
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded font-semibold text-slate-700">
                           {project.project_score || 0}
                         </div>
                       </div>
@@ -338,24 +350,24 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
 
                 {/* Project Metrics */}
-                <div className="print:hidden">
-                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Project Metrics
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                    Metriche Progetto
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Priority</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Priorità</label>
                       <div className="px-2 py-1.5">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getPriorityColor(project.business_priority)}`}>
-                          {project.business_priority || 'Not set'}
+                          {project.business_priority || 'Non impostata'}
                         </span>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Complexity</label>
+                      <label className="block text-xs font-medium text-slate-600 mb-0.5">Complessità</label>
                       <div className="px-2 py-1.5">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getPriorityColor(project.complexity_level)}`}>
-                          {project.complexity_level || 'Not set'}
+                          {project.complexity_level || 'Non impostata'}
                         </span>
                       </div>
                     </div>
@@ -364,19 +376,19 @@ const StatusReport = ({ projectId, onClose }) => {
 
                 {/* Project Details */}
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                  <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
                     Dettagli Progetto
                   </h4>
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-xs font-medium text-slate-600 mb-0.5">Famiglia Macchina</label>
-                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
-                          {project.machine_family || 'Not specified'}
+                        <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-slate-700">
+                          {project.machine_family || 'Non specificata'}
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Deliverable</label>
+                        <label className="block text-xs font-medium text-slate-600 mb-0.5">Deliverable (Voce a Listino)</label>
                         <div className="px-2 py-1.5">
                           {project.deliverable ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">
@@ -384,7 +396,7 @@ const StatusReport = ({ projectId, onClose }) => {
                               Yes (Voce a Listino)
                             </span>
                           ) : (
-                            <span className="text-sm text-slate-600">No</span>
+                            <span className="text-slate-600">No</span>
                           )}
                         </div>
                       </div>
@@ -410,20 +422,20 @@ const StatusReport = ({ projectId, onClose }) => {
 
                 {/* Leadership */}
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Responsabili
+                  <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                    Leadership Progetto
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-xs font-medium text-slate-600 mb-0.5">R&D Lead</label>
-                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
-                        {project.rd_lead || 'Not assigned'}
+                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-slate-700">
+                        {project.rd_lead || 'Non assegnato'}
                       </div>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-600 mb-0.5">Automation Lead</label>
-                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
-                        {project.automation_lead || 'Not assigned'}
+                      <div className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-slate-700">
+                        {project.automation_lead || 'Non assegnato'}
                       </div>
                     </div>
                   </div>
@@ -433,8 +445,8 @@ const StatusReport = ({ projectId, onClose }) => {
               {/* Right Column: Statistics Grid - Clean style matching Overview tab */}
               <div className="print:hidden">
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
-                    Progress Statistics
+                  <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                    Statistiche Avanzamento
                   </h4>
                   <div className="grid grid-cols-2 gap-3">
 
@@ -442,9 +454,9 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-slate-600 font-medium mb-1">Checklist</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Avanzamento Checklist</p>
                           <p className="text-xl font-bold text-slate-800 leading-none">{statistics.checklist.completed}/{statistics.checklist.total}</p>
-                          <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Done</p>
+                          <p className="text-xs text-emerald-600 font-medium mt-1">{statistics.checklist.completionPercentage}% Completato</p>
                         </div>
                         <CheckCircle className="w-5 h-5 text-emerald-500 opacity-50" />
                       </div>
@@ -454,9 +466,9 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-slate-600 font-medium mb-1">Sessions</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Sessioni</p>
                           <p className="text-xl font-bold text-slate-800 leading-none">{statistics.knowledge.completed}/{statistics.knowledge.total}</p>
-                          <p className="text-xs text-blue-600 font-medium mt-1">Completed</p>
+                          <p className="text-xs text-blue-600 font-medium mt-1">Completate</p>
                         </div>
                         <Users className="w-5 h-5 text-blue-500 opacity-50" />
                       </div>
@@ -466,9 +478,9 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-slate-600 font-medium mb-1">Open Issues</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">Problemi Aperti</p>
                           <p className="text-xl font-bold text-slate-800 leading-none">{statistics.issues.open + statistics.issues.inProgress}</p>
-                          <p className="text-xs text-amber-600 font-medium mt-1">of {statistics.issues.total} total</p>
+                          <p className="text-xs text-amber-600 font-medium mt-1">su {statistics.issues.total} totali</p>
                         </div>
                         <AlertTriangle className="w-5 h-5 text-amber-500 opacity-50" />
                       </div>
@@ -478,7 +490,7 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="bg-slate-50 border border-slate-200 rounded p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-xs text-slate-600 font-medium mb-1">Files</p>
+                          <p className="text-xs text-slate-600 font-medium mb-1">File Allegati</p>
                           <p className="text-xl font-bold text-slate-800 leading-none">{statistics.attachments.total}</p>
                           <p className="text-xs text-slate-600 font-medium mt-1">{formatFileSize(statistics.attachments.totalSize)}</p>
                         </div>
@@ -494,12 +506,12 @@ const StatusReport = ({ projectId, onClose }) => {
 
             {/* Project Timeline - Full Width - Clean style */}
             <div className="mt-4 page-break-inside-avoid">
-              <h4 className="text-sm font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200 flex items-center justify-between">
+              <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-slate-600" />
-                  <span>Linea Temporale</span>
+                  <span>Cronologia Progetto</span>
                 </div>
-                <span className={`text-xs font-semibold print:hidden ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                <span className={`text-xs font-semibold ${project.daysRemaining < 0 ? 'text-red-600' : project.daysRemaining < 7 ? 'text-amber-600' : 'text-emerald-600'}`}>
                   {project.daysRemaining !== null ? `${project.daysRemaining} giorni rimanenti` : ''}
                 </span>
               </h4>
@@ -551,7 +563,7 @@ const StatusReport = ({ projectId, onClose }) => {
                               >
                                 <div className="w-px h-3 bg-slate-400 opacity-40"></div>
                                 <div className="mt-0.5 text-[9px] text-slate-500 opacity-70 whitespace-nowrap">
-                                  {currentDate.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}
+                                  {currentDate.toLocaleDateString('it-IT', { month: 'short', year: '2-digit' })}
                                 </div>
                               </div>
                             );
@@ -563,7 +575,7 @@ const StatusReport = ({ projectId, onClose }) => {
 
                       {/* Today Marker */}
                       <div
-                        className="absolute top-0 flex flex-col items-center z-10"
+                        className="absolute top-0 flex flex-col items-center z-10 print:hidden"
                         style={{ left: `${timeProgress}%`, transform: 'translateX(-50%)' }}
                       >
                         <div className="w-0.5 h-3 bg-red-600"></div>
@@ -578,15 +590,15 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="flex justify-between items-center mt-8 text-xs">
                       <div className="text-left">
                         <div className="text-slate-500 font-medium">Inizio</div>
-                        <div className="text-sm font-semibold text-slate-900">{formatDate(project.start_date)}</div>
+                        <div className="font-semibold text-slate-900">{formatDate(project.start_date)}</div>
                       </div>
                       <div className="text-center bg-emerald-50 px-3 py-1 rounded">
                         <div className="text-slate-500 font-medium">Durata</div>
-                        <div className="text-sm font-semibold text-slate-900">{totalDays} days</div>
+                        <div className="font-semibold text-slate-900">{totalDays} giorni</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-slate-500 font-medium">Scadenza</div>
-                        <div className="text-sm font-semibold text-slate-900">{formatDate(project.target_date)}</div>
+                        <div className="text-slate-500 font-medium">Obiettivo</div>
+                        <div className="font-semibold text-slate-900">{formatDate(project.target_date)}</div>
                       </div>
                     </div>
                   </div>
@@ -599,12 +611,12 @@ const StatusReport = ({ projectId, onClose }) => {
                   {project.completionPercentage >= (project.daysRemaining !== null ? Math.round(((new Date() - new Date(project.start_date)) / (new Date(project.target_date) - new Date(project.start_date))) * 100) : 0) ? (
                     <>
                       <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                      <span className="text-xs font-medium text-emerald-800">In Linea - Avanzamento lavori ({project.completionPercentage}%) è in anticipo sui tempi</span>
+                      <span className="text-xs font-medium text-emerald-800">In Anticipo - Avanzamento lavori ({project.completionPercentage}%) è in anticipo rispetto alla pianificazione</span>
                     </>
                   ) : (
                     <>
                       <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                      <span className="text-xs font-medium text-amber-800">In Ritardo - Avanzamento lavori ({project.completionPercentage}%) è in ritardo sui tempi</span>
+                      <span className="text-xs font-medium text-amber-800">In Ritardo - Avanzamento lavori ({project.completionPercentage}%) è in ritardo rispetto alla pianificazione</span>
                     </>
                   )}
                 </div>
@@ -612,43 +624,53 @@ const StatusReport = ({ projectId, onClose }) => {
             </div>
           </section>
 
-          {/* Team Composition - Moved here for better organization */}
-          {teamContacts.length > 0 && (
-            <section className="mb-6 page-break-inside-avoid">
-              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                Composizione del Team
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 text-sm">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Reparto</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Ruolo</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Nome</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Email</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Telefono</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {teamContacts.map((contact, idx) => (
-                      <tr key={idx} className="border-t border-gray-200">
-                        <td className="px-3 py-2">{contact.department}</td>
-                        <td className="px-3 py-2">{contact.role}</td>
-                        <td className="px-3 py-2 font-medium">{contact.name}</td>
-                        <td className="px-3 py-2">{contact.email}</td>
-                        <td className="px-3 py-2">{contact.phone}</td>
+          {/* Team Composition */}
+          {teamContacts.length > 0 && (() => {
+            const leaderNamesBody = [project.rd_lead, project.automation_lead].filter(Boolean).map(n => n?.toLowerCase());
+            const sortedTeamBody = [...teamContacts].sort((a, b) => {
+              const aL = leaderNamesBody.includes(a.name?.toLowerCase());
+              const bL = leaderNamesBody.includes(b.name?.toLowerCase());
+              if (aL && !bL) return -1;
+              if (!aL && bL) return 1;
+              return 0;
+            });
+            return (
+              <section className="mb-6 page-break-inside-avoid print:hidden">
+                <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  Composizione del Team
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white border border-gray-200">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-semibold">Reparto</th>
+                        <th className="px-3 py-2 text-left text-xs font-semibold">Ruolo</th>
+                        <th className="px-3 py-2 text-left text-xs font-semibold">Nome</th>
+                        <th className="px-3 py-2 text-left text-xs font-semibold">Email</th>
+                        <th className="px-3 py-2 text-left text-xs font-semibold">Telefono</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+                    </thead>
+                    <tbody>
+                      {sortedTeamBody.map((contact, idx) => (
+                        <tr key={idx} className="border-t border-gray-200">
+                          <td className="px-3 py-2">{contact.department}</td>
+                          <td className="px-3 py-2">{contact.role}</td>
+                          <td className="px-3 py-2 font-medium">{contact.name}</td>
+                          <td className="px-3 py-2">{contact.email}</td>
+                          <td className="px-3 py-2">{contact.phone}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            );
+          })()}
 
           {/* Specifiche Funzionalità - Feature Specifications */}
           {features && features.length > 0 && (
-            <section className="mb-6 print-page-break-before">
+            <section className="mb-6">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-purple-500 pb-2 flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
                 Specifiche Funzionalità
@@ -662,11 +684,11 @@ const StatusReport = ({ projectId, onClose }) => {
                     <div className="p-4">
                       {/* Feature Name Header */}
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg text-sm font-semibold">
+                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg font-semibold">
                           #{idx + 1}
                         </span>
                         <h4 className="text-lg font-semibold text-secondary-900">
-                          {feature.feature_name || 'Unnamed Feature'}
+                          {feature.feature_name || 'Funzionalità senza nome'}
                         </h4>
                       </div>
 
@@ -674,11 +696,11 @@ const StatusReport = ({ projectId, onClose }) => {
                       <div className="space-y-3">
                         {/* Description */}
                         {feature.description && (
-                          <div className="bg-gray-50 rounded-lg p-3 page-break-inside-avoid">
+                          <div className="bg-gray-50 rounded-lg p-3">
                             <p className="text-xs font-semibold text-secondary-500 uppercase tracking-wide mb-1">
                               Descrizione
                             </p>
-                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-secondary-700 leading-relaxed whitespace-pre-wrap">
                               {feature.description}
                             </p>
                           </div>
@@ -686,11 +708,11 @@ const StatusReport = ({ projectId, onClose }) => {
 
                         {/* Purpose / Finalità */}
                         {feature.purpose && (
-                          <div className="bg-blue-50 rounded-lg p-3 page-break-inside-avoid">
+                          <div className="bg-blue-50 rounded-lg p-3">
                             <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
                               Finalità
                             </p>
-                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-secondary-700 leading-relaxed whitespace-pre-wrap">
                               {feature.purpose}
                             </p>
                           </div>
@@ -698,11 +720,11 @@ const StatusReport = ({ projectId, onClose }) => {
 
                         {/* Technical Specifications */}
                         {feature.tech_specs && (
-                          <div className="bg-amber-50 rounded-lg p-3 page-break-inside-avoid">
+                          <div className="bg-amber-50 rounded-lg p-3">
                             <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">
                               Specifiche Tecniche
                             </p>
-                            <p className="text-sm text-secondary-700 leading-relaxed whitespace-pre-wrap font-mono">
+                            <p className="text-secondary-700 leading-relaxed whitespace-pre-wrap font-mono">
                               {feature.tech_specs}
                             </p>
                           </div>
@@ -715,81 +737,88 @@ const StatusReport = ({ projectId, onClose }) => {
 
               {/* Features Summary */}
               <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-3 text-center page-break-inside-avoid">
-                <p className="text-sm text-secondary-600">
-                  Total Features Documented: <span className="font-bold text-purple-700">{features.length}</span>
+                <p className="text-secondary-600">
+                  Funzionalità totali documentate: <span className="font-bold text-purple-700">{features.length}</span>
                 </p>
               </div>
             </section>
           )}
 
-          {/* Checklist Status Details */}
-          {Object.keys(checklistByPhase).length > 0 && (
-            <section className="mb-6 print-page-break-before">
-              <h3 className="text-xl font-bold text-secondary-800 mb-4 border-b-2 border-blue-500 pb-2 flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Dettaglio Checklist
+          {/* Osservazioni, Note e Criticità */}
+          {(project.osservazioni_note || project.azioni_correttive || (criticalities && criticalities.length > 0)) && (
+            <section className="mb-6">
+              <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-orange-500 pb-2 flex items-center">
+                <AlertTriangle className="w-5 h-5 mr-2" />
+                Osservazioni, Note e Criticità
               </h3>
-              <div className="space-y-6">
-                {Object.entries(checklistByPhase).map(([phase, categories]) => {
-                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
-                  return (
-                    <div key={phase}>
-                      <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-3 pb-1 border-b border-slate-300">
-                        {phaseName}
-                      </h4>
-                      <div className="space-y-5">
-                        {Object.entries(categories).map(([category, items]) => (
-                          <div key={category} className="ml-2">
-                            <h5 className="text-xs font-semibold text-blue-800 uppercase tracking-widest mb-3 mt-1">
-                              {category}
-                            </h5>
-                            <ul className="space-y-1">
-                              {items.map((item, idx) => (
-                                <li key={idx} className="text-sm text-slate-800">
-                                  {item.requirement}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
+              <div className="space-y-4">
+                {project.osservazioni_note && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                      Osservazioni / Note
+                    </h4>
+                    <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded text-slate-700 leading-relaxed whitespace-pre-wrap">
+                      {project.osservazioni_note}
                     </div>
-                  );
-                })}
+                  </div>
+                )}
+                {project.azioni_correttive && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                      Azioni Correttive
+                    </h4>
+                    <div className="px-3 py-2 bg-amber-50 border border-amber-200 rounded text-slate-700 leading-relaxed whitespace-pre-wrap">
+                      {project.azioni_correttive}
+                    </div>
+                  </div>
+                )}
+                {criticalities && criticalities.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 mb-2 pb-1 border-b border-slate-200">
+                      Criticità
+                    </h4>
+                    <ol className="space-y-1 list-decimal list-inside">
+                      {criticalities.map((c, idx) => (
+                        <li key={idx} className="px-3 py-1.5 bg-red-50 border border-red-200 rounded text-slate-700">
+                          {c.criticality_text}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
               </div>
             </section>
           )}
 
           {/* Knowledge Transfer Calendar - Compact Multi-Month View (same style as Calendario tab) */}
           {knowledgeSessions.length > 0 && (
-            <section className="mb-6 print-page-break-before">
+            <section className="mb-6 print:hidden">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2 flex items-center">
                 <Calendar className="w-5 h-5 mr-2" />
-                Calendario Sessioni
+                Calendario Trasferimento Know-How
               </h3>
 
               {/* Calendar Legend */}
-              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs print:hidden">
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
-                  <span className="text-secondary-600">Has Sessions</span>
+                  <span className="text-secondary-600">Con Sessioni</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-green-100 border border-green-400"></div>
-                  <span className="text-secondary-600">Completed</span>
+                  <span className="text-secondary-600">Completate</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-yellow-100 border border-yellow-400"></div>
-                  <span className="text-secondary-600">Scheduled</span>
+                  <span className="text-secondary-600">Pianificate</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-red-100 border border-red-400"></div>
-                  <span className="text-secondary-600">Cancelled</span>
+                  <span className="text-secondary-600">Annullate</span>
                 </div>
               </div>
 
-              {/* Multi-Month Calendar Grid + card list — screen only */}
-              <div className="print:hidden">
+              {/* Multi-Month Calendar Grid */}
               {(() => {
                 // Helper functions
                 const getDaysInMonth = (date) => {
@@ -825,14 +854,14 @@ const StatusReport = ({ projectId, onClose }) => {
                   })
                   .sort((a, b) => a - b);
 
-                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
+                                    'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
                 const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
                 return (
                   <div className="bg-white border border-secondary-200 rounded-lg p-4 page-break-inside-avoid">
                     {/* Multi-Month Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 print:hidden">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {projectMonths.map((monthDate, index) => {
                         const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(monthDate);
 
@@ -840,7 +869,7 @@ const StatusReport = ({ projectId, onClose }) => {
                           <div key={index} className="bg-white border border-secondary-200 rounded p-3">
                             {/* Month Header */}
                             <div className="text-center mb-2">
-                              <div className="text-sm font-bold text-secondary-900">{monthNames[month]}</div>
+                              <div className="font-bold text-secondary-900">{monthNames[month]}</div>
                               <div className="text-xs text-secondary-500">{year}</div>
                             </div>
 
@@ -905,13 +934,13 @@ const StatusReport = ({ projectId, onClose }) => {
                     </div>
 
                     {/* Sessions List Below Calendar */}
-                    <div className="mt-4 pt-4 print:mt-0 print:pt-0 border-t border-secondary-200 print:border-none">
-                      <h4 className="text-sm font-semibold text-secondary-900 mb-3 print:hidden">Session Details</h4>
+                    <div className="mt-4 pt-4 border-t border-secondary-200">
+                      <h4 className="font-semibold text-secondary-900 mb-3">Dettaglio Sessioni</h4>
                       <div className="space-y-2">
                         {knowledgeSessions
                           .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
                           .map((session, idx) => (
-                            <div key={idx} className="flex items-start gap-3 bg-gray-50 rounded p-2 text-sm page-break-inside-avoid">
+                            <div key={idx} className="flex items-start gap-3 bg-gray-50 rounded p-2 page-break-inside-avoid">
                               <div className={`flex-shrink-0 px-2 py-1 rounded text-xs font-medium min-w-[80px] text-center ${
                                 session.status === 'Completed'
                                   ? 'bg-green-100 text-green-700'
@@ -939,50 +968,21 @@ const StatusReport = ({ projectId, onClose }) => {
                   </div>
                 );
               })()}
-              </div>
-
-              {/* Print-only plain text sessions list */}
-              <ul className="hidden print:block text-sm">
-                {knowledgeSessions
-                  .slice()
-                  .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
-                  .map((session, idx) => (
-                    <li key={idx} className="page-break-inside-avoid py-2 border-b border-slate-200 last:border-0">
-                      <div className="font-bold">{session.session_topic}</div>
-                      <div className="text-slate-500 text-xs mt-0.5">
-                        {formatDate(session.scheduled_date)}
-                        {session.start_time && <span> · {session.start_time}</span>}
-                        {session.duration && <span> ({session.duration})</span>}
-                        <span> [{session.status || 'Scheduled'}]</span>
-                      </div>
-                      {session.attendees && (
-                        <div className="text-slate-500 text-xs mt-0.5">
-                          <span className="italic">Attendees:</span>
-                          <ul className="list-disc list-inside ml-1 mt-0.5">
-                            {session.attendees.split(',').map((a, i) => (
-                              <li key={i} className="text-slate-400">{a.trim()}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-              </ul>
 
               {/* Summary Stats */}
-              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid print:hidden">
+              <div className="mt-4 grid grid-cols-3 gap-3 page-break-inside-avoid">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-secondary-600 mb-1">Total Sessions</p>
+                  <p className="text-xs text-secondary-600 mb-1">Sessioni Totali</p>
                   <p className="text-2xl font-bold text-blue-700">{knowledgeSessions.length}</p>
                 </div>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-secondary-600 mb-1">Completed</p>
+                  <p className="text-xs text-secondary-600 mb-1">Completate</p>
                   <p className="text-2xl font-bold text-green-700">
                     {knowledgeSessions.filter(s => s.status === 'Completed').length}
                   </p>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
-                  <p className="text-xs text-secondary-600 mb-1">Scheduled</p>
+                  <p className="text-xs text-secondary-600 mb-1">Pianificate</p>
                   <p className="text-2xl font-bold text-yellow-700">
                     {knowledgeSessions.filter(s => s.status === 'Scheduled').length}
                   </p>
@@ -992,9 +992,9 @@ const StatusReport = ({ projectId, onClose }) => {
           )}
 
           {/* SECTION 2: Phase Breakdown - Matching Overview tab style */}
-          <section className="mb-6 print-page-break-before print:hidden">
+          <section className="mb-6">
             <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-              Avanzamento Progetto
+              Panoramica Processo Handover
             </h3>
             {Object.keys(statistics.phases).length > 0 ? (
               <div className="bg-white rounded shadow-sm border border-slate-200 p-4">
@@ -1003,22 +1003,22 @@ const StatusReport = ({ projectId, onClose }) => {
                     // Define phase metadata
                     const phaseMetadata = {
                       'Phase 1': {
-                        activities: 'Prerequisites completion, documentation review, initial assessment',
-                        criteria: 'All technical and documentation requirements met'
+                        activities: 'Completamento prerequisiti, revisione documentazione, valutazione iniziale',
+                        criteria: 'Tutti i requisiti tecnici e documentali soddisfatti'
                       },
                       'Phase 2': {
-                        activities: 'Training sessions, hands-on activities, shadow support',
-                        criteria: 'Team demonstrates competency in system operation'
+                        activities: 'Sessioni di formazione, attività pratiche, supporto in affiancamento',
+                        criteria: 'Il team dimostra competenza nell\'operatività del sistema'
                       },
                       'Phase 3': {
-                        activities: 'Approvals, documentation handover, transition activities',
-                        criteria: 'All sign-offs completed and access transferred'
+                        activities: 'Approvazioni, consegna documentazione, attività di transizione',
+                        criteria: 'Tutte le firme completate e accessi trasferiti'
                       }
                     };
 
                     return Object.entries(statistics.phases).map(([phase, stats], index) => {
                       const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
-                      const metadata = phaseMetadata[phase] || { activities: 'Phase activities', criteria: 'Phase criteria' };
+                      const metadata = phaseMetadata[phase] || { activities: 'Attività di fase', criteria: 'Criteri di fase' };
 
                       // Determine status based on progress
                       const status = stats.percentage === 100 ? 'complete' :
@@ -1035,7 +1035,7 @@ const StatusReport = ({ projectId, onClose }) => {
                         >
                           <div className="flex items-start gap-3">
                             {/* Phase Number Circle */}
-                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                               status === 'complete' ? 'bg-emerald-500 text-white' :
                               status === 'progress' ? 'bg-amber-500 text-white' :
                               'bg-slate-300 text-slate-600'
@@ -1046,7 +1046,7 @@ const StatusReport = ({ projectId, onClose }) => {
                             <div className="flex-1 min-w-0">
                               {/* Phase Header */}
                               <div className="flex items-center justify-between mb-1.5">
-                                <h4 className="text-sm font-semibold text-slate-900">{phaseName}</h4>
+                                <h4 className="font-semibold text-slate-900">{phaseName}</h4>
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-semibold text-blue-600">{stats.percentage}%</span>
                                   {status === 'complete' && <CheckCircle className="w-4 h-4 text-emerald-500" />}
@@ -1069,11 +1069,11 @@ const StatusReport = ({ projectId, onClose }) => {
                               {/* Key Activities and Success Criteria */}
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                                 <div>
-                                  <span className="font-medium text-slate-700">Key Activities:</span>
+                                  <span className="font-medium text-slate-700">Attività Principali:</span>
                                   <p className="text-slate-600 mt-0.5">{metadata.activities}</p>
                                 </div>
                                 <div>
-                                  <span className="font-medium text-slate-700">Success Criteria:</span>
+                                  <span className="font-medium text-slate-700">Criteri di Successo:</span>
                                   <p className="text-slate-600 mt-0.5">{metadata.criteria}</p>
                                 </div>
                               </div>
@@ -1082,16 +1082,16 @@ const StatusReport = ({ projectId, onClose }) => {
                               <div className="mt-2 pt-2 border-t border-slate-200">
                                 <div className="flex flex-wrap gap-3 text-xs">
                                   <span className="text-slate-600">
-                                    <span className="font-medium">Total:</span> {stats.total}
+                                    <span className="font-medium">Totale:</span> {stats.total}
                                   </span>
                                   <span className="text-emerald-600">
-                                    <span className="font-medium">Complete:</span> {stats.completed}
+                                    <span className="font-medium">Completati:</span> {stats.completed}
                                   </span>
                                   <span className="text-blue-600">
-                                    <span className="font-medium">In Progress:</span> {stats.inProgress}
+                                    <span className="font-medium">In Corso:</span> {stats.inProgress}
                                   </span>
                                   <span className="text-slate-500">
-                                    <span className="font-medium">Not Started:</span> {stats.notStarted}
+                                    <span className="font-medium">Non Avviati:</span> {stats.notStarted}
                                   </span>
                                 </div>
                               </div>
@@ -1104,27 +1104,80 @@ const StatusReport = ({ projectId, onClose }) => {
                 </div>
               </div>
             ) : (
-              <p className="text-secondary-500 italic">No phase data available</p>
+              <p className="text-secondary-500 italic">Nessun dato di fase disponibile</p>
             )}
           </section>
 
+          {/* SECTION 3: Checklist Details */}
+          <section className="mb-6">
+            <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
+              Dettaglio Stato Checklist
+            </h3>
+            {Object.keys(checklistByPhase).length > 0 ? (
+              <div className="space-y-6">
+                {Object.entries(checklistByPhase).map(([phase, categories]) => {
+                  const phaseName = phaseNames.find(p => p.phase_id === phase)?.phase_name || phase;
+                  return (
+                    <div key={phase} className="page-break-inside-avoid">
+                      <h4 className="text-xl font-semibold mb-3 text-secondary-700">{phaseName}</h4>
+                      {Object.entries(categories).map(([category, items]) => (
+                        <div key={category} className="mb-4 ml-4">
+                          <h5 className="text-lg font-medium mb-2 text-secondary-600">{category}</h5>
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full bg-white border border-gray-200">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold">Requisito</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold">Stato</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold">Verificato Da</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold">Data</th>
+                                  <th className="px-3 py-2 text-left text-xs font-semibold">Note</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {items.map((item, idx) => (
+                                  <tr key={idx} className="border-t border-gray-200">
+                                    <td className="px-3 py-2">{item.requirement}</td>
+                                    <td className="px-3 py-2">
+                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(item.status)}`}>
+                                        {item.status}
+                                      </span>
+                                    </td>
+                                    <td className="px-3 py-2">{item.verified_by || '-'}</td>
+                                    <td className="px-3 py-2">{formatDate(item.verification_date)}</td>
+                                    <td className="px-3 py-2 text-xs">{item.notes || '-'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-secondary-500 italic">Nessun elemento checklist disponibile</p>
+            )}
+          </section>
 
-          {/* SECTION 4: Criticità */}
+          {/* SECTION 4: Issues & Risks */}
           {issues.length > 0 && (
-            <section className="mb-6 print-page-break-before">
+            <section className="mb-6">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
-                Criticità
+                Problemi e Rischi
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 text-sm">
+                <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">ID</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">ID Problema</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold">Priorità</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold">Descrizione</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Assegnato a</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Assegnato A</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold">Stato</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Scadenza</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Data Obiettivo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1154,20 +1207,20 @@ const StatusReport = ({ projectId, onClose }) => {
 
           {/* SECTION 5: Attachments */}
           {attachments.length > 0 && (
-            <section className="mb-6 print-page-break-before">
+            <section className="mb-6">
               <h3 className="text-xl font-bold text-secondary-800 mb-3 border-b-2 border-blue-500 pb-2">
                 Allegati e Documentazione
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 text-sm">
+                <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">File Name</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Size</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Type</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Description</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Uploaded By</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold">Date</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Nome File</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Dimensione</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Tipo</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Descrizione</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Caricato Da</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold">Data</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1187,11 +1240,6 @@ const StatusReport = ({ projectId, onClose }) => {
             </section>
           )}
 
-          {/* Report Footer */}
-          <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-secondary-500">
-            <p>End of Handover Status Report</p>
-            <p className="mt-2">Generated by Handover Management System on {formatDate(new Date().toISOString())}</p>
-          </div>
         </div>
       </div>
 
@@ -1205,55 +1253,6 @@ const StatusReport = ({ projectId, onClose }) => {
           /* Show only the report content */
           .report-content, .report-content * {
             visibility: visible;
-          }
-
-          /* Per-page fixed header */
-          .report-page-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 3px 16px;
-            border-bottom: 1px solid #cbd5e1;
-            background: white;
-            font-size: 10px;
-            color: #475569;
-            z-index: 1000;
-          }
-
-          /* Per-page fixed footer */
-          .report-page-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 4px 16px;
-            border-top: 1px solid #cbd5e1;
-            background: white;
-            font-size: 10px;
-            color: #475569;
-            z-index: 1000;
-            flex-direction: row;
-            align-items: center;
-          }
-
-          .report-page-footer .footer-page-num::after {
-            content: "Pagina " counter(page);
-            display: block;
-            text-align: right;
-            font-size: 9px;
-            color: #94a3b8;
-          }
-
-          /* Push content below the fixed header on page-start elements */
-          .print-page-break-before {
-            padding-top: 28px !important;
-          }
-
-          /* Feature cards and other avoid-break blocks can also land
-             at the top of a new page — give them the same clearance */
-          .page-break-inside-avoid {
-            padding-top: 28px !important;
           }
 
           /* Position report at top of page */
@@ -1275,24 +1274,12 @@ const StatusReport = ({ projectId, onClose }) => {
             break-after: always !important;
           }
 
-          .print\\:min-h-screen {
-            min-height: 100vh !important;
-          }
-
           .print\\:flex {
             display: flex !important;
           }
 
           .print\\:flex-col {
             flex-direction: column !important;
-          }
-
-          .print\\:justify-center {
-            justify-content: center !important;
-          }
-
-          .print\\:items-center {
-            align-items: center !important;
           }
 
           /* Avoid page breaks inside elements */
@@ -1382,70 +1369,38 @@ const StatusReport = ({ projectId, onClose }) => {
             display: table-header-group;
           }
 
-          /* Better page margins — suppress browser native header/footer decorations */
+          /* Quill content in frontispiece */
+          .ql-editor-readonly p { margin: 0 0 2px 0; }
+          .ql-editor-readonly ul { list-style: disc; padding-left: 1.2em; margin: 2px 0; }
+          .ql-editor-readonly ol { list-style: decimal; padding-left: 1.2em; margin: 2px 0; }
+          .ql-editor-readonly li { margin: 1px 0; }
+          .ql-editor-readonly strong { font-weight: 700; }
+          .ql-editor-readonly em { font-style: italic; }
+
+          /* Larger base font for print */
+          .report-content {
+            font-size: 14pt !important;
+          }
+          .report-content p,
+          .report-content td,
+          .report-content th,
+          .report-content li,
+          .report-content label,
+          .report-content span {
+            font-size: inherit;
+          }
+          .report-content .text-xs {
+            font-size: 11pt !important;
+          }
+          .report-content h1 { font-size: 32pt !important; }
+          .report-content h2 { font-size: 22pt !important; }
+          .report-content h3 { font-size: 16pt !important; }
+          .report-content h4 { font-size: 14pt !important; }
+
+          /* Better page margins */
           @page {
-            margin: 1cm 1cm 0.5cm 1cm;
-            @top-left { content: none; }
-            @top-center { content: none; }
-            @top-right { content: none; }
-            @bottom-left { content: none; }
-            @bottom-center { content: none; }
-            @bottom-right { content: none; }
+            margin: 1.5cm 3.5cm;
           }
-
-          /* ── Clean text output: strip box/card styling ── */
-
-          /* Remove muted background fills from field boxes and stat cards */
-          .report-content .bg-slate-50,
-          .report-content .bg-gray-50,
-          .report-content .bg-blue-50,
-          .report-content .bg-green-50,
-          .report-content .bg-amber-50,
-          .report-content .bg-emerald-50,
-          .report-content .bg-red-50,
-          .report-content .bg-yellow-50,
-          .report-content .bg-purple-50,
-          .report-content .bg-teal-50,
-          .report-content .bg-white {
-            background-color: transparent !important;
-          }
-
-          /* Remove decorative border colors on box containers */
-          .report-content .border-slate-200,
-          .report-content .border-slate-300,
-          .report-content .border-gray-200,
-          .report-content .border-gray-300 {
-            border-color: transparent !important;
-          }
-
-          /* Remove left accent borders on feature/team cards */
-          .report-content .border-l-4 {
-            border-left-width: 0 !important;
-          }
-
-          /* Remove box shadows */
-          .report-content .shadow-sm,
-          .report-content .shadow-md,
-          .report-content .shadow-lg,
-          .report-content .shadow-xl,
-          .report-content .shadow-2xl {
-            box-shadow: none !important;
-          }
-
-          /* Remove border radius */
-          .report-content .rounded,
-          .report-content .rounded-lg,
-          .report-content .rounded-xl,
-          .report-content .rounded-full {
-            border-radius: 0 !important;
-          }
-
-          /* Remove padding from field-value box wrappers */
-          .report-content .px-2.py-1\\.5,
-          .report-content .px-2.py-2 {
-            padding: 0 !important;
-          }
-
         }
       `}} />
     </div>

@@ -147,7 +147,8 @@ app.get('/api/projects/:id/report', async (req, res) => {
       teamContacts,
       attachments,
       phaseNames,
-      features
+      features,
+      criticalities
     ] = await Promise.all([
       db.getAsync('SELECT * FROM projects WHERE id = ?', [projectId]),
       db.allAsync('SELECT * FROM checklist_items WHERE project_id = ? ORDER BY phase, category, id', [projectId]),
@@ -156,7 +157,8 @@ app.get('/api/projects/:id/report', async (req, res) => {
       db.allAsync('SELECT * FROM team_contacts WHERE project_id = ? ORDER BY department, role', [projectId]),
       db.allAsync('SELECT id, file_name, original_name, file_size, mime_type, description, uploaded_by, uploaded_at FROM attachments WHERE project_id = ? ORDER BY uploaded_at DESC', [projectId]),
       db.allAsync('SELECT * FROM phase_names WHERE project_id = ? ORDER BY phase_id', [projectId]),
-      db.allAsync('SELECT * FROM features WHERE project_id = ? ORDER BY created_at DESC', [projectId])
+      db.allAsync('SELECT * FROM features WHERE project_id = ? ORDER BY created_at DESC', [projectId]),
+      db.allAsync('SELECT * FROM project_criticalities WHERE project_id = ? ORDER BY created_at', [projectId])
     ]);
 
     if (!project) {
@@ -246,7 +248,8 @@ app.get('/api/projects/:id/report', async (req, res) => {
       issues,
       attachments,
       phaseNames,
-      features
+      features,
+      criticalities
     };
 
     res.json(report);
@@ -1060,8 +1063,14 @@ app.delete('/api/features/:projectId/:featureId', async (req, res) => {
 
 // ==================== NEWSLETTER ROUTES ====================
 
-const newsletterService = require('./services/newsletterService');
-const newsletterScheduler = require('./services/newsletterScheduler');
+let newsletterService = null;
+let newsletterScheduler = null;
+try {
+  newsletterService = require('./services/newsletterService');
+  newsletterScheduler = require('./services/newsletterScheduler');
+} catch (e) {
+  console.warn('⚠️  Newsletter service non disponibile:', e.message);
+}
 
 // Get newsletter subscriptions for a project
 app.get('/api/newsletter/subscriptions/:projectId', async (req, res) => {
@@ -1136,6 +1145,7 @@ app.delete('/api/newsletter/subscriptions/:projectId/:subscriptionId', async (re
 // Auto-subscribe team members
 app.post('/api/newsletter/auto-subscribe/:projectId', async (req, res) => {
   try {
+    if (!newsletterService) return res.status(503).json({ error: 'Newsletter service non disponibile' });
     const result = await newsletterService.autoSubscribeTeamMembers(req.params.projectId);
     res.json(result);
   } catch (error) {
@@ -1235,6 +1245,7 @@ app.post('/api/newsletter/trigger', async (req, res) => {
       return res.status(403).json({ error: 'Manual trigger not allowed in production' });
     }
 
+    if (!newsletterScheduler) return res.status(503).json({ error: 'Newsletter service non disponibile' });
     newsletterScheduler.triggerNow();
     res.json({ message: 'Newsletter generation triggered' });
   } catch (error) {
@@ -1261,8 +1272,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`💾 Database: ${process.env.DATABASE_PATH || './database/handover.db'}`);
 
   // Start newsletter scheduler
-  if (process.env.BREVO_API_KEY) {
+  if (process.env.BREVO_API_KEY && newsletterScheduler) {
     newsletterScheduler.start();
+  } else if (!newsletterScheduler) {
+    console.log('⚠️  Newsletter scheduler non disponibile (modulo non caricato)');
   } else {
     console.log('⚠️  Newsletter scheduler not started - BREVO_API_KEY not configured');
     console.log('   Add BREVO_API_KEY to .env file to enable weekly newsletters');

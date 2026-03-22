@@ -21,317 +21,317 @@ const Assessment = ({ projectId }) => {
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const [phases, setPhases] = useState([
-    { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
-    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow', weight: 25 },
-    { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green', weight: 25 }
+    { id: 'Phase 1', name: 'Fase 1: Valutazione pre-consegna', color: 'blue', weight: 50 },
+    { id: 'Phase 2', name: 'Fase 2: Sessioni di trasferimento know-how', color: 'yellow', weight: 25 },
+    { id: 'Phase 3', name: 'Fase 3: Approvazioni finali', color: 'green', weight: 25 }
   ]);
 
   const defaultAssessments = [
-    // Phase 1: Pre-Handover Assessment (50% weight)
-    { 
-      phase: 'Phase 1', 
-      category: 'B1: Code Quality', 
+    // Fase 1: Valutazione pre-consegna (50% peso)
+    {
+      phase: 'Phase 1',
+      category: 'B1: Qualità del codice',
       categoryWeight: 25,
-      criteria: 'Code follows established standards and conventions', 
+      criteria: 'Il codice segue gli standard e le convenzioni stabiliti',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B1: Code Quality', 
+    {
+      phase: 'Phase 1',
+      category: 'B1: Qualità del codice',
       categoryWeight: 25,
-      criteria: 'Code is well-structured and maintainable', 
+      criteria: 'Il codice è ben strutturato e manutenibile',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B1: Code Quality', 
+    {
+      phase: 'Phase 1',
+      category: 'B1: Qualità del codice',
       categoryWeight: 25,
-      criteria: 'Adequate code comments and inline documentation', 
+      criteria: 'Commenti al codice e documentazione inline adeguati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B1: Code Quality', 
+    {
+      phase: 'Phase 1',
+      category: 'B1: Qualità del codice',
       categoryWeight: 25,
-      criteria: 'Code review process has been followed', 
+      criteria: 'Il processo di revisione del codice è stato seguito',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B1: Code Quality', 
+    {
+      phase: 'Phase 1',
+      category: 'B1: Qualità del codice',
       categoryWeight: 25,
-      criteria: 'Version control history is complete and organized', 
+      criteria: 'La cronologia del controllo versione è completa e organizzata',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 1', 
-      category: 'B2: Testing Coverage', 
+    {
+      phase: 'Phase 1',
+      category: 'B2: Copertura dei test',
       categoryWeight: 20,
-      criteria: 'Unit test coverage meets minimum requirements (≥80%)', 
+      criteria: 'La copertura dei test unitari soddisfa i requisiti minimi (≥80%)',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B2: Testing Coverage', 
+    {
+      phase: 'Phase 1',
+      category: 'B2: Copertura dei test',
       categoryWeight: 20,
-      criteria: 'Integration tests cover critical workflows', 
+      criteria: 'I test di integrazione coprono i flussi critici',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B2: Testing Coverage', 
+    {
+      phase: 'Phase 1',
+      category: 'B2: Copertura dei test',
       categoryWeight: 20,
-      criteria: 'End-to-end testing scenarios complete', 
+      criteria: 'Scenari di test end-to-end completati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B2: Testing Coverage', 
+    {
+      phase: 'Phase 1',
+      category: 'B2: Copertura dei test',
       categoryWeight: 20,
-      criteria: 'Performance testing conducted and passed', 
+      criteria: 'Test delle prestazioni eseguiti e superati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B2: Testing Coverage', 
+    {
+      phase: 'Phase 1',
+      category: 'B2: Copertura dei test',
       categoryWeight: 20,
-      criteria: 'Security testing performed', 
+      criteria: 'Test di sicurezza eseguiti',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 1', 
-      category: 'B3: Performance & Security', 
+    {
+      phase: 'Phase 1',
+      category: 'B3: Prestazioni e sicurezza',
       categoryWeight: 15,
-      criteria: 'Performance benchmarks met or exceeded', 
+      criteria: 'Benchmark delle prestazioni raggiunti o superati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B3: Performance & Security', 
+    {
+      phase: 'Phase 1',
+      category: 'B3: Prestazioni e sicurezza',
       categoryWeight: 15,
-      criteria: 'Security vulnerabilities addressed', 
+      criteria: 'Vulnerabilità di sicurezza affrontate',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B3: Performance & Security', 
+    {
+      phase: 'Phase 1',
+      category: 'B3: Prestazioni e sicurezza',
       categoryWeight: 15,
-      criteria: 'Load testing completed successfully', 
+      criteria: 'Test di carico completati con successo',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B3: Performance & Security', 
+    {
+      phase: 'Phase 1',
+      category: 'B3: Prestazioni e sicurezza',
       categoryWeight: 15,
-      criteria: 'Security best practices implemented', 
+      criteria: 'Best practice di sicurezza implementate',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 1', 
-      category: 'B4: Technical Debt', 
+    {
+      phase: 'Phase 1',
+      category: 'B4: Debito tecnico',
       categoryWeight: 10,
-      criteria: 'Technical debt documented and manageable', 
+      criteria: 'Il debito tecnico è documentato e gestibile',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B4: Technical Debt', 
+    {
+      phase: 'Phase 1',
+      category: 'B4: Debito tecnico',
       categoryWeight: 10,
-      criteria: 'No critical technical debt remaining', 
+      criteria: 'Nessun debito tecnico critico residuo',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 1', 
-      category: 'B4: Technical Debt', 
+    {
+      phase: 'Phase 1',
+      category: 'B4: Debito tecnico',
       categoryWeight: 10,
-      criteria: 'Refactoring needs identified and prioritized', 
+      criteria: 'Esigenze di refactoring identificate e prioritizzate',
       score: null,
       evidence: ''
     },
 
-    // Phase 2: Documentation Quality (25% weight)
-    { 
-      phase: 'Phase 2', 
-      category: 'C1: Technical Documentation', 
+    // Fase 2: Qualità della documentazione (25% peso)
+    {
+      phase: 'Phase 2',
+      category: 'C1: Documentazione tecnica',
       categoryWeight: 35,
-      criteria: 'Architecture documentation is complete and clear', 
+      criteria: 'La documentazione dell\'architettura è completa e chiara',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C1: Technical Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C1: Documentazione tecnica',
       categoryWeight: 35,
-      criteria: 'API documentation is comprehensive', 
+      criteria: 'La documentazione API è completa ed esaustiva',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C1: Technical Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C1: Documentazione tecnica',
       categoryWeight: 35,
-      criteria: 'Database schema documented', 
+      criteria: 'Schema del database documentato',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C1: Technical Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C1: Documentazione tecnica',
       categoryWeight: 35,
-      criteria: 'Integration points documented', 
+      criteria: 'Punti di integrazione documentati',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 2', 
-      category: 'C2: User Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C2: Documentazione utente',
       categoryWeight: 30,
-      criteria: 'User manuals are complete and accurate', 
+      criteria: 'I manuali utente sono completi e accurati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C2: User Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C2: Documentazione utente',
       categoryWeight: 30,
-      criteria: 'Training materials prepared', 
+      criteria: 'Materiali di formazione preparati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C2: User Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C2: Documentazione utente',
       categoryWeight: 30,
-      criteria: 'FAQ documentation available', 
+      criteria: 'Documentazione FAQ disponibile',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 2', 
-      category: 'C3: Operational Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C3: Documentazione operativa',
       categoryWeight: 35,
-      criteria: 'Deployment procedures documented', 
+      criteria: 'Procedure di deployment documentate',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C3: Operational Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C3: Documentazione operativa',
       categoryWeight: 35,
-      criteria: 'Troubleshooting guides available', 
+      criteria: 'Guide per la risoluzione dei problemi disponibili',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C3: Operational Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C3: Documentazione operativa',
       categoryWeight: 35,
-      criteria: 'Monitoring and alerting documented', 
+      criteria: 'Monitoraggio e alerting documentati',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 2', 
-      category: 'C3: Operational Documentation', 
+    {
+      phase: 'Phase 2',
+      category: 'C3: Documentazione operativa',
       categoryWeight: 35,
-      criteria: 'Rollback procedures documented', 
+      criteria: 'Procedure di rollback documentate',
       score: null,
       evidence: ''
     },
 
-    // Phase 3: Operational Readiness (25% weight)
-    { 
-      phase: 'Phase 3', 
-      category: 'D1: Deployment Readiness', 
+    // Fase 3: Prontezza operativa (25% peso)
+    {
+      phase: 'Phase 3',
+      category: 'D1: Prontezza al deployment',
       categoryWeight: 35,
-      criteria: 'Deployment process tested and validated', 
+      criteria: 'Processo di deployment testato e validato',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D1: Deployment Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D1: Prontezza al deployment',
       categoryWeight: 35,
-      criteria: 'Infrastructure requirements met', 
+      criteria: 'Requisiti infrastrutturali soddisfatti',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D1: Deployment Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D1: Prontezza al deployment',
       categoryWeight: 35,
-      criteria: 'Deployment automation in place', 
+      criteria: 'Automazione del deployment in atto',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 3', 
-      category: 'D2: Support Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D2: Prontezza del supporto',
       categoryWeight: 35,
-      criteria: 'Support team trained and ready', 
+      criteria: 'Team di supporto formato e pronto',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D2: Support Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D2: Prontezza del supporto',
       categoryWeight: 35,
-      criteria: 'Escalation procedures defined', 
+      criteria: 'Procedure di escalation definite',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D2: Support Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D2: Prontezza del supporto',
       categoryWeight: 35,
-      criteria: 'On-call rotation established', 
+      criteria: 'Rotazione di reperibilità stabilita',
       score: null,
       evidence: ''
     },
 
-    { 
-      phase: 'Phase 3', 
-      category: 'D3: Team Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D3: Prontezza del team',
       categoryWeight: 30,
-      criteria: 'Knowledge transfer sessions completed', 
+      criteria: 'Sessioni di trasferimento know-how completate',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D3: Team Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D3: Prontezza del team',
       categoryWeight: 30,
-      criteria: 'Team demonstrates competency', 
+      criteria: 'Il team dimostra competenza',
       score: null,
       evidence: ''
     },
-    { 
-      phase: 'Phase 3', 
-      category: 'D3: Team Readiness', 
+    {
+      phase: 'Phase 3',
+      category: 'D3: Prontezza del team',
       categoryWeight: 30,
-      criteria: 'Shadow support period completed successfully', 
+      criteria: 'Periodo di supporto in affiancamento completato con successo',
       score: null,
       evidence: ''
     }
@@ -341,9 +341,9 @@ const Assessment = ({ projectId }) => {
     if (projectId) {
       // Reset phases to default first, then load custom names
       setPhases([
-        { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue', weight: 50 },
-        { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow', weight: 25 },
-        { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green', weight: 25 }
+        { id: 'Phase 1', name: 'Fase 1: Valutazione pre-consegna', color: 'blue', weight: 50 },
+        { id: 'Phase 2', name: 'Fase 2: Sessioni di trasferimento know-how', color: 'yellow', weight: 25 },
+        { id: 'Phase 3', name: 'Fase 3: Approvazioni finali', color: 'green', weight: 25 }
       ]);
       loadAssessments();
       loadPhaseNames();
@@ -420,7 +420,7 @@ const Assessment = ({ projectId }) => {
       }
     } catch (error) {
       console.error('❌ Error loading assessments:', error);
-      setSaveStatus('Error loading assessments');
+      setSaveStatus('Errore nel caricamento delle valutazioni');
     } finally {
       setLoading(false);
     }
@@ -466,12 +466,12 @@ const Assessment = ({ projectId }) => {
         item.id === assessmentId ? { ...item, ...updates } : item
       ));
 
-      setSaveStatus('Saved');
+      setSaveStatus('Salvato');
       setTimeout(() => setSaveStatus(''), 2000);
       
     } catch (error) {
       console.error('❌ Error updating assessment:', error);
-      setSaveStatus('Error saving');
+      setSaveStatus('Errore nel salvataggio');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -502,7 +502,7 @@ const Assessment = ({ projectId }) => {
       const result = await response.json();
       setAssessments([...assessments, { ...newItem, id: result.id }]);
       
-      setSaveStatus('Criteria added');
+      setSaveStatus('Criterio aggiunto');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error adding criteria:', error);
@@ -521,7 +521,7 @@ const Assessment = ({ projectId }) => {
 
   const handleSaveEditCategory = async (phase, oldCategory) => {
     if (!editingCategoryText.trim()) {
-      setSaveStatus('Category name cannot be empty');
+      setSaveStatus('Il nome della categoria non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -550,11 +550,11 @@ const Assessment = ({ projectId }) => {
 
       await loadAssessments();
 
-      setSaveStatus('Category updated');
+      setSaveStatus('Categoria aggiornata');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error updating category:', error);
-      setSaveStatus('Error updating category');
+      setSaveStatus('Errore nell\'aggiornamento della categoria');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -574,7 +574,7 @@ const Assessment = ({ projectId }) => {
 
   const handleSaveEditPhase = async (phaseId) => {
     if (!editingPhaseText.trim()) {
-      setSaveStatus('Phase name cannot be empty');
+      setSaveStatus('Il nome della fase non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -590,7 +590,7 @@ const Assessment = ({ projectId }) => {
       setEditingPhaseId(null);
       setEditingPhaseText('');
 
-      setSaveStatus('Phase name updated');
+      setSaveStatus('Nome fase aggiornato');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error updating phase name:', error);
@@ -619,11 +619,11 @@ const Assessment = ({ projectId }) => {
       setShowDeleteModal(false);
       setItemToDelete(null);
       
-      setSaveStatus('Criteria deleted');
+      setSaveStatus('Criterio eliminato');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error deleting criteria:', error);
-      setSaveStatus('Error deleting criteria');
+      setSaveStatus('Errore nell\'eliminazione del criterio');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -663,13 +663,13 @@ const Assessment = ({ projectId }) => {
       setShowDeleteCategoryModal(false);
       setCategoryToDelete(null);
 
-      setSaveStatus('Category deleted');
+      setSaveStatus('Categoria eliminata');
       setTimeout(() => setSaveStatus(''), 2000);
 
       console.log('✅ Category deleted successfully');
     } catch (error) {
       console.error('❌ Error deleting category:', error);
-      setSaveStatus('Error deleting category');
+      setSaveStatus('Errore nell\'eliminazione della categoria');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -691,7 +691,7 @@ const Assessment = ({ projectId }) => {
 
   const handleSaveEditItem = async (itemId) => {
     if (!editingItemText.trim()) {
-      setSaveStatus('Criteria cannot be empty');
+      setSaveStatus('Il criterio non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -727,15 +727,15 @@ const Assessment = ({ projectId }) => {
   };
 
   const getScoreLabel = (score) => {
-    if (!score) return 'Not Scored';
+    if (!score) return 'Non valutato';
     const labels = {
-      1: '1 - Poor',
-      2: '2 - Below Standard',
-      3: '3 - Satisfactory',
-      4: '4 - Good',
-      5: '5 - Excellent'
+      1: '1 - Insufficiente',
+      2: '2 - Sotto lo standard',
+      3: '3 - Soddisfacente',
+      4: '4 - Buono',
+      5: '5 - Eccellente'
     };
-    return labels[score] || 'Not Scored';
+    return labels[score] || 'Non valutato';
   };
 
   const getPhaseColor = (color) => {
@@ -801,11 +801,11 @@ const Assessment = ({ projectId }) => {
   };
 
   const getReadinessLevel = (score) => {
-    if (score >= 90) return { label: 'Excellent', color: 'text-green-600', bg: 'bg-green-50' };
-    if (score >= 80) return { label: 'Good', color: 'text-blue-600', bg: 'bg-blue-50' };
-    if (score >= 70) return { label: 'Fair', color: 'text-yellow-600', bg: 'bg-yellow-50' };
-    if (score >= 60) return { label: 'Poor', color: 'text-orange-600', bg: 'bg-orange-50' };
-    return { label: 'Not Ready', color: 'text-red-600', bg: 'bg-red-50' };
+    if (score >= 90) return { label: 'Eccellente', color: 'text-green-600', bg: 'bg-green-50' };
+    if (score >= 80) return { label: 'Buono', color: 'text-blue-600', bg: 'bg-blue-50' };
+    if (score >= 70) return { label: 'Discreto', color: 'text-yellow-600', bg: 'bg-yellow-50' };
+    if (score >= 60) return { label: 'Insufficiente', color: 'text-orange-600', bg: 'bg-orange-50' };
+    return { label: 'Non pronto', color: 'text-red-600', bg: 'bg-red-50' };
   };
 
   const overallScore = calculateOverallScore();
@@ -830,16 +830,16 @@ const Assessment = ({ projectId }) => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-secondary-900">Delete Assessment Criteria?</h3>
-                <p className="text-sm text-secondary-500">This action cannot be undone</p>
+                <h3 className="text-lg font-semibold text-secondary-900">Eliminare il criterio di valutazione?</h3>
+                <p className="text-secondary-500">Questa azione non può essere annullata</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="text-secondary-700 mb-2">Stai per eliminare:</p>
               <p className="font-semibold text-secondary-900">{itemToDelete?.criteria}</p>
-              <p className="text-sm text-secondary-600 mt-1">
-                Phase: {itemToDelete?.phase} | Category: {itemToDelete?.category}
+              <p className="text-secondary-600 mt-1">
+                Fase: {itemToDelete?.phase} | Categoria: {itemToDelete?.category}
               </p>
             </div>
 
@@ -848,14 +848,14 @@ const Assessment = ({ projectId }) => {
                 onClick={handleDeleteCancel}
                 className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete
+                Elimina
               </button>
             </div>
           </div>
@@ -871,18 +871,18 @@ const Assessment = ({ projectId }) => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-secondary-900">Delete Entire Category?</h3>
-                <p className="text-sm text-secondary-500">This will delete all items in this category</p>
+                <h3 className="text-lg font-semibold text-secondary-900">Eliminare l'intera categoria?</h3>
+                <p className="text-secondary-500">Questa operazione eliminerà tutti gli elementi in questa categoria</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="text-secondary-700 mb-2">Stai per eliminare:</p>
               <p className="font-semibold text-secondary-900">{categoryToDelete?.category}</p>
-              <p className="text-sm text-secondary-600 mt-1">
-                Phase: {categoryToDelete?.phase}
+              <p className="text-secondary-600 mt-1">
+                Fase: {categoryToDelete?.phase}
               </p>
-              <p className="text-sm text-red-600 mt-2 font-medium">
+              <p className="text-red-600 mt-2 font-medium">
                 {assessments.filter(item =>
                   item.phase === categoryToDelete?.phase && item.category === categoryToDelete?.category
                 ).length} item(s) will be deleted
@@ -894,14 +894,14 @@ const Assessment = ({ projectId }) => {
                 onClick={handleDeleteCategoryCancel}
                 className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeleteCategoryConfirm}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete Category
+                Elimina categoria
               </button>
             </div>
           </div>
@@ -912,14 +912,14 @@ const Assessment = ({ projectId }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-secondary-900">Project Readiness Assessment</h2>
-            <p className="text-sm text-secondary-600 mt-1">
-              Comprehensive evaluation across all handover phases
+            <h2 className="text-lg font-semibold text-secondary-900">Valutazione della prontezza del progetto</h2>
+            <p className="text-secondary-600 mt-1">
+              Valutazione complessiva su tutte le fasi di consegna
             </p>
           </div>
           <div className="flex items-center gap-3">
             {saveStatus && (
-              <span className={`text-sm font-medium ${
+              <span className={`font-medium ${
                 saveStatus.includes('Error') ? 'text-red-600' : 'text-green-600'
               }`}>
                 {saveStatus}
@@ -933,12 +933,12 @@ const Assessment = ({ projectId }) => {
           <div className={`${readiness.bg} border-2 ${readiness.color.replace('text-', 'border-')} rounded-lg p-6`}>
             <div className="flex items-center justify-between mb-2">
               <Award className={`w-8 h-8 ${readiness.color}`} />
-              <span className={`text-sm font-semibold ${readiness.color}`}>{readiness.label}</span>
+              <span className={`font-semibold ${readiness.color}`}>{readiness.label}</span>
             </div>
             <div className={`text-4xl font-bold ${readiness.color} mb-1`}>
               {overallScore}%
             </div>
-            <div className="text-sm text-secondary-600">Overall Readiness</div>
+            <div className="text-secondary-600">Prontezza complessiva</div>
           </div>
 
           {phases.map(phaseInfo => {
@@ -949,12 +949,12 @@ const Assessment = ({ projectId }) => {
               <div key={phaseInfo.id} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-2">
                   <Target className="w-6 h-6 text-gray-400" />
-                  <span className="text-xs font-semibold text-secondary-500">{phaseInfo.weight}% weight</span>
+                  <span className="text-xs font-semibold text-secondary-500">{phaseInfo.weight}% peso</span>
                 </div>
                 <div className="text-3xl font-bold text-secondary-900 mb-1">
                   {phaseScore}%
                 </div>
-                <div className="text-sm text-secondary-600">{phaseInfo.name.split(':')[0]}</div>
+                <div className="text-secondary-600">{phaseInfo.name.split(':')[0]}</div>
               </div>
             );
           })}
@@ -962,27 +962,27 @@ const Assessment = ({ projectId }) => {
 
         {/* Readiness Scale */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold text-secondary-900 mb-3 text-sm">Readiness Level Classification:</h3>
+          <h3 className="font-semibold text-secondary-900 mb-3">Classificazione del livello di prontezza:</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span><strong>90-100:</strong> Excellent</span>
+              <span><strong>90-100:</strong> Eccellente</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span><strong>80-89:</strong> Good</span>
+              <span><strong>80-89:</strong> Buono</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span><strong>70-79:</strong> Fair</span>
+              <span><strong>70-79:</strong> Discreto</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-              <span><strong>60-69:</strong> Poor</span>
+              <span><strong>60-69:</strong> Insufficiente</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span><strong>&lt;60:</strong> Not Ready</span>
+              <span><strong>&lt;60:</strong> Non pronto</span>
             </div>
           </div>
         </div>
@@ -1014,7 +1014,7 @@ const Assessment = ({ projectId }) => {
                           onChange={(e) => setEditingPhaseText(e.target.value)}
                           className="flex-1 px-4 py-2 text-secondary-900 border-2 border-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                           autoFocus
-                          placeholder="Enter phase name..."
+                          placeholder="Inserisci il nome della fase..."
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handleSaveEditPhase(phaseInfo.id);
                             if (e.key === 'Escape') handleCancelEditPhase();
@@ -1023,14 +1023,14 @@ const Assessment = ({ projectId }) => {
                         <button
                           onClick={() => handleSaveEditPhase(phaseInfo.id)}
                           className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                          title="Save"
+                          title="Salva"
                         >
                           <Save className="w-5 h-5" />
                         </button>
                         <button
                           onClick={handleCancelEditPhase}
                           className="p-2 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                          title="Cancel"
+                          title="Annulla"
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -1044,7 +1044,7 @@ const Assessment = ({ projectId }) => {
                             handleStartEditPhase(phaseInfo.id);
                           }}
                           className="p-2 opacity-0 group-hover:opacity-100 hover:bg-gray-800 hover:bg-opacity-20 rounded-lg transition-all"
-                          title="Edit phase name"
+                          title="Modifica nome fase"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -1057,8 +1057,8 @@ const Assessment = ({ projectId }) => {
                     )}
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
-                    <p className="text-sm mt-1 text-secondary-700">
-                      {phaseItems.filter(i => i.score !== null && i.score > 0).length} of {phaseItems.length} scored • {phaseInfo.weight}% of total
+                    <p className="mt-1 text-secondary-700">
+                      {phaseItems.filter(i => i.score !== null && i.score > 0).length} di {phaseItems.length} valutati • {phaseInfo.weight}% del totale
                     </p>
                   )}
                 </div>
@@ -1069,10 +1069,10 @@ const Assessment = ({ projectId }) => {
                       e.stopPropagation();
                       handleAddCustomCriteria(phaseInfo.id);
                     }}
-                    className="mt-2 px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                    className="mt-2 px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg flex items-center gap-1 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    Add Criteria
+                    Aggiungi criterio
                   </button>
                 </div>
               </div>
@@ -1118,7 +1118,7 @@ const Assessment = ({ projectId }) => {
                                   onChange={(e) => setEditingCategoryText(e.target.value)}
                                   className="flex-1 px-3 py-1 border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   autoFocus
-                                  placeholder="Enter category name..."
+                                  placeholder="Inserisci il nome della categoria..."
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleSaveEditCategory(phaseInfo.id, category);
                                     if (e.key === 'Escape') handleCancelEditCategory();
@@ -1127,14 +1127,14 @@ const Assessment = ({ projectId }) => {
                                 <button
                                   onClick={() => handleSaveEditCategory(phaseInfo.id, category)}
                                   className="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                  title="Save"
+                                  title="Salva"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={handleCancelEditCategory}
                                   className="p-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                                  title="Cancel"
+                                  title="Annulla"
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -1143,7 +1143,7 @@ const Assessment = ({ projectId }) => {
                               <>
                                 <h3 className="font-semibold text-secondary-900">{category}</h3>
                                 <span className="text-xs text-secondary-500 bg-gray-100 px-2 py-1 rounded">
-                                  {categoryWeight}% weight
+                                  {categoryWeight}% peso
                                 </span>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
@@ -1152,7 +1152,7 @@ const Assessment = ({ projectId }) => {
                                       handleStartEditCategory(phaseInfo.id, category);
                                     }}
                                     className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
-                                    title="Edit category name"
+                                    title="Modifica nome categoria"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                   </button>
@@ -1162,7 +1162,7 @@ const Assessment = ({ projectId }) => {
                                       handleDeleteCategoryClick(phaseInfo.id, category);
                                     }}
                                     className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
-                                    title="Delete category"
+                                    title="Elimina categoria"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -1172,8 +1172,8 @@ const Assessment = ({ projectId }) => {
                           </div>
                           
                           <div className="flex items-center gap-4">
-                            <span className="text-sm font-medium text-secondary-600">
-                              {categoryItems.filter(i => i.score !== null && i.score > 0).length}/{categoryItems.length} scored
+                            <span className="font-medium text-secondary-600">
+                              {categoryItems.filter(i => i.score !== null && i.score > 0).length}/{categoryItems.length} valutati
                             </span>
                             <div className="flex items-center gap-2">
                               <div className="w-32 bg-gray-200 rounded-full h-2">
@@ -1182,7 +1182,7 @@ const Assessment = ({ projectId }) => {
                                   style={{ width: `${categoryScore}%` }}
                                 />
                               </div>
-                              <span className="text-sm font-bold text-secondary-900 w-12 text-right">
+                              <span className="font-bold text-secondary-900 w-12 text-right">
                                 {categoryScore}%
                               </span>
                             </div>
@@ -1201,9 +1201,9 @@ const Assessment = ({ projectId }) => {
                                     type="text"
                                     value={editingItemText}
                                     onChange={(e) => setEditingItemText(e.target.value)}
-                                    className="flex-1 px-3 py-1 text-sm border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="flex-1 px-3 py-1 border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     autoFocus
-                                    placeholder="Enter criteria..."
+                                    placeholder="Inserisci il criterio..."
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') handleSaveEditItem(item.id);
                                       if (e.key === 'Escape') handleCancelEditItem();
@@ -1212,14 +1212,14 @@ const Assessment = ({ projectId }) => {
                                   <button
                                     onClick={() => handleSaveEditItem(item.id)}
                                     className="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                    title="Save"
+                                    title="Salva"
                                   >
                                     <CheckCircle className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={handleCancelEditItem}
                                     className="p-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                                    title="Cancel"
+                                    title="Annulla"
                                   >
                                     <X className="w-4 h-4" />
                                   </button>
@@ -1229,7 +1229,7 @@ const Assessment = ({ projectId }) => {
                                   <div className="flex items-center gap-3">
                                     {/* Criteria and Score in one line */}
                                     <div className="flex-1 flex items-center gap-3 min-w-0">
-                                      <h4 className="text-sm text-secondary-900 flex-1 truncate" title={item.criteria}>
+                                      <h4 className="text-secondary-900 flex-1 truncate" title={item.criteria}>
                                         {item.criteria}
                                       </h4>
 
@@ -1241,12 +1241,12 @@ const Assessment = ({ projectId }) => {
                                           })}
                                           className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getScoreColor(item.score)} cursor-pointer hover:shadow-sm transition-shadow`}
                                         >
-                                          <option value="">Not Scored</option>
-                                          <option value="1">1 - Poor</option>
-                                          <option value="2">2 - Below Standard</option>
-                                          <option value="3">3 - Satisfactory</option>
-                                          <option value="4">4 - Good</option>
-                                          <option value="5">5 - Excellent</option>
+                                          <option value="">Non valutato</option>
+                                          <option value="1">1 - Insufficiente</option>
+                                          <option value="2">2 - Sotto lo standard</option>
+                                          <option value="3">3 - Soddisfacente</option>
+                                          <option value="4">4 - Buono</option>
+                                          <option value="5">5 - Eccellente</option>
                                         </select>
 
                                         {item.score && (
@@ -1266,14 +1266,14 @@ const Assessment = ({ projectId }) => {
                                           <button
                                             onClick={() => handleStartEditItem(item)}
                                             className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
-                                            title="Edit criteria"
+                                            title="Modifica criterio"
                                           >
                                             <Edit2 className="w-3.5 h-3.5" />
                                           </button>
                                           <button
                                             onClick={() => handleDeleteClick(item)}
                                             className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
-                                            title="Delete criteria"
+                                            title="Elimina criterio"
                                           >
                                             <Trash2 className="w-3.5 h-3.5" />
                                           </button>
@@ -1295,7 +1295,7 @@ const Assessment = ({ projectId }) => {
                                         value={item.evidence || ''}
                                         onChange={(e) => handleUpdateAssessment(item.id, { evidence: e.target.value })}
                                         className="w-full px-2 py-0.5 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Add evidence or notes..."
+                                        placeholder="Aggiungi evidenze o note..."
                                       />
                                     </div>
                                   )}

@@ -8,9 +8,9 @@ const Knowledge = ({ projectId }) => {
   const [project, setProject] = useState(null);
   const [phaseDates, setPhaseDates] = useState({});
   const [phaseNames, setPhaseNames] = useState({
-    'Phase 1': 'Phase 1: Pre-Handover Assessment',
-    'Phase 2': 'Phase 2: Knowledge Transfer Sessions',
-    'Phase 3': 'Phase 3: Final Sign-Offs'
+    'Phase 1': 'Fase 1: Valutazione pre-consegna',
+    'Phase 2': 'Fase 2: Sessioni di trasferimento know-how',
+    'Phase 3': 'Fase 3: Approvazioni finali'
   });
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
@@ -127,7 +127,7 @@ const Knowledge = ({ projectId }) => {
 
   const handleAddSession = async () => {
     if (!newSession.session_topic || !newSession.scheduled_date) {
-      alert('Please fill in Topic and Date fields');
+      alert('Compila i campi Argomento e Data');
       return;
     }
 
@@ -169,7 +169,7 @@ const Knowledge = ({ projectId }) => {
     if (!editingSession) return;
 
     if (!editingSession.session_topic || !editingSession.scheduled_date) {
-      alert('Please fill in Topic and Date fields');
+      alert('Compila i campi Argomento e Data');
       return;
     }
 
@@ -522,7 +522,7 @@ const Knowledge = ({ projectId }) => {
                 {daySessions.map((session, idx) => (
                   <div key={session.id} className={`${idx > 0 ? 'pt-2 border-t border-secondary-200' : ''}`}>
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <div className="font-semibold text-sm text-secondary-900 flex-1">
+                      <div className="font-semibold text-secondary-900 flex-1">
                         {session.session_topic}
                       </div>
                       <button
@@ -532,7 +532,7 @@ const Knowledge = ({ projectId }) => {
                           setHoveredDate(null);
                         }}
                         className="p-1 hover:bg-blue-100 rounded transition-colors flex-shrink-0"
-                        title="Edit session"
+                        title="Modifica sessione"
                       >
                         <Edit2 className="w-3.5 h-3.5 text-blue-600" />
                       </button>
@@ -575,7 +575,7 @@ const Knowledge = ({ projectId }) => {
     return (
       <div className="bg-white border border-secondary-200 rounded p-3">
         <div className="text-center mb-2">
-          <div className="text-sm font-bold text-secondary-900">{monthNames[month]}</div>
+          <div className="font-bold text-secondary-900">{monthNames[month]}</div>
           <div className="text-xs text-secondary-500">{year}</div>
         </div>
         <div className="grid grid-cols-7 gap-1 mb-1">
@@ -601,7 +601,7 @@ const Knowledge = ({ projectId }) => {
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-secondary-900">
-              Project Calendar
+              Calendario sessioni
             </h2>
             <div className="flex items-center gap-2">
               {/* View Toggle - Always Visible */}
@@ -613,7 +613,7 @@ const Knowledge = ({ projectId }) => {
                       ? 'bg-primary-100 text-primary-600'
                       : 'text-secondary-600 hover:bg-secondary-100'
                   }`}
-                  title="Calendar View"
+                  title="Vista calendario"
                 >
                   <Calendar className="w-4 h-4" />
                 </button>
@@ -624,7 +624,7 @@ const Knowledge = ({ projectId }) => {
                       ? 'bg-primary-100 text-primary-600'
                       : 'text-secondary-600 hover:bg-secondary-100'
                   }`}
-                  title="List View"
+                  title="Vista lista"
                 >
                   <BookOpen className="w-4 h-4" />
                 </button>
@@ -633,7 +633,7 @@ const Knowledge = ({ projectId }) => {
               <button
                 onClick={() => setShowAddModal(true)}
                 className="p-1.5 bg-success-100 text-success-600 rounded hover:bg-success-200 transition-all opacity-0 group-hover:opacity-100"
-                title="Add Session"
+                title="Aggiungi sessione"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -644,19 +644,19 @@ const Knowledge = ({ projectId }) => {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-primary-100 border-2 border-primary-500"></div>
-                <span className="text-secondary-600">Today</span>
+                <span className="text-secondary-600">Oggi</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-blue-50 border-2 border-blue-300"></div>
-                <span className="text-secondary-600">Has Sessions</span>
+                <span className="text-secondary-600">Ha sessioni</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-green-50 border-2 border-green-500"></div>
-                <span className="text-secondary-600">Start Date</span>
+                <span className="text-secondary-600">Data inizio</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-red-50 border-2 border-red-500"></div>
-                <span className="text-secondary-600">End Date</span>
+                <span className="text-secondary-600">Data fine</span>
               </div>
             </div>
             {/* Second Row - Phase Indicators */}
@@ -688,31 +688,31 @@ const Knowledge = ({ projectId }) => {
 
         {/* Sessions Summary */}
         <div className="mt-6 pt-4 border-t border-secondary-200">
-          <div className="text-sm font-semibold text-secondary-900 mb-2">
-            Quick Info
+          <div className="font-semibold text-secondary-900 mb-2">
+            Riepilogo rapido
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-blue-50 rounded p-3">
               <div className="text-2xl font-bold text-blue-600">{sessions.length}</div>
-              <div className="text-xs text-blue-700">Total Sessions</div>
+              <div className="text-xs text-blue-700">Sessioni totali</div>
             </div>
             <div className="bg-green-50 rounded p-3">
               <div className="text-2xl font-bold text-green-600">
                 {sessions.filter(s => s.status === 'Completed').length}
               </div>
-              <div className="text-xs text-green-700">Completed</div>
+              <div className="text-xs text-green-700">Completate</div>
             </div>
             <div className="bg-yellow-50 rounded p-3">
               <div className="text-2xl font-bold text-yellow-600">
                 {sessions.filter(s => s.status === 'Scheduled').length}
               </div>
-              <div className="text-xs text-yellow-700">Scheduled</div>
+              <div className="text-xs text-yellow-700">Pianificate</div>
             </div>
             <div className="bg-purple-50 rounded p-3">
               <div className="text-2xl font-bold text-purple-600">
                 {projectMonths.length}
               </div>
-              <div className="text-xs text-purple-700">Project Months</div>
+              <div className="text-xs text-purple-700">Mesi di progetto</div>
             </div>
           </div>
         </div>
@@ -728,7 +728,7 @@ const Knowledge = ({ projectId }) => {
     return (
       <div className="bg-white rounded shadow-sm border border-gray-200 p-6 group">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-secondary-900">All Sessions</h2>
+          <h2 className="font-semibold text-secondary-900">Tutte le sessioni</h2>
           <div className="flex items-center gap-2">
             {/* View Toggle - Always Visible */}
             <div className="flex items-center gap-1">
@@ -739,7 +739,7 @@ const Knowledge = ({ projectId }) => {
                     ? 'bg-primary-100 text-primary-600'
                     : 'text-secondary-600 hover:bg-secondary-100'
                 }`}
-                title="Calendar View"
+                title="Vista calendario"
               >
                 <Calendar className="w-4 h-4" />
               </button>
@@ -750,7 +750,7 @@ const Knowledge = ({ projectId }) => {
                     ? 'bg-primary-100 text-primary-600'
                     : 'text-secondary-600 hover:bg-secondary-100'
                 }`}
-                title="List View"
+                title="Vista lista"
               >
                 <BookOpen className="w-4 h-4" />
               </button>
@@ -759,7 +759,7 @@ const Knowledge = ({ projectId }) => {
             <button
               onClick={() => setShowAddModal(true)}
               className="p-1.5 bg-success-100 text-success-600 rounded hover:bg-success-200 transition-all opacity-0 group-hover:opacity-100"
-              title="Add Session"
+              title="Aggiungi sessione"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -768,8 +768,8 @@ const Knowledge = ({ projectId }) => {
         {sortedSessions.length === 0 ? (
           <div className="text-center py-12 text-secondary-500">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-sm font-medium">No knowledge transfer sessions scheduled yet</p>
-            <p className="text-sm mt-2">Click "Add Session" to schedule your first knowledge transfer session</p>
+            <p className="font-medium">Nessuna sessione di trasferimento know-how pianificata</p>
+            <p className="mt-2">Clicca "Aggiungi sessione" per pianificare la tua prima sessione di trasferimento know-how</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -783,8 +783,8 @@ const Knowledge = ({ projectId }) => {
                     <div className="flex items-start gap-3 mb-3">
                       <BookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-secondary-900 text-sm">{session.session_topic}</h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-secondary-600">
+                        <h3 className="font-semibold text-secondary-900">{session.session_topic}</h3>
+                        <div className="flex items-center gap-4 mt-2 text-secondary-600">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {new Date(session.scheduled_date).toLocaleDateString()}
@@ -810,7 +810,7 @@ const Knowledge = ({ projectId }) => {
                       </span>
                       {session.effectiveness_rating && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs text-secondary-600 mr-1">Effectiveness:</span>
+                          <span className="text-xs text-secondary-600 mr-1">Efficacia:</span>
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
@@ -824,7 +824,7 @@ const Knowledge = ({ projectId }) => {
                     </div>
 
                     {session.notes && (
-                      <p className="mt-3 text-sm text-secondary-600 bg-gray-50 p-3 rounded">
+                      <p className="mt-3 text-secondary-600 bg-gray-50 p-3 rounded">
                         {session.notes}
                       </p>
                     )}
@@ -834,7 +834,7 @@ const Knowledge = ({ projectId }) => {
                     <button
                       onClick={() => openEditModal(session)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Edit session"
+                      title="Modifica sessione"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -844,7 +844,7 @@ const Knowledge = ({ projectId }) => {
                         setShowDeleteModal(true);
                       }}
                       className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete session"
+                      title="Elimina sessione"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -887,9 +887,9 @@ const Knowledge = ({ projectId }) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-4 h-4 text-blue-600" />
-                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Next Incoming Event</h3>
+                    <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">Prossimo evento</h3>
                   </div>
-                  <h2 className="text-sm font-bold text-secondary-900 mb-2">{nextSession.session_topic}</h2>
+                  <h2 className="font-bold text-secondary-900 mb-2">{nextSession.session_topic}</h2>
 
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-secondary-700">
                     <div className="flex items-center gap-1">
@@ -934,7 +934,7 @@ const Knowledge = ({ projectId }) => {
                   <div className="bg-blue-600 text-white rounded px-3 py-2 min-w-[60px] text-center">
                     <div className="text-xl font-bold leading-none">{daysUntil}</div>
                     <div className="text-[10px] uppercase tracking-wide mt-0.5">
-                      {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Day' : 'Days'}
+                      {daysUntil === 0 ? 'Oggi' : daysUntil === 1 ? 'Giorno' : 'Giorni'}
                     </div>
                   </div>
                 </div>
@@ -959,11 +959,11 @@ const Knowledge = ({ projectId }) => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-secondary-700" />
-                <h3 className="text-sm font-semibold text-secondary-900">Knowledge Transfer Progress</h3>
+                <h3 className="font-semibold text-secondary-900">Avanzamento trasferimento know-how</h3>
               </div>
               <div className="flex items-center gap-2 text-xs text-secondary-600">
                 <span className="font-semibold text-success-600">
-                  {completedSessions} / {totalSessions} sessions completed
+                  {completedSessions} / {totalSessions} sessioni completate
                 </span>
               </div>
             </div>
@@ -1002,21 +1002,21 @@ const Knowledge = ({ projectId }) => {
               {/* Labels */}
               <div className="flex justify-between items-center mt-8 text-xs">
                 <div className="text-left">
-                  <div className="text-secondary-500 font-medium">Not Started</div>
-                  <div className="text-sm font-semibold text-secondary-900">
-                    {sessions.filter(s => s.status === 'Scheduled').length} sessions
+                  <div className="text-secondary-500 font-medium">Non iniziate</div>
+                  <div className="font-semibold text-secondary-900">
+                    {sessions.filter(s => s.status === 'Scheduled').length} sessioni
                   </div>
                 </div>
                 <div className="text-center bg-success-50 px-3 py-1 rounded">
-                  <div className="text-secondary-500 font-medium">Completion</div>
-                  <div className="text-sm font-semibold text-success-600">
+                  <div className="text-secondary-500 font-medium">Completamento</div>
+                  <div className="font-semibold text-success-600">
                     {progressPercentage}%
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-secondary-500 font-medium">Completed</div>
-                  <div className="text-sm font-semibold text-success-600">
-                    {completedSessions} sessions
+                  <div className="text-secondary-500 font-medium">Completate</div>
+                  <div className="font-semibold text-success-600">
+                    {completedSessions} sessioni
                   </div>
                 </div>
               </div>
@@ -1029,21 +1029,21 @@ const Knowledge = ({ projectId }) => {
                   <>
                     <CheckCircle className="w-4 h-4 text-success-600 flex-shrink-0" />
                     <span className="text-xs font-medium text-success-800">
-                      All knowledge transfer sessions completed
+                      Tutte le sessioni di trasferimento know-how completate
                     </span>
                   </>
                 ) : progressPercentage >= 50 ? (
                   <>
                     <Clock className="w-4 h-4 text-primary-600 flex-shrink-0" />
                     <span className="text-xs font-medium text-primary-800">
-                      Knowledge transfer in progress - {progressPercentage}% completed
+                      Trasferimento know-how in corso - {progressPercentage}% completato
                     </span>
                   </>
                 ) : (
                   <>
                     <AlertCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />
                     <span className="text-xs font-medium text-warning-800">
-                      Knowledge transfer starting - {totalSessions - completedSessions} sessions remaining
+                      Trasferimento know-how in avvio - {totalSessions - completedSessions} sessioni rimanenti
                     </span>
                   </>
                 )}
@@ -1058,7 +1058,7 @@ const Knowledge = ({ projectId }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded shadow-xl max-w-2xl w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-secondary-900">Add New Session</h3>
+              <h3 className="font-semibold text-secondary-900">Aggiungi nuova sessione</h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-secondary-600">
                 <X className="w-5 h-5" />
               </button>
@@ -1066,22 +1066,22 @@ const Knowledge = ({ projectId }) => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Session Topic <span className="text-red-500">*</span>
+                <label className="block font-medium text-secondary-700 mb-1">
+                  Argomento <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={newSession.session_topic}
                   onChange={(e) => setNewSession({ ...newSession, session_topic: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., System Architecture Overview"
+                  placeholder="es. Panoramica architettura di sistema"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Date <span className="text-red-500">*</span>
+                  <label className="block font-medium text-secondary-700 mb-1">
+                    Data pianificata <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -1091,7 +1091,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">Start Time</label>
+                  <label className="block font-medium text-secondary-700 mb-1">Orario</label>
                   <input
                     type="time"
                     value={newSession.start_time}
@@ -1100,24 +1100,24 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">Duration</label>
+                  <label className="block font-medium text-secondary-700 mb-1">Durata</label>
                   <input
                     type="text"
                     value={newSession.duration}
                     onChange={(e) => setNewSession({ ...newSession, duration: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 2 hours"
+                    placeholder="es. 2 ore"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-2">Attendees</label>
+                <label className="block font-medium text-secondary-700 mb-2">Partecipanti</label>
 
                 {/* Team Members */}
                 {teamContacts.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-secondary-600 mb-1 font-medium">Team Members</div>
+                    <div className="text-xs text-secondary-600 mb-1 font-medium">Membri del team</div>
                     <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
                       <div className="space-y-2">
                         {teamContacts.map(contact => (
@@ -1141,20 +1141,20 @@ const Knowledge = ({ projectId }) => {
 
                 {/* Custom Attendees */}
                 <div>
-                  <div className="text-xs text-secondary-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="text-xs text-secondary-600 mb-1 font-medium">Aggiungi partecipante</div>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={customAttendee}
                       onChange={(e) => setCustomAttendee(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && addCustomAttendee()}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="Enter name and press Add"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Inserisci nome e premi Aggiungi"
                     />
                     <button
                       type="button"
                       onClick={addCustomAttendee}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors font-medium"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -1164,12 +1164,12 @@ const Knowledge = ({ projectId }) => {
                 {/* Selected Attendees */}
                 {selectedAttendees.length > 0 && (
                   <div className="mt-3">
-                    <div className="text-xs text-secondary-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="text-xs text-secondary-600 mb-2 font-medium">Partecipanti selezionati</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedAttendees.map((attendee, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
                         >
                           {attendee}
                           <button
@@ -1186,13 +1186,13 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Notes</label>
+                <label className="block font-medium text-secondary-700 mb-1">Note</label>
                 <textarea
                   value={newSession.notes}
                   onChange={(e) => setNewSession({ ...newSession, notes: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="3"
-                  placeholder="Additional notes about this session..."
+                  placeholder="Note aggiuntive su questa sessione..."
                 />
               </div>
             </div>
@@ -1202,13 +1202,13 @@ const Knowledge = ({ projectId }) => {
                 onClick={() => setShowAddModal(false)}
                 className="px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleAddSession}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
-                Add Session
+                Aggiungi sessione
               </button>
             </div>
           </div>
@@ -1220,7 +1220,7 @@ const Knowledge = ({ projectId }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-secondary-900">Edit Session</h3>
+              <h3 className="font-semibold text-secondary-900">Modifica sessione</h3>
               <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-secondary-600">
                 <X className="w-5 h-5" />
               </button>
@@ -1228,22 +1228,22 @@ const Knowledge = ({ projectId }) => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
-                  Session Topic <span className="text-red-500">*</span>
+                <label className="block font-medium text-secondary-700 mb-1">
+                  Argomento <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={editingSession.session_topic}
                   onChange={(e) => setEditingSession({ ...editingSession, session_topic: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., System Architecture Overview"
+                  placeholder="es. Panoramica architettura di sistema"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">
-                    Date <span className="text-red-500">*</span>
+                  <label className="block font-medium text-secondary-700 mb-1">
+                    Data pianificata <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -1253,7 +1253,7 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">Start Time</label>
+                  <label className="block font-medium text-secondary-700 mb-1">Orario</label>
                   <input
                     type="time"
                     value={editingSession.start_time || ''}
@@ -1262,24 +1262,24 @@ const Knowledge = ({ projectId }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 mb-1">Duration</label>
+                  <label className="block font-medium text-secondary-700 mb-1">Durata</label>
                   <input
                     type="text"
                     value={editingSession.duration || ''}
                     onChange={(e) => setEditingSession({ ...editingSession, duration: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 2 hours"
+                    placeholder="es. 2 ore"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-2">Attendees</label>
+                <label className="block font-medium text-secondary-700 mb-2">Partecipanti</label>
 
                 {/* Team Members */}
                 {teamContacts.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-secondary-600 mb-1 font-medium">Team Members</div>
+                    <div className="text-xs text-secondary-600 mb-1 font-medium">Membri del team</div>
                     <div className="border border-gray-300 rounded-md p-3 max-h-36 overflow-y-auto bg-gray-50">
                       <div className="space-y-2">
                         {teamContacts.map(contact => (
@@ -1303,20 +1303,20 @@ const Knowledge = ({ projectId }) => {
 
                 {/* Custom Attendees */}
                 <div>
-                  <div className="text-xs text-secondary-600 mb-1 font-medium">Add Custom Attendee</div>
+                  <div className="text-xs text-secondary-600 mb-1 font-medium">Aggiungi partecipante</div>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={editCustomAttendee}
                       onChange={(e) => setEditCustomAttendee(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && addEditCustomAttendee()}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="Enter name and press Add"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Inserisci nome e premi Aggiungi"
                     />
                     <button
                       type="button"
                       onClick={addEditCustomAttendee}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-secondary-700 rounded-md transition-colors font-medium"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -1326,12 +1326,12 @@ const Knowledge = ({ projectId }) => {
                 {/* Selected Attendees */}
                 {editSelectedAttendees.length > 0 && (
                   <div className="mt-3">
-                    <div className="text-xs text-secondary-600 mb-2 font-medium">Selected Attendees</div>
+                    <div className="text-xs text-secondary-600 mb-2 font-medium">Partecipanti selezionati</div>
                     <div className="flex flex-wrap gap-2">
                       {editSelectedAttendees.map((attendee, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
                         >
                           {attendee}
                           <button
@@ -1348,22 +1348,22 @@ const Knowledge = ({ projectId }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Status</label>
+                <label className="block font-medium text-secondary-700 mb-1">Stato</label>
                 <select
                   value={editingSession.status}
                   onChange={(e) => setEditingSession({ ...editingSession, status: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
+                  <option value="Scheduled">Pianificata</option>
+                  <option value="In Progress">In corso</option>
+                  <option value="Completed">Completata</option>
+                  <option value="Cancelled">Annullata</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-2">
-                  Effectiveness Rating
+                <label className="block font-medium text-secondary-700 mb-2">
+                  Valutazione efficacia
                 </label>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((rating) => (
@@ -1384,22 +1384,22 @@ const Knowledge = ({ projectId }) => {
                   {editingSession.effectiveness_rating && (
                     <button
                       onClick={() => setEditingSession({ ...editingSession, effectiveness_rating: null })}
-                      className="ml-2 text-sm text-secondary-500 hover:text-secondary-700"
+                      className="ml-2 text-secondary-500 hover:text-secondary-700"
                     >
-                      Clear
+                      Rimuovi
                     </button>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Notes</label>
+                <label className="block font-medium text-secondary-700 mb-1">Note</label>
                 <textarea
                   value={editingSession.notes || ''}
                   onChange={(e) => setEditingSession({ ...editingSession, notes: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="4"
-                  placeholder="Session notes, outcomes, action items..."
+                  placeholder="Note della sessione, risultati, azioni da intraprendere..."
                 />
               </div>
             </div>
@@ -1414,20 +1414,20 @@ const Knowledge = ({ projectId }) => {
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete Session
+                Elimina sessione
               </button>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowEditModal(false)}
                   className="px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  Annulla
                 </button>
                 <button
                   onClick={handleUpdateSession}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                 >
-                  Save Changes
+                  Salva modifiche
                 </button>
               </div>
             </div>
@@ -1444,15 +1444,15 @@ const Knowledge = ({ projectId }) => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-secondary-900">Delete Session?</h3>
-                <p className="text-sm text-secondary-500">This action cannot be undone</p>
+                <h3 className="font-semibold text-secondary-900">Eliminare la sessione?</h3>
+                <p className="text-secondary-500">Questa azione non può essere annullata</p>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded p-4 mb-4">
-              <p className="text-sm text-secondary-700 mb-2">You are about to delete:</p>
+              <p className="text-secondary-700 mb-2">Stai per eliminare:</p>
               <p className="font-semibold text-secondary-900">{sessionToDelete.session_topic}</p>
-              <p className="text-sm text-secondary-600">
+              <p className="text-secondary-600">
                 {new Date(sessionToDelete.scheduled_date).toLocaleDateString()}
               </p>
             </div>
@@ -1462,14 +1462,14 @@ const Knowledge = ({ projectId }) => {
                 onClick={() => setShowDeleteModal(false)}
                 className="flex-1 px-4 py-2 border border-gray-300 text-secondary-700 rounded hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeleteSession}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                Delete
+                Elimina
               </button>
             </div>
           </div>

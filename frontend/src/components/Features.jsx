@@ -315,7 +315,7 @@ const Features = ({ projectId }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-sm text-secondary-500">Caricamento...</div>
+        <div className="text-secondary-500">Caricamento...</div>
       </div>
     );
   }
@@ -323,7 +323,7 @@ const Features = ({ projectId }) => {
   if (!project) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-sm text-danger-600">Errore nel caricare il progetto</div>
+        <div className="text-danger-600">Errore nel caricare il progetto</div>
       </div>
     );
   }
@@ -347,10 +347,6 @@ const Features = ({ projectId }) => {
         {showDescrizioneGenerale && (
           <div className="p-4 space-y-4">
             <style>{`
-              .quill-custom .ql-container {
-                border: none !important;
-                font-size: 0.875rem;
-              }
               .quill-custom .ql-editor {
                 min-height: 80px;
                 padding: 0.375rem 0.625rem;
@@ -364,7 +360,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-sm font-semibold text-secondary-900">Funzioni Progettate e Collaudate</label>
+                <label className="font-semibold text-secondary-900">Funzioni Progettate e Collaudate</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(funzioniQuillRef, 'bold')}
@@ -418,7 +414,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-sm font-semibold text-secondary-900">Finalità</label>
+                <label className="font-semibold text-secondary-900">Finalità</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(finalitaQuillRef, 'bold')}
@@ -472,7 +468,7 @@ const Features = ({ projectId }) => {
 
             <div className="group/field">
               <div className="flex items-center justify-between mb-1">
-                <label className="text-sm font-semibold text-secondary-900">Specifiche</label>
+                <label className="font-semibold text-secondary-900">Specifiche</label>
                 <div className="flex gap-1 opacity-0 group-hover/field:opacity-100 transition-opacity">
                   <button
                     onClick={() => applyFormat(specificheQuillRef, 'bold')}
@@ -544,7 +540,7 @@ const Features = ({ projectId }) => {
         {showOsservazioni && (
           <div className="p-4 space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-secondary-900 mb-1">Osservazioni e Note</label>
+              <label className="block font-semibold text-secondary-900 mb-1">Osservazioni e Note</label>
               <textarea
                 ref={osservazioniRef}
                 value={project.osservazioni_note || ''}
@@ -553,7 +549,7 @@ const Features = ({ projectId }) => {
                   handleTextareaResize(e);
                 }}
                 onInput={handleTextareaResize}
-                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                className="w-full px-2.5 py-1.5 bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
                 placeholder="Inserisci osservazioni e note..."
                 rows="3"
                 style={{ minHeight: '80px' }}
@@ -563,7 +559,7 @@ const Features = ({ projectId }) => {
             {/* Criticità - Dynamic List */}
             <div className="group/section">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-secondary-900">Criticità</label>
+                <label className="block font-semibold text-secondary-900">Criticità</label>
                 {!showAddCriticalityForm && (
                   <button
                     onClick={() => setShowAddCriticalityForm(true)}
@@ -577,7 +573,7 @@ const Features = ({ projectId }) => {
               <div className="bg-white border-2 border-primary-300 rounded overflow-hidden">
                 {/* Criticalities list */}
                 {criticalities.length === 0 && !showAddCriticalityForm ? (
-                  <div className="text-center py-6 text-sm text-secondary-500 px-4">
+                  <div className="text-center py-6 text-secondary-500 px-4">
                     <AlertCircle className="w-8 h-8 text-secondary-300 mx-auto mb-2" />
                     <p>Nessuna criticità aggiunta.</p>
                   </div>
@@ -604,7 +600,7 @@ const Features = ({ projectId }) => {
                                   setEditCriticalityText('');
                                 }
                               }}
-                              className="flex-1 px-2.5 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                              className="flex-1 px-2.5 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                               rows="2"
                               autoFocus
                             />
@@ -633,7 +629,7 @@ const Features = ({ projectId }) => {
                             <span className="flex-shrink-0 w-6 text-xs font-semibold text-danger-600 mt-0.5">
                               {index + 1}.
                             </span>
-                            <span className="flex-1 text-sm text-secondary-900 whitespace-pre-wrap">{criticality.criticality_text}</span>
+                            <span className="flex-1 text-secondary-900 whitespace-pre-wrap">{criticality.criticality_text}</span>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleEditCriticality(criticality)}
@@ -675,7 +671,7 @@ const Features = ({ projectId }) => {
                                 handleCancelAddCriticality();
                               }
                             }}
-                            className="flex-1 px-2.5 py-1.5 text-sm border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white resize-none"
+                            className="flex-1 px-2.5 py-1.5 border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white resize-none"
                             placeholder="Inserisci la criticità... (Ctrl+Enter per salvare)"
                             rows="2"
                             autoFocus
@@ -705,7 +701,7 @@ const Features = ({ projectId }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-secondary-900 mb-1">Eventuali Azioni Correttive o Integrative</label>
+              <label className="block font-semibold text-secondary-900 mb-1">Eventuali Azioni Correttive o Integrative</label>
               <textarea
                 ref={azioniRef}
                 value={project.azioni_correttive || ''}
@@ -714,7 +710,7 @@ const Features = ({ projectId }) => {
                   handleTextareaResize(e);
                 }}
                 onInput={handleTextareaResize}
-                className="w-full px-2.5 py-1.5 text-sm bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
+                className="w-full px-2.5 py-1.5 bg-white border-2 border-primary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none overflow-hidden"
                 placeholder="Descrivi eventuali azioni correttive o integrative necessarie..."
                 rows="3"
                 style={{ minHeight: '80px' }}
@@ -746,52 +742,52 @@ const Features = ({ projectId }) => {
             <h3 className="text-base font-semibold text-secondary-900 mb-3">Aggiungi Nuova Funzionalità</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                <label className="block font-medium text-secondary-700 mb-1">
                   Nome Funzionalità <span className="text-danger-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.feature_name}
                   onChange={(e) => setFormData({ ...formData, feature_name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="es. Sistema di Autenticazione Utente"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                <label className="block font-medium text-secondary-700 mb-1">
                   <FileText className="w-4 h-4 inline mr-1" />
                   Descrizione
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                  className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows="4"
                   placeholder="Descrizione generale di cosa fa questa funzionalità e come funziona..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                <label className="block font-medium text-secondary-700 mb-1">
                   <Target className="w-4 h-4 inline mr-1" />
                   Finalità (Esplicita)
                 </label>
                 <textarea
                   value={formData.purpose}
                   onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                  className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows="3"
                   placeholder="Perché serve questa funzionalità, quali problemi risolve, obiettivi di business..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                <label className="block font-medium text-secondary-700 mb-1">
                   <Wrench className="w-4 h-4 inline mr-1" />
                   Specifiche Tecniche
                 </label>
                 <textarea
                   value={formData.tech_specs}
                   onChange={(e) => setFormData({ ...formData, tech_specs: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                  className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                   rows="5"
                   placeholder="Dettagli tecnici: tecnologie utilizzate, architettura, API, database, framework, integrazioni..."
                 />
@@ -801,14 +797,14 @@ const Features = ({ projectId }) => {
               <button
                 onClick={handleSaveFeature}
                 disabled={saving}
-                className="flex items-center gap-1.5 px-4 py-2 bg-success-600 text-white text-sm rounded hover:bg-success-700 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Salvataggio...' : 'Salva Funzionalità'}
               </button>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 bg-secondary-300 text-secondary-700 text-sm rounded hover:bg-secondary-400 transition-colors"
+                className="px-4 py-2 bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors"
               >
                 Annulla
               </button>
@@ -820,7 +816,7 @@ const Features = ({ projectId }) => {
         {features.length === 0 && !showAddForm ? (
           <div className="text-center py-8 text-secondary-500">
             <FileText className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
-            <p className="text-sm">Nessuna funzionalità aggiunta. Clicca "Aggiungi Funzionalità" per iniziare.</p>
+            <p className="">Nessuna funzionalità aggiunta. Clicca "Aggiungi Funzionalità" per iniziare.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -834,49 +830,49 @@ const Features = ({ projectId }) => {
                     <h3 className="text-base font-semibold text-secondary-900 mb-3">Modifica Funzionalità</h3>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-secondary-700 mb-1">
+                        <label className="block font-medium text-secondary-700 mb-1">
                           Nome Funzionalità <span className="text-danger-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={formData.feature_name}
                           onChange={(e) => setFormData({ ...formData, feature_name: e.target.value })}
-                          className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-secondary-700 mb-1">
+                        <label className="block font-medium text-secondary-700 mb-1">
                           <FileText className="w-4 h-4 inline mr-1" />
                           Descrizione
                         </label>
                         <textarea
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                          className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                          className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                           rows="4"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-secondary-700 mb-1">
+                        <label className="block font-medium text-secondary-700 mb-1">
                           <Target className="w-4 h-4 inline mr-1" />
                           Finalità (Esplicita)
                         </label>
                         <textarea
                           value={formData.purpose}
                           onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                          className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                          className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                           rows="3"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-secondary-700 mb-1">
+                        <label className="block font-medium text-secondary-700 mb-1">
                           <Wrench className="w-4 h-4 inline mr-1" />
                           Specifiche Tecniche
                         </label>
                         <textarea
                           value={formData.tech_specs}
                           onChange={(e) => setFormData({ ...formData, tech_specs: e.target.value })}
-                          className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                          className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                           rows="5"
                         />
                       </div>
@@ -885,14 +881,14 @@ const Features = ({ projectId }) => {
                       <button
                         onClick={handleSaveFeature}
                         disabled={saving}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-success-600 text-white text-sm rounded hover:bg-success-700 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-success-600 text-white rounded hover:bg-success-700 transition-colors disabled:opacity-50"
                       >
                         <Save className="w-4 h-4" />
                         {saving ? 'Salvataggio...' : 'Salva Modifiche'}
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-4 py-2 bg-secondary-300 text-secondary-700 text-sm rounded hover:bg-secondary-400 transition-colors"
+                        className="px-4 py-2 bg-secondary-300 text-secondary-700 rounded hover:bg-secondary-400 transition-colors"
                       >
                         Annulla
                       </button>
@@ -943,27 +939,27 @@ const Features = ({ projectId }) => {
                         <div>
                           <div className="flex items-center gap-1.5 mb-2">
                             <FileText className="w-4 h-4 text-primary-600" />
-                            <h4 className="text-sm font-semibold text-secondary-900">Descrizione</h4>
+                            <h4 className="font-semibold text-secondary-900">Descrizione</h4>
                           </div>
-                          <p className="text-sm text-secondary-700 whitespace-pre-wrap pl-5">{feature.description}</p>
+                          <p className="text-secondary-700 whitespace-pre-wrap pl-5">{feature.description}</p>
                         </div>
                       )}
                       {feature.purpose && (
                         <div>
                           <div className="flex items-center gap-1.5 mb-2">
                             <Target className="w-4 h-4 text-success-600" />
-                            <h4 className="text-sm font-semibold text-secondary-900">Finalità</h4>
+                            <h4 className="font-semibold text-secondary-900">Finalità</h4>
                           </div>
-                          <p className="text-sm text-secondary-700 whitespace-pre-wrap pl-5">{feature.purpose}</p>
+                          <p className="text-secondary-700 whitespace-pre-wrap pl-5">{feature.purpose}</p>
                         </div>
                       )}
                       {feature.tech_specs && (
                         <div>
                           <div className="flex items-center gap-1.5 mb-2">
                             <Wrench className="w-4 h-4 text-warning-600" />
-                            <h4 className="text-sm font-semibold text-secondary-900">Specifiche Tecniche</h4>
+                            <h4 className="font-semibold text-secondary-900">Specifiche Tecniche</h4>
                           </div>
-                          <p className="text-sm text-secondary-700 whitespace-pre-wrap pl-5 font-mono bg-secondary-50 p-3 rounded">{feature.tech_specs}</p>
+                          <p className="text-secondary-700 whitespace-pre-wrap pl-5 font-mono bg-secondary-50 p-3 rounded">{feature.tech_specs}</p>
                         </div>
                       )}
                       </div>

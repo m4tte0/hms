@@ -346,7 +346,7 @@ const TechSpecs = ({ projectId }) => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Specifiche Tecniche</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-gray-600 mt-1">
               Seleziona le caratteristiche tecniche del progetto cliccando sui badge
             </p>
           </div>
@@ -355,17 +355,17 @@ const TechSpecs = ({ projectId }) => {
               {saveStatus === 'saving' && (
                 <div className="flex items-center gap-2 text-blue-600">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm font-medium">Salvataggio...</span>
+                  <span className="font-medium">Salvataggio...</span>
                 </div>
               )}
               {saveStatus === 'saved' && (
                 <div className="flex items-center gap-2 text-green-600">
                   <Save className="w-4 h-4" />
-                  <span className="text-sm font-medium">Salvato</span>
+                  <span className="font-medium">Salvato</span>
                 </div>
               )}
               {saveStatus === 'error' && (
-                <span className="text-sm font-medium text-red-600">Errore nel salvataggio</span>
+                <span className="font-medium text-red-600">Errore nel salvataggio</span>
               )}
             </div>
           )}
@@ -394,20 +394,20 @@ const TechSpecs = ({ projectId }) => {
                   <React.Fragment key={categoryKey}>
                     {level1.length > 0 && (
                       <>
-                        <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                        <div className="text-sm text-gray-600">{level1.join(' | ')}</div>
+                        <div className="font-semibold text-gray-700">{category.title}:</div>
+                        <div className="text-gray-600">{level1.join(' | ')}</div>
                       </>
                     )}
                     {level2.length > 0 && (
                       <>
-                        <div className="text-sm font-semibold text-gray-700">Machine Family:</div>
-                        <div className="text-sm text-gray-600">{level2.join(' | ')}</div>
+                        <div className="font-semibold text-gray-700">Machine Family:</div>
+                        <div className="text-gray-600">{level2.join(' | ')}</div>
                       </>
                     )}
                     {level3.length > 0 && (
                       <>
-                        <div className="text-sm font-semibold text-gray-700">Model:</div>
-                        <div className="text-sm text-gray-600">{level3.join(' | ')}</div>
+                        <div className="font-semibold text-gray-700">Model:</div>
+                        <div className="text-gray-600">{level3.join(' | ')}</div>
                       </>
                     )}
                   </React.Fragment>
@@ -430,8 +430,8 @@ const TechSpecs = ({ projectId }) => {
                   .join(' | ');
                 return (
                   <React.Fragment key={categoryKey}>
-                    <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                    <div className="text-sm text-gray-600">{display}</div>
+                    <div className="font-semibold text-gray-700">{category.title}:</div>
+                    <div className="text-gray-600">{display}</div>
                   </React.Fragment>
                 );
               }
@@ -444,8 +444,8 @@ const TechSpecs = ({ projectId }) => {
                   : '';
                 return (
                   <React.Fragment key={categoryKey}>
-                    <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-semibold text-gray-700">{category.title}:</div>
+                    <div className="text-gray-600">
                       {selections.map(g => `${g}${dotnetSuffix}`).join(' | ')}
                     </div>
                   </React.Fragment>
@@ -454,13 +454,13 @@ const TechSpecs = ({ projectId }) => {
 
               return (
                 <React.Fragment key={categoryKey}>
-                  <div className="text-sm font-semibold text-gray-700">{category.title}:</div>
-                  <div className="text-sm text-gray-600">{selections.join(' | ')}</div>
+                  <div className="font-semibold text-gray-700">{category.title}:</div>
+                  <div className="text-gray-600">{selections.join(' | ')}</div>
                 </React.Fragment>
               );
             })}
             {Object.values(specs).every(arr => arr.length === 0) && (
-              <p className="text-sm text-gray-500 italic col-span-2">Nessuna specifica selezionata</p>
+              <p className="text-gray-500 italic col-span-2">Nessuna specifica selezionata</p>
             )}
           </div>
         </div>
@@ -502,7 +502,7 @@ const TechSpecs = ({ projectId }) => {
               <button
                 key={option}
                 onClick={() => enabled && toggleBadge('calender_technology', option)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                   !enabled
                     ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed'
                     : selected
@@ -595,7 +595,7 @@ const TechSpecs = ({ projectId }) => {
                             <button
                               key={option}
                               onClick={() => toggleBadge('platform_compatibility', option)}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                              className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                                 selected
                                   ? pcStyles.active
                                   : `${pcStyles.inactive} ${pcStyles.hover}`
@@ -653,7 +653,7 @@ const TechSpecs = ({ projectId }) => {
                           return (
                             <div
                               key={option}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 ${
+                              className={`px-4 py-2 rounded-lg font-medium border-2 ${
                                 selected
                                   ? hwStyles.active
                                   : hwStyles.inactive
@@ -724,7 +724,7 @@ const TechSpecs = ({ projectId }) => {
                                 if (isWildcard) return;
                                 toggleBadge('power_segmentation', segKey);
                               }}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                              className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                                 isWildcard
                                   ? 'bg-amber-50 text-amber-600 border-amber-300 cursor-default'
                                   : selected
@@ -777,7 +777,7 @@ const TechSpecs = ({ projectId }) => {
                       <button
                         key={option}
                         onClick={() => toggleBadge('gui_interface', option)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                        className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                           selected
                             ? guiStyles.active
                             : `${guiStyles.inactive} ${guiStyles.hover}`
@@ -795,7 +795,7 @@ const TechSpecs = ({ projectId }) => {
                       <button
                         key={option}
                         onClick={() => toggleBadge('gui_interface', option)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                        className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                           selected
                             ? guiStyles.active
                             : `${guiStyles.inactive} ${guiStyles.hover}`
@@ -838,7 +838,7 @@ const TechSpecs = ({ projectId }) => {
                       <button
                         key={option}
                         onClick={() => toggleBadge('dotnet_version', option)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                        className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                           selected
                             ? dotnetStyles.active
                             : `${dotnetStyles.inactive} ${dotnetStyles.hover}`
@@ -883,7 +883,7 @@ const TechSpecs = ({ projectId }) => {
                       <button
                         key={option}
                         onClick={() => toggleBadge(categoryKey, option)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all duration-200 ${
+                        className={`px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200 ${
                           selected
                             ? styles.active
                             : `${styles.inactive} ${styles.hover}`

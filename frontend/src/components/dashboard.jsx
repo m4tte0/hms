@@ -10,7 +10,7 @@ const Dashboard = ({ projectId }) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Overall Progress</p>
+              <p className="text-gray-600">Progresso complessivo</p>
               <p className="text-3xl font-bold text-blue-600 mt-2">45%</p>
             </div>
             <TrendingUp className="w-8 h-8 text-blue-600" />
@@ -20,7 +20,7 @@ const Dashboard = ({ projectId }) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Completed</p>
+              <p className="text-gray-600">Completati</p>
               <p className="text-3xl font-bold text-green-600 mt-2">18</p>
             </div>
             <CheckCircle className="w-8 h-8 text-green-600" />
@@ -30,7 +30,7 @@ const Dashboard = ({ projectId }) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">In Progress</p>
+              <p className="text-gray-600">In corso</p>
               <p className="text-3xl font-bold text-yellow-600 mt-2">12</p>
             </div>
             <Clock className="w-8 h-8 text-yellow-600" />
@@ -40,7 +40,7 @@ const Dashboard = ({ projectId }) => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Issues</p>
+              <p className="text-gray-600">Problemi</p>
               <p className="text-3xl font-bold text-red-600 mt-2">3</p>
             </div>
             <AlertTriangle className="w-8 h-8 text-red-600" />
@@ -51,19 +51,19 @@ const Dashboard = ({ projectId }) => {
       {/* Phase Status */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Phase Status Overview
+          Stato delle fasi
         </h2>
         <div className="space-y-3">
           {[
-            { phase: 'Pre-Handover Assessment', progress: 100, status: 'Complete' },
-            { phase: 'Knowledge Transfer', progress: 65, status: 'In Progress' },
-            { phase: 'Acceptance Testing', progress: 0, status: 'Pending' },
-            { phase: 'Official Handover', progress: 0, status: 'Pending' }
+            { phase: 'Valutazione pre-consegna', progress: 100, status: 'Complete' },
+            { phase: 'Trasferimento know-how', progress: 65, status: 'In Progress' },
+            { phase: 'Test di accettazione', progress: 0, status: 'Pending' },
+            { phase: 'Consegna ufficiale', progress: 0, status: 'Pending' }
           ].map((item, idx) => (
             <div key={idx} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-900">{item.phase}</span>
-                <span className="text-sm text-gray-600">{item.progress}%</span>
+                <span className="text-gray-600">{item.progress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
@@ -83,28 +83,28 @@ const Dashboard = ({ projectId }) => {
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Recent Activity
+          Attività recenti
         </h2>
         <div className="space-y-3">
-          <div className="flex gap-3 text-sm">
+          <div className="flex gap-3">
             <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
             <div>
-              <p className="text-gray-900">Code review completed</p>
-              <p className="text-gray-500 text-xs">2 hours ago</p>
+              <p className="text-gray-900">Revisione del codice completata</p>
+              <p className="text-gray-500 text-xs">2 ore fa</p>
             </div>
           </div>
-          <div className="flex gap-3 text-sm">
+          <div className="flex gap-3">
             <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
             <div>
-              <p className="text-gray-900">Knowledge transfer session scheduled</p>
-              <p className="text-gray-500 text-xs">5 hours ago</p>
+              <p className="text-gray-900">Sessione di trasferimento know-how pianificata</p>
+              <p className="text-gray-500 text-xs">5 ore fa</p>
             </div>
           </div>
-          <div className="flex gap-3 text-sm">
+          <div className="flex gap-3">
             <div className="flex-shrink-0 w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
             <div>
-              <p className="text-gray-900">Documentation updated</p>
-              <p className="text-gray-500 text-xs">1 day ago</p>
+              <p className="text-gray-900">Documentazione aggiornata</p>
+              <p className="text-gray-500 text-xs">1 giorno fa</p>
             </div>
           </div>
         </div>

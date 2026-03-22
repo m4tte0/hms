@@ -215,7 +215,7 @@ function App() {
     const timestamp = Date.now();
     const newProject = {
       handover_id: `HTD-${timestamp}`,
-      project_name: 'New Project',
+      project_name: 'Nuovo progetto',
       rd_lead: '',
       automation_lead: '',
       start_date: new Date().toISOString().split('T')[0],
@@ -321,34 +321,34 @@ function App() {
         return (
           <div className="flex items-center gap-1.5 text-primary-700 text-xs bg-primary-100 px-2 py-1 rounded">
             <Loader className="w-3 h-3 animate-spin" />
-            <span>Saving...</span>
+            <span>Salvataggio...</span>
           </div>
         );
       case 'saved':
         return (
           <div className="flex items-center gap-1.5 text-success-700 text-xs bg-success-100 px-2 py-1 rounded">
             <CheckCircle className="w-3 h-3" />
-            <span>Saved {lastSaved ? `${lastSaved.toLocaleTimeString()}` : ''}</span>
+            <span>Salvato {lastSaved ? `${lastSaved.toLocaleTimeString()}` : ''}</span>
           </div>
         );
       case 'error':
         return (
           <div className="flex items-center gap-1.5 text-danger-700 text-xs bg-danger-100 px-2 py-1 rounded">
             <AlertCircle className="w-3 h-3" />
-            <span>Error saving</span>
+            <span>Errore nel salvataggio</span>
           </div>
         );
       case 'Project deleted':
         return (
           <div className="flex items-center gap-1.5 text-warning-700 text-xs bg-warning-100 px-2 py-1 rounded">
             <CheckCircle className="w-3 h-3" />
-            <span>Project deleted</span>
+            <span>Progetto eliminato</span>
           </div>
         );
       default:
         return lastSaved ? (
           <div className="text-secondary-600 text-xs font-medium">
-            Last saved: {lastSaved.toLocaleTimeString()}
+            Ultimo salvataggio: {lastSaved.toLocaleTimeString()}
           </div>
         ) : null;
     }
@@ -367,8 +367,8 @@ function App() {
                   <Settings className="w-5 h-5 text-primary-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-secondary-900">Project Settings</h3>
-                  <p className="text-xs text-secondary-500">Manage project configuration and metrics</p>
+                  <h3 className="text-lg font-semibold text-secondary-900">Impostazioni progetto</h3>
+                  <p className="text-xs text-secondary-500">Gestisci configurazione e metriche del progetto</p>
                 </div>
               </div>
               <button onClick={() => setShowProjectSettings(false)} className="p-1 hover:bg-secondary-100 rounded transition-colors">
@@ -379,48 +379,48 @@ function App() {
             <div className="space-y-4">
               {/* Basic Information Section */}
               <div>
-                <h4 className="text-sm font-semibold text-secondary-900 mb-3">Basic Information</h4>
+                <h4 className="font-semibold text-secondary-900 mb-3">Informazioni base</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">
-                      Project Name <span className="text-danger-500">*</span>
+                    <label className="block font-medium text-secondary-700 mb-1">
+                      Nome progetto <span className="text-danger-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={currentProject.project_name || ''}
                       onChange={(e) => setCurrentProject({ ...currentProject, project_name: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="Enter project name"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Inserisci il nome del progetto"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">
-                      Handover ID <span className="text-danger-500">*</span>
+                    <label className="block font-medium text-secondary-700 mb-1">
+                      ID Handover <span className="text-danger-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={currentProject.handover_id || ''}
                       onChange={(e) => setCurrentProject({ ...currentProject, handover_id: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="HTD-YYYY-XXX"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Start Date</label>
+                    <label className="block font-medium text-secondary-700 mb-1">Data inizio</label>
                     <input
                       type="date"
                       value={currentProject.start_date || ''}
                       onChange={(e) => setCurrentProject({ ...currentProject, start_date: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Target Completion Date</label>
+                    <label className="block font-medium text-secondary-700 mb-1">Data di completamento prevista</label>
                     <input
                       type="date"
                       value={currentProject.target_date || ''}
                       onChange={(e) => setCurrentProject({ ...currentProject, target_date: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                 </div>
@@ -428,14 +428,14 @@ function App() {
 
               {/* Project Metrics Section */}
               <div className="pt-3 border-t border-secondary-200">
-                <h4 className="text-sm font-semibold text-secondary-900 mb-3">Project Metrics</h4>
+                <h4 className="font-semibold text-secondary-900 mb-3">Metriche del progetto</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Project Priority</label>
+                    <label className="block font-medium text-secondary-700 mb-1">Priorità del progetto</label>
                     <select
                       value={currentProject.business_priority || 'Media'}
                       onChange={(e) => setCurrentProject({ ...currentProject, business_priority: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
                       <option value="Alta">Alta</option>
                       <option value="Media">Media</option>
@@ -443,11 +443,11 @@ function App() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Complexity Level</label>
+                    <label className="block font-medium text-secondary-700 mb-1">Livello di complessità</label>
                     <select
                       value={currentProject.complexity_level || 'Media'}
                       onChange={(e) => setCurrentProject({ ...currentProject, complexity_level: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
                       <option value="Alta">Alta</option>
                       <option value="Media">Media</option>
@@ -455,9 +455,9 @@ function App() {
                     </select>
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-secondary-700 mb-1">Project Score (Auto-calculated)</label>
+                    <label className="block font-medium text-secondary-700 mb-1">Punteggio progetto (calcolato automaticamente)</label>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-secondary-50 px-3 py-2 border border-secondary-300 rounded text-sm text-secondary-700 font-semibold">
+                      <div className="flex-1 bg-secondary-50 px-3 py-2 border border-secondary-300 rounded text-secondary-700 font-semibold">
                         {currentProject.project_score || 0} / 15
                       </div>
                       <div className="flex-1">
@@ -474,7 +474,7 @@ function App() {
                         </div>
                       </div>
                     </div>
-                    <p className="text-xs text-secondary-500 mt-1">Calculated from Priority (weight: 2) and Complexity (weight: 3)</p>
+                    <p className="text-xs text-secondary-500 mt-1">Calcolato da Priorità (peso: 2) e Complessità (peso: 3)</p>
                   </div>
                 </div>
               </div>
@@ -483,9 +483,9 @@ function App() {
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-secondary-200">
               <button
                 onClick={() => setShowProjectSettings(false)}
-                className="px-4 py-2 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+                className="px-4 py-2 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
-                Close
+                Chiudi
               </button>
             </div>
           </div>
@@ -500,27 +500,27 @@ function App() {
                 <AlertTriangle className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-secondary-900">Delete Project?</h3>
-                <p className="text-xs text-secondary-500">This action cannot be undone</p>
+                <h3 className="text-base font-semibold text-secondary-900">Eliminare il progetto?</h3>
+                <p className="text-xs text-secondary-500">Questa azione non può essere annullata</p>
               </div>
             </div>
             <div className="bg-secondary-50 rounded p-3 mb-3">
-              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
-              <p className="font-semibold text-sm text-secondary-900">{projectToDelete?.project_name}</p>
+              <p className="text-xs text-secondary-700 mb-1">Stai per eliminare:</p>
+              <p className="font-semibold text-secondary-900">{projectToDelete?.project_name}</p>
               <p className="text-xs text-secondary-600">ID: {projectToDelete?.handover_id}</p>
             </div>
             <div className="bg-warning-50 border border-warning-200 rounded p-2 mb-3">
-              <p className="text-xs text-warning-800"><strong>Warning:</strong> This will permanently delete all project data.</p>
+              <p className="text-xs text-warning-800"><strong>Attenzione:</strong> Questa operazione eliminerà definitivamente tutti i dati del progetto.</p>
               <ul className="text-xs text-warning-700 mt-1 ml-4 list-disc">
-                <li>Checklist items</li>
-                <li>Knowledge transfer sessions</li>
-                <li>Assessment scores</li>
+                <li>Elementi della checklist</li>
+                <li>Sessioni di trasferimento know-how</li>
+                <li>Punteggi di valutazione</li>
               </ul>
             </div>
             <div className="flex gap-2">
-              <button onClick={handleDeleteCancel} disabled={isDeleting} className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors disabled:opacity-50">Cancel</button>
-              <button onClick={handleDeleteConfirm} disabled={isDeleting} className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
-                {isDeleting ? (<><Loader className="w-3.5 h-3.5 animate-spin" />Deleting...</>) : (<><Trash2 className="w-3.5 h-3.5" />Delete Project</>)}
+              <button onClick={handleDeleteCancel} disabled={isDeleting} className="flex-1 px-3 py-1.5 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors disabled:opacity-50">Annulla</button>
+              <button onClick={handleDeleteConfirm} disabled={isDeleting} className="flex-1 px-3 py-1.5 bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
+                {isDeleting ? (<><Loader className="w-3.5 h-3.5 animate-spin" />Eliminazione...</>) : (<><Trash2 className="w-3.5 h-3.5" />Elimina progetto</>)}
               </button>
             </div>
           </div>
@@ -529,9 +529,9 @@ function App() {
       <header className="bg-gradient-to-r from-primary-700 to-primary-800 border-b-2 border-primary-900 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-white">Handover Management System</h1>
+            <h1 className="text-xl font-bold text-white">Sistema di Gestione Handover</h1>
             {currentProject && (
-              <p className="text-sm text-primary-100 mt-0.5">
+              <p className="text-primary-100 mt-0.5">
                 {currentProject.project_name} <span className="text-xs">({currentProject.handover_id})</span>
               </p>
             )}
@@ -547,14 +547,14 @@ function App() {
           {/* Projects List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-3">
             <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-secondary-500">
-              <h2 className="text-sm font-semibold text-secondary-900">Projects ({projects.length})</h2>
+              <h2 className="font-semibold text-secondary-900">Progetti ({projects.length})</h2>
               <div className="flex items-center gap-2">
                 {/* Actions Menu */}
                 <div className="relative actions-menu-container">
                   <button
                     onClick={() => setShowActionsMenu(!showActionsMenu)}
                     className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
-                    title="Actions"
+                    title="Azioni"
                   >
                     <Menu className="w-4 h-4 text-secondary-700" />
                   </button>
@@ -567,10 +567,10 @@ function App() {
                           handleCreateProject();
                           setShowActionsMenu(false);
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-secondary-700 hover:bg-primary-50 transition-colors"
                       >
                         <Plus className="w-4 h-4 text-primary-600 flex-shrink-0" />
-                        <span className="font-medium whitespace-nowrap">New Project</span>
+                        <span className="font-medium whitespace-nowrap">Nuovo progetto</span>
                       </button>
 
                       <button
@@ -579,10 +579,10 @@ function App() {
                           setShowActionsMenu(false);
                         }}
                         disabled={refreshing}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-secondary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
                       >
                         <RefreshCw className={`w-4 h-4 text-secondary-600 flex-shrink-0 ${refreshing ? 'animate-spin' : ''}`} />
-                        <span className="font-medium whitespace-nowrap">Refresh Data</span>
+                        <span className="font-medium whitespace-nowrap">Aggiorna dati</span>
                       </button>
 
                       {currentProject && (
@@ -605,10 +605,10 @@ function App() {
                               setShowReport(true);
                               setShowActionsMenu(false);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary-700 hover:bg-primary-50 transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-secondary-700 hover:bg-primary-50 transition-colors"
                           >
                             <FileBarChart className="w-4 h-4 text-secondary-600 flex-shrink-0" />
-                            <span className="font-medium whitespace-nowrap">Generate Report</span>
+                            <span className="font-medium whitespace-nowrap">Genera report</span>
                           </button>
 
                           <div className="border-t border-secondary-200 my-1"></div>
@@ -618,10 +618,10 @@ function App() {
                               handleDeleteClick(currentProject);
                               setShowActionsMenu(false);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger-600 hover:bg-danger-50 transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-danger-600 hover:bg-danger-50 transition-colors"
                           >
                             <Trash2 className="w-4 h-4 flex-shrink-0" />
-                            <span className="font-medium whitespace-nowrap">Delete Project</span>
+                            <span className="font-medium whitespace-nowrap">Elimina progetto</span>
                           </button>
                         </>
                       )}
@@ -633,7 +633,7 @@ function App() {
                 <button
                   onClick={() => setShowOverallCalendar(true)}
                   className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
-                  title="Overall Calendar"
+                  title="Calendario generale"
                 >
                   <Calendar className="w-4 h-4 text-secondary-700" />
                 </button>
@@ -643,7 +643,7 @@ function App() {
                   <button
                     onClick={() => setShowProjectSettings(true)}
                     className="p-1.5 hover:bg-secondary-100 rounded transition-colors"
-                    title="Project Settings"
+                    title="Impostazioni progetto"
                   >
                     <Settings className="w-4 h-4 text-secondary-700" />
                   </button>
@@ -652,7 +652,7 @@ function App() {
             </div>
             <div className="relative mb-3">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-secondary-400" />
-              <input type="text" placeholder="Search projects..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-8 pr-3 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="text" placeholder="Cerca progetti..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-8 pr-3 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500" />
             </div>
             <div className="space-y-1.5">
               {filteredProjects.map((project) => {
@@ -666,13 +666,13 @@ function App() {
                         : 'bg-secondary-50 hover:bg-white border-2 border-secondary-300 hover:border-primary-400 hover:shadow-sm'
                     }`}>
                     <button onClick={() => handleProjectSelect(project)} className={`w-full text-left pr-8 ${isSelected ? 'p-2' : 'p-1.5'}`}>
-                      <div className={`font-medium text-sm text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'} flex items-center gap-1.5`}>
+                      <div className={`font-medium text-secondary-900 truncate ${isSelected ? 'mb-0.5' : 'mb-0'} flex items-center gap-1.5`}>
                         <span className="truncate">{project.project_name}</span>
                         {getProjectStatusColor(project) && (
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getProjectStatusColor(project)}`} title={
-                            getProjectStatusColor(project) === 'bg-red-500' ? 'Overdue' :
-                            getProjectStatusColor(project) === 'bg-yellow-500' ? 'Due within 7 days' :
-                            'On track'
+                            getProjectStatusColor(project) === 'bg-red-500' ? 'Scaduto' :
+                            getProjectStatusColor(project) === 'bg-yellow-500' ? 'Scade entro 7 giorni' :
+                            'In linea'
                           }></span>
                         )}
                       </div>
@@ -698,7 +698,7 @@ function App() {
                               }`} style={{ width: `${progress.percentage}%` }} />
                           </div>
                           <div className="flex items-center justify-between">
-                            <div className="text-xs text-secondary-400">{progress.completedItems}/{progress.totalItems} tasks</div>
+                            <div className="text-xs text-secondary-400">{progress.completedItems}/{progress.totalItems} attività</div>
                             <div className="text-xs text-secondary-400">{project.business_priority}</div>
                           </div>
                         </>
@@ -709,7 +709,7 @@ function App() {
                         </div>
                       )}
                     </button>
-                    <button onClick={(e) => handleDeleteClick(project, e)} className={`absolute right-1.5 p-1 opacity-0 group-hover:opacity-100 hover:bg-danger-100 text-danger-600 rounded transition-all ${isSelected ? 'top-2' : 'top-1'}`} title="Delete project">
+                    <button onClick={(e) => handleDeleteClick(project, e)} className={`absolute right-1.5 p-1 opacity-0 group-hover:opacity-100 hover:bg-danger-100 text-danger-600 rounded transition-all ${isSelected ? 'top-2' : 'top-1'}`} title="Elimina progetto">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -718,8 +718,8 @@ function App() {
             </div>
             {filteredProjects.length === 0 && (
               <div className="text-center py-6 text-secondary-500">
-                <p className="text-sm">No projects found</p>
-                <button onClick={handleCreateProject} className="mt-2 text-primary-600 hover:underline text-xs">Create your first project</button>
+                <p className="">Nessun progetto trovato</p>
+                <button onClick={handleCreateProject} className="mt-2 text-primary-600 hover:underline text-xs">Crea il tuo primo progetto</button>
               </div>
             )}
           </div>
@@ -741,7 +741,7 @@ function App() {
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-4 py-2.5 border-b-3 text-sm transition-all whitespace-nowrap ${
+                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-4 py-2.5 border-b-3 transition-all whitespace-nowrap ${
                         activeTab === tab.id
                           ? 'border-secondary-700 text-white bg-secondary-700 font-semibold shadow-md rounded-t -mb-0.5'
                           : 'border-transparent text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100'
@@ -763,9 +763,9 @@ function App() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <FileText className="w-12 h-12 text-secondary-300 mx-auto mb-3" />
-                  <h2 className="text-lg font-semibold text-secondary-600 mb-2">No Project Selected</h2>
-                  <p className="text-sm text-secondary-500 mb-3">Create a new project or select an existing one to get started</p>
-                  <button onClick={handleCreateProject} className="px-4 py-2 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors">Create New Project</button>
+                  <h2 className="text-lg font-semibold text-secondary-600 mb-2">Nessun progetto selezionato</h2>
+                  <p className="text-secondary-500 mb-3">Crea un nuovo progetto o selezionane uno esistente per iniziare</p>
+                  <button onClick={handleCreateProject} className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors">Crea nuovo progetto</button>
                 </div>
               </div>
             ) : activeTab === 'overview' ? (
@@ -790,7 +790,7 @@ function App() {
             ) : (
               <div className="bg-white rounded shadow-sm border border-secondary-200 p-4">
                 <h2 className="text-base font-semibold text-secondary-900 mb-3">{tabs.find(t => t.id === activeTab)?.label}</h2>
-                <p className="text-sm text-secondary-600">This section is coming soon! The full components will be added next.</p>
+                <p className="text-secondary-600">Questa sezione è in arrivo! I componenti completi verranno aggiunti a breve.</p>
               </div>
             )}
           </div>

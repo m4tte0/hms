@@ -36,64 +36,64 @@ const Checklist = ({ projectId }) => {
   
   // Phase configuration - can be customized per project
   const [phases, setPhases] = useState([
-    { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue' },
-    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow' },
-    { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green' }
+    { id: 'Phase 1', name: 'Fase 1: Valutazione pre-consegna', color: 'blue' },
+    { id: 'Phase 2', name: 'Fase 2: Sessioni di trasferimento know-how', color: 'yellow' },
+    { id: 'Phase 3', name: 'Fase 3: Approvazioni finali', color: 'green' }
   ]);
   
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const defaultItems = [
-    // Phase 1: Pre-Handover Assessment
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'Code follows company coding standards', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'Code coverage ≥80%', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'All critical/high bugs resolved', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'Performance benchmarks met', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'Security review completed', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Technical Prerequisites', requirement: 'Code repository organized', status: 'Not Started' },
-    
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'Technical architecture documentation', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'API documentation', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'Database schema documentation', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'Deployment guides', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'User manuals', status: 'Not Started' },
-    { phase: 'Phase 1', category: 'Documentation Prerequisites', requirement: 'Troubleshooting documentation', status: 'Not Started' },
-    
-    // Phase 2: Knowledge Transfer Sessions
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Architecture Overview session scheduled', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Code Walkthrough session completed', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Database/Data Management training', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Deployment Procedures training', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Troubleshooting & Support training', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Training Sessions', requirement: 'Shadow Support Period completed', status: 'Not Started' },
-    
-    { phase: 'Phase 2', category: 'Team Competency', requirement: 'Team demonstrates system understanding', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Team Competency', requirement: 'Can perform basic operations independently', status: 'Not Started' },
-    { phase: 'Phase 2', category: 'Team Competency', requirement: 'Can troubleshoot common issues', status: 'Not Started' },
-    
-    // Phase 3: Final Sign-Offs
-    { phase: 'Phase 3', category: 'Approvals', requirement: 'R&D Project Lead sign-off', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Approvals', requirement: 'R&D Technical Lead sign-off', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Approvals', requirement: 'Automation Operations Manager sign-off', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Approvals', requirement: 'Automation Technical Lead sign-off', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Approvals', requirement: 'Department Manager sign-off', status: 'Not Started' },
-    
-    { phase: 'Phase 3', category: 'Documentation Handover', requirement: 'All documentation transferred', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Documentation Handover', requirement: 'Access credentials provided', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Documentation Handover', requirement: 'Repository access transferred', status: 'Not Started' },
-    
-    { phase: 'Phase 3', category: 'Transition Activities', requirement: 'Support contacts established', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Transition Activities', requirement: 'Escalation procedures documented', status: 'Not Started' },
-    { phase: 'Phase 3', category: 'Transition Activities', requirement: 'Post-handover support schedule defined', status: 'Not Started' },
+    // Fase 1: Valutazione pre-consegna
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Il codice rispetta gli standard aziendali di codifica', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Copertura del codice ≥80%', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Tutti i bug critici/gravi risolti', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Benchmark di prestazioni raggiunti', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Revisione della sicurezza completata', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti tecnici', requirement: 'Repository del codice organizzato', status: 'Not Started' },
+
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Documentazione architettura tecnica', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Documentazione API', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Documentazione schema del database', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Guide al deployment', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Manuali utente', status: 'Not Started' },
+    { phase: 'Phase 1', category: 'Prerequisiti documentali', requirement: 'Documentazione per la risoluzione dei problemi', status: 'Not Started' },
+
+    // Fase 2: Sessioni di trasferimento know-how
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Sessione di panoramica architetturale pianificata', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Sessione di analisi del codice completata', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Formazione su database/gestione dati', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Formazione sulle procedure di deployment', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Formazione su risoluzione problemi e supporto', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Sessioni di formazione', requirement: 'Periodo di supporto affiancato completato', status: 'Not Started' },
+
+    { phase: 'Phase 2', category: 'Competenze del team', requirement: 'Il team dimostra comprensione del sistema', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Competenze del team', requirement: 'Capacità di eseguire operazioni base in autonomia', status: 'Not Started' },
+    { phase: 'Phase 2', category: 'Competenze del team', requirement: 'Capacità di risolvere i problemi comuni', status: 'Not Started' },
+
+    // Fase 3: Approvazioni finali
+    { phase: 'Phase 3', category: 'Approvazioni', requirement: 'Approvazione del Project Lead R&D', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Approvazioni', requirement: 'Approvazione del Technical Lead R&D', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Approvazioni', requirement: 'Approvazione del Responsabile Operazioni Automazione', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Approvazioni', requirement: 'Approvazione del Technical Lead Automazione', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Approvazioni', requirement: 'Approvazione del Responsabile di reparto', status: 'Not Started' },
+
+    { phase: 'Phase 3', category: 'Consegna documentazione', requirement: 'Tutta la documentazione trasferita', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Consegna documentazione', requirement: 'Credenziali di accesso fornite', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Consegna documentazione', requirement: 'Accesso al repository trasferito', status: 'Not Started' },
+
+    { phase: 'Phase 3', category: 'Attività di transizione', requirement: 'Contatti di supporto definiti', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Attività di transizione', requirement: 'Procedure di escalation documentate', status: 'Not Started' },
+    { phase: 'Phase 3', category: 'Attività di transizione', requirement: 'Pianificazione del supporto post-consegna definita', status: 'Not Started' },
   ];
 
   useEffect(() => {
     if (projectId) {
       // Reset phases to default first, then load custom names
       setPhases([
-        { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue' },
-        { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow' },
-        { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green' }
+        { id: 'Phase 1', name: 'Fase 1: Valutazione pre-consegna', color: 'blue' },
+        { id: 'Phase 2', name: 'Fase 2: Sessioni di trasferimento know-how', color: 'yellow' },
+        { id: 'Phase 3', name: 'Fase 3: Approvazioni finali', color: 'green' }
       ]);
       loadChecklistItems();
       loadPhaseNames();
@@ -183,7 +183,7 @@ const Checklist = ({ projectId }) => {
       }
     } catch (error) {
       console.error('❌ Error loading checklist:', error);
-      setSaveStatus('Error loading checklist');
+      setSaveStatus('Errore nel caricamento della checklist');
     } finally {
       setLoading(false);
     }
@@ -308,12 +308,12 @@ const Checklist = ({ projectId }) => {
         }
       }
 
-      setSaveStatus('Saved');
+      setSaveStatus('Salvato');
       setTimeout(() => setSaveStatus(''), 2000);
 
     } catch (error) {
       console.error('❌ Error updating item:', error);
-      setSaveStatus('Error saving');
+      setSaveStatus('Errore nel salvataggio');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -433,7 +433,7 @@ const Checklist = ({ projectId }) => {
     const newItem = {
       phase: phase,
       category: category,
-      requirement: 'New custom requirement',
+      requirement: 'Nuovo requisito personalizzato',
       status: 'Not Started',
       verification_date: null,
       verified_by: '',
@@ -454,7 +454,7 @@ const Checklist = ({ projectId }) => {
       const result = await response.json();
       setItems([...items, { ...newItem, id: result.id }]);
       
-      setSaveStatus('Item added');
+      setSaveStatus('Elemento aggiunto');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error adding item:', error);
@@ -473,7 +473,7 @@ const Checklist = ({ projectId }) => {
 
   const handleSaveEdit = async (itemId) => {
     if (!editingText.trim()) {
-      setSaveStatus('Name cannot be empty');
+      setSaveStatus('Il nome non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -499,7 +499,7 @@ const Checklist = ({ projectId }) => {
 
   const handleSaveEditCategory = async (phase, oldCategory) => {
     if (!editingCategoryText.trim()) {
-      setSaveStatus('Category name cannot be empty');
+      setSaveStatus('Il nome della categoria non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -539,11 +539,11 @@ const Checklist = ({ projectId }) => {
       // Reload items from database to ensure sync
       await loadChecklistItems();
 
-      setSaveStatus('Category updated');
+      setSaveStatus('Categoria aggiornata');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error updating category:', error);
-      setSaveStatus('Error updating category');
+      setSaveStatus('Errore nell\'aggiornamento della categoria');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -563,13 +563,13 @@ const Checklist = ({ projectId }) => {
 
   const handleSaveEditPhase = async (phaseId) => {
     if (!editingPhaseText.trim()) {
-      setSaveStatus('Phase name cannot be empty');
+      setSaveStatus('Il nome della fase non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
 
     try {
-      const updatedPhases = phases.map(p => 
+      const updatedPhases = phases.map(p =>
         p.id === phaseId ? { ...p, name: editingPhaseText } : p
       );
       
@@ -579,7 +579,7 @@ const Checklist = ({ projectId }) => {
       setEditingPhaseId(null);
       setEditingPhaseText('');
       
-      setSaveStatus('Phase name updated');
+      setSaveStatus('Nome fase aggiornato');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error updating phase name:', error);
@@ -598,7 +598,7 @@ const Checklist = ({ projectId }) => {
     const itemsInPhase = items.filter(item => item.phase === itemToDelete.phase);
 
     if (itemsInPhase.length === 1) {
-      setSaveStatus('Cannot delete: last item in phase');
+      setSaveStatus('Impossibile eliminare: ultimo elemento nella fase');
       setTimeout(() => setSaveStatus(''), 3000);
       setShowDeleteModal(false);
       setItemToDelete(null);
@@ -621,13 +621,13 @@ const Checklist = ({ projectId }) => {
       setShowDeleteModal(false);
       setItemToDelete(null);
 
-      setSaveStatus('Item deleted');
+      setSaveStatus('Elemento eliminato');
       setTimeout(() => setSaveStatus(''), 2000);
 
       console.log('✅ Item deleted successfully');
     } catch (error) {
       console.error('❌ Error deleting item:', error);
-      setSaveStatus('Error deleting item');
+      setSaveStatus('Errore nell\'eliminazione dell\'elemento');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -667,13 +667,13 @@ const Checklist = ({ projectId }) => {
       setShowDeleteCategoryModal(false);
       setCategoryToDelete(null);
 
-      setSaveStatus('Category deleted');
+      setSaveStatus('Categoria eliminata');
       setTimeout(() => setSaveStatus(''), 2000);
 
       console.log('✅ Category deleted successfully');
     } catch (error) {
       console.error('❌ Error deleting category:', error);
-      setSaveStatus('Error deleting category');
+      setSaveStatus('Errore nell\'eliminazione della categoria');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -691,7 +691,7 @@ const Checklist = ({ projectId }) => {
 
   const handleAddCategoryConfirm = async () => {
     if (!newCategoryName.trim()) {
-      setSaveStatus('Category name cannot be empty');
+      setSaveStatus('Il nome della categoria non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -699,7 +699,7 @@ const Checklist = ({ projectId }) => {
     const newItem = {
       phase: newCategoryPhase,
       category: newCategoryName,
-      requirement: 'New requirement',
+      requirement: 'Nuovo requisito',
       status: 'Not Started',
       verification_date: null,
       verified_by: '',
@@ -724,11 +724,11 @@ const Checklist = ({ projectId }) => {
       setNewCategoryPhase('');
       setNewCategoryName('');
 
-      setSaveStatus('Category added');
+      setSaveStatus('Categoria aggiunta');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error adding category:', error);
-      setSaveStatus('Error adding category');
+      setSaveStatus('Errore nell\'aggiunta della categoria');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -749,7 +749,7 @@ const Checklist = ({ projectId }) => {
 
   const handleAddItemConfirm = async () => {
     if (!newItemCategory) {
-      setSaveStatus('Please select a category');
+      setSaveStatus('Seleziona una categoria');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -757,7 +757,7 @@ const Checklist = ({ projectId }) => {
     const newItem = {
       phase: newItemPhase,
       category: newItemCategory,
-      requirement: 'New requirement',
+      requirement: 'Nuovo requisito',
       status: 'Not Started',
       verification_date: null,
       verified_by: '',
@@ -782,11 +782,11 @@ const Checklist = ({ projectId }) => {
       setNewItemPhase('');
       setNewItemCategory('');
 
-      setSaveStatus('Item added');
+      setSaveStatus('Elemento aggiunto');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error adding item:', error);
-      setSaveStatus('Error adding item');
+      setSaveStatus('Errore nell\'aggiunta dell\'elemento');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -805,7 +805,7 @@ const Checklist = ({ projectId }) => {
 
   const handleAddPhaseConfirm = async () => {
     if (!newPhaseName.trim()) {
-      setSaveStatus('Phase name cannot be empty');
+      setSaveStatus('Il nome della fase non può essere vuoto');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
     }
@@ -842,8 +842,8 @@ const Checklist = ({ projectId }) => {
       // Create a default item for the new phase
       const newItem = {
         phase: newPhaseId,
-        category: 'General',
-        requirement: 'New requirement',
+        category: 'Generale',
+        requirement: 'Nuovo requisito',
         status: 'Not Started',
         verification_date: null,
         verified_by: '',
@@ -867,11 +867,11 @@ const Checklist = ({ projectId }) => {
       setNewPhaseName('');
       setNewPhaseColor('blue');
 
-      setSaveStatus('Phase added successfully');
+      setSaveStatus('Fase aggiunta con successo');
       setTimeout(() => setSaveStatus(''), 2000);
     } catch (error) {
       console.error('❌ Error adding phase:', error);
-      setSaveStatus('Error adding phase');
+      setSaveStatus('Errore nell\'aggiunta della fase');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -918,13 +918,13 @@ const Checklist = ({ projectId }) => {
       setShowDeletePhaseModal(false);
       setPhaseToDelete(null);
 
-      setSaveStatus('Phase deleted successfully');
+      setSaveStatus('Fase eliminata con successo');
       setTimeout(() => setSaveStatus(''), 2000);
 
       console.log('✅ Phase deleted successfully');
     } catch (error) {
       console.error('❌ Error deleting phase:', error);
-      setSaveStatus('Error deleting phase');
+      setSaveStatus('Errore nell\'eliminazione della fase');
       setTimeout(() => setSaveStatus(''), 3000);
     }
   };
@@ -1038,6 +1038,16 @@ const Checklist = ({ projectId }) => {
     return statuses[(currentIndex + 1) % statuses.length];
   };
 
+  // Translate status for display
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Complete': return 'Completato';
+      case 'In Progress': return 'In corso';
+      case 'Not Started': return 'Non avviato';
+      default: return status;
+    }
+  };
+
   // Handle notes modal
   const handleOpenNotes = (item) => {
     setNotesItem(item);
@@ -1124,32 +1134,32 @@ const Checklist = ({ projectId }) => {
                 <Trash2 className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-secondary-900">Delete Checklist Item?</h3>
-                <p className="text-xs text-secondary-500">This action cannot be undone</p>
+                <h3 className="text-base font-semibold text-secondary-900">Eliminare l'elemento?</h3>
+                <p className="text-xs text-secondary-500">Questa azione non può essere annullata</p>
               </div>
             </div>
 
             <div className="bg-secondary-50 rounded p-3 mb-3">
-              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
-              <p className="font-semibold text-sm text-secondary-900">{itemToDelete?.requirement}</p>
+              <p className="text-xs text-secondary-700 mb-1">Stai per eliminare:</p>
+              <p className="font-semibold text-secondary-900">{itemToDelete?.requirement}</p>
               <p className="text-xs text-secondary-600 mt-1">
-                Phase: {itemToDelete?.phase} | Category: {itemToDelete?.category}
+                Fase: {itemToDelete?.phase} | Categoria: {itemToDelete?.category}
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteCancel}
-                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+                className="flex-1 px-3 py-1.5 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 px-3 py-1.5 bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                Delete
+                Elimina
               </button>
             </div>
           </div>
@@ -1165,37 +1175,37 @@ const Checklist = ({ projectId }) => {
                 <Trash2 className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-secondary-900">Delete Entire Category?</h3>
-                <p className="text-xs text-secondary-500">This will delete all items in this category</p>
+                <h3 className="text-base font-semibold text-secondary-900">Eliminare la categoria?</h3>
+                <p className="text-xs text-secondary-500">Questa azione eliminerà tutti gli elementi in questa categoria</p>
               </div>
             </div>
 
             <div className="bg-secondary-50 rounded p-3 mb-3">
-              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
-              <p className="font-semibold text-sm text-secondary-900">{categoryToDelete?.category}</p>
+              <p className="text-xs text-secondary-700 mb-1">Stai per eliminare:</p>
+              <p className="font-semibold text-secondary-900">{categoryToDelete?.category}</p>
               <p className="text-xs text-secondary-600 mt-1">
-                Phase: {categoryToDelete?.phase}
+                Fase: {categoryToDelete?.phase}
               </p>
               <p className="text-xs text-danger-600 mt-1.5 font-medium">
                 {items.filter(item =>
                   item.phase === categoryToDelete?.phase && item.category === categoryToDelete?.category
-                ).length} item(s) will be deleted
+                ).length} elemento/i verrà eliminato
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteCategoryCancel}
-                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+                className="flex-1 px-3 py-1.5 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeleteCategoryConfirm}
-                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 px-3 py-1.5 bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                Delete Category
+                Elimina categoria
               </button>
             </div>
           </div>
@@ -1211,21 +1221,21 @@ const Checklist = ({ projectId }) => {
                 <Plus className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-secondary-900">Add New Category</h3>
-                <p className="text-xs text-secondary-500">Create a new category in {phases.find(p => p.id === newCategoryPhase)?.name}</p>
+                <h3 className="text-base font-semibold text-secondary-900">Aggiungi nuova categoria</h3>
+                <p className="text-xs text-secondary-500">Crea una nuova categoria in {phases.find(p => p.id === newCategoryPhase)?.name}</p>
               </div>
             </div>
 
             <div className="mb-3">
               <label className="block text-xs font-medium text-secondary-700 mb-1.5">
-                Category Name
+                Nome categoria
               </label>
               <input
                 type="text"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter category name..."
+                className="w-full px-3 py-1.5 border border-secondary-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Inserisci il nome della categoria..."
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddCategoryConfirm();
@@ -1233,23 +1243,23 @@ const Checklist = ({ projectId }) => {
                 }}
               />
               <p className="text-xs text-secondary-500 mt-1">
-                A default item will be created in this category
+                Un elemento predefinito verrà creato in questa categoria
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleAddCategoryCancel}
-                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+                className="flex-1 px-3 py-1.5 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleAddCategoryConfirm}
-                className="flex-1 px-3 py-1.5 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 px-3 py-1.5 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Add Category
+                Aggiungi categoria
               </button>
             </div>
           </div>
@@ -1265,14 +1275,14 @@ const Checklist = ({ projectId }) => {
                 <Plus className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Add New Item</h3>
-                <p className="text-sm text-gray-500">Add an item to an existing category in {phases.find(p => p.id === newItemPhase)?.name}</p>
+                <h3 className="text-lg font-semibold text-gray-900">Aggiungi nuovo elemento</h3>
+                <p className="text-gray-500">Aggiungi un elemento a una categoria esistente in {phases.find(p => p.id === newItemPhase)?.name}</p>
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Category
+              <label className="block font-medium text-gray-700 mb-2">
+                Seleziona categoria
               </label>
               <select
                 value={newItemCategory}
@@ -1287,7 +1297,7 @@ const Checklist = ({ projectId }) => {
                 ))}
               </select>
               <p className="text-xs text-gray-500 mt-2">
-                A new item will be added to the selected category
+                Un nuovo elemento verrà aggiunto alla categoria selezionata
               </p>
             </div>
 
@@ -1296,14 +1306,14 @@ const Checklist = ({ projectId }) => {
                 onClick={handleAddItemCancel}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleAddItemConfirm}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add Item
+                Aggiungi elemento
               </button>
             </div>
           </div>
@@ -1319,21 +1329,21 @@ const Checklist = ({ projectId }) => {
                 <Plus className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Add New Phase</h3>
-                <p className="text-sm text-gray-500">Create a new phase for the checklist</p>
+                <h3 className="text-lg font-semibold text-gray-900">Aggiungi nuova fase</h3>
+                <p className="text-gray-500">Crea una nuova fase per la checklist</p>
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phase Name
+              <label className="block font-medium text-gray-700 mb-2">
+                Nome fase
               </label>
               <input
                 type="text"
                 value={newPhaseName}
                 onChange={(e) => setNewPhaseName(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter phase name..."
+                placeholder="Nome nuova fase"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddPhaseConfirm();
@@ -1343,25 +1353,25 @@ const Checklist = ({ projectId }) => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phase Color
+              <label className="block font-medium text-gray-700 mb-2">
+                Colore fase
               </label>
               <select
                 value={newPhaseColor}
                 onChange={(e) => setNewPhaseColor(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
-                <option value="blue">Blue</option>
-                <option value="yellow">Yellow</option>
-                <option value="green">Green</option>
-                <option value="purple">Purple</option>
-                <option value="red">Red</option>
-                <option value="orange">Orange</option>
-                <option value="pink">Pink</option>
-                <option value="indigo">Indigo</option>
+                <option value="blue">Blu</option>
+                <option value="yellow">Giallo</option>
+                <option value="green">Verde</option>
+                <option value="purple">Viola</option>
+                <option value="red">Rosso</option>
+                <option value="orange">Arancione</option>
+                <option value="pink">Rosa</option>
+                <option value="indigo">Indaco</option>
               </select>
               <p className="text-xs text-gray-500 mt-2">
-                A default item will be created in this phase
+                Un elemento predefinito verrà creato in questa fase
               </p>
             </div>
 
@@ -1370,14 +1380,14 @@ const Checklist = ({ projectId }) => {
                 onClick={handleAddPhaseCancel}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleAddPhaseConfirm}
                 className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add Phase
+                Aggiungi fase
               </button>
             </div>
           </div>
@@ -1393,34 +1403,34 @@ const Checklist = ({ projectId }) => {
                 <Trash2 className="w-5 h-5 text-danger-600" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-secondary-900">Delete Entire Phase?</h3>
-                <p className="text-xs text-secondary-500">This will delete all items in this phase</p>
+                <h3 className="text-base font-semibold text-secondary-900">Eliminare la fase?</h3>
+                <p className="text-xs text-secondary-500">Questa azione eliminerà tutti gli elementi in questa fase</p>
               </div>
             </div>
 
             <div className="bg-secondary-50 rounded p-3 mb-3">
-              <p className="text-xs text-secondary-700 mb-1">You are about to delete:</p>
-              <p className="font-semibold text-sm text-secondary-900">
+              <p className="text-xs text-secondary-700 mb-1">Stai per eliminare:</p>
+              <p className="font-semibold text-secondary-900">
                 {phases.find(p => p.id === phaseToDelete)?.name}
               </p>
               <p className="text-xs text-danger-600 mt-1.5 font-medium">
-                {items.filter(item => item.phase === phaseToDelete).length} item(s) will be deleted
+                {items.filter(item => item.phase === phaseToDelete).length} elemento/i verrà eliminato
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={handleDeletePhaseCancel}
-                className="flex-1 px-3 py-1.5 text-sm border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
+                className="flex-1 px-3 py-1.5 border border-secondary-300 text-secondary-700 rounded hover:bg-secondary-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleDeletePhaseConfirm}
-                className="flex-1 px-3 py-1.5 text-sm bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 px-3 py-1.5 bg-danger-600 text-white rounded hover:bg-danger-700 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                Delete Phase
+                Elimina fase
               </button>
             </div>
           </div>
@@ -1437,33 +1447,33 @@ const Checklist = ({ projectId }) => {
                   <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Notes</h3>
-                  <p className="text-sm text-gray-500 truncate max-w-md">{notesItem.requirement}</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Note</h3>
+                  <p className="text-gray-500 truncate max-w-md">{notesItem.requirement}</p>
                 </div>
               </div>
               <button
                 onClick={handleCloseNotes}
                 className="p-1 hover:bg-gray-100 rounded transition-colors"
-                title="Close"
+                title="Chiudi"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Additional Notes
+              <label className="block font-medium text-gray-700 mb-2">
+                Note aggiuntive
               </label>
               <textarea
                 value={editingNotes}
                 onChange={(e) => setEditingNotes(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                placeholder="Add any additional notes or comments..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="Aggiungi note o commenti aggiuntivi..."
                 rows={6}
                 autoFocus
               />
               <p className="text-xs text-gray-500 mt-1">
-                {editingNotes.length} characters
+                {editingNotes.length} caratteri
               </p>
             </div>
 
@@ -1472,14 +1482,14 @@ const Checklist = ({ projectId }) => {
                 onClick={handleCloseNotes}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                Annulla
               </button>
               <button
                 onClick={handleSaveNotes}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                Save Notes
+                Salva note
               </button>
             </div>
           </div>
@@ -1490,14 +1500,14 @@ const Checklist = ({ projectId }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Handover Checklist</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Track progress across all handover phases
+            <h2 className="text-lg font-semibold text-gray-900">Checklist di consegna</h2>
+            <p className="text-gray-600 mt-1">
+              Monitora il progresso in tutte le fasi di consegna
             </p>
           </div>
           <div className="flex items-center gap-3">
             {saveStatus && (
-              <span className={`text-sm font-medium ${
+              <span className={`font-medium ${
                 saveStatus.includes('Error') ? 'text-red-600' : 'text-green-600'
               }`}>
                 {saveStatus}
@@ -1505,18 +1515,18 @@ const Checklist = ({ projectId }) => {
             )}
             <button
               onClick={handleAddPhaseClick}
-              className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
-              Add Phase
+              Aggiungi fase
             </button>
           </div>
         </div>
 
         {/* Overall Progress Bar */}
         <div className="mb-4">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-            <span className="font-medium">Overall Progress</span>
+          <div className="flex items-center justify-between text-gray-600 mb-2">
+            <span className="font-medium">Avanzamento complessivo</span>
             <span className="font-bold text-blue-600">{calculateProgress()}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
@@ -1539,19 +1549,19 @@ const Checklist = ({ projectId }) => {
             <div className="text-xl font-bold text-success-600">
               {items.filter(i => i.status === 'Complete').length}
             </div>
-            <div className="text-xs text-secondary-600">Complete</div>
+            <div className="text-xs text-secondary-600">Completati</div>
           </div>
           <div className="text-center p-2.5 bg-warning-50 rounded border border-warning-200">
             <div className="text-xl font-bold text-warning-600">
               {items.filter(i => i.status === 'In Progress').length}
             </div>
-            <div className="text-xs text-secondary-600">In Progress</div>
+            <div className="text-xs text-secondary-600">In corso</div>
           </div>
           <div className="text-center p-2.5 bg-secondary-50 rounded border border-secondary-200">
             <div className="text-xl font-bold text-secondary-600">
               {items.filter(i => i.status === 'Not Started').length}
             </div>
-            <div className="text-xs text-secondary-600">Not Started</div>
+            <div className="text-xs text-secondary-600">Non avviati</div>
           </div>
         </div>
       </div>
@@ -1580,9 +1590,9 @@ const Checklist = ({ projectId }) => {
                           type="text"
                           value={editingPhaseText}
                           onChange={(e) => setEditingPhaseText(e.target.value)}
-                          className="flex-1 px-3 py-1.5 text-sm text-secondary-900 border-2 border-white rounded focus:outline-none focus:ring-2 focus:ring-white"
+                          className="flex-1 px-3 py-1.5 text-secondary-900 border-2 border-white rounded focus:outline-none focus:ring-2 focus:ring-white"
                           autoFocus
-                          placeholder="Enter phase name..."
+                          placeholder="Inserisci il nome della fase..."
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handleSaveEditPhase(phaseInfo.id);
                             if (e.key === 'Escape') handleCancelEditPhase();
@@ -1591,14 +1601,14 @@ const Checklist = ({ projectId }) => {
                         <button
                           onClick={() => handleSaveEditPhase(phaseInfo.id)}
                           className="p-1.5 bg-secondary-800 bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
-                          title="Save"
+                          title="Salva"
                         >
                           <Save className="w-4 h-4" />
                         </button>
                         <button
                           onClick={handleCancelEditPhase}
                           className="p-1.5 bg-secondary-800 bg-opacity-20 hover:bg-opacity-30 rounded transition-colors"
-                          title="Cancel"
+                          title="Annulla"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -1615,7 +1625,7 @@ const Checklist = ({ projectId }) => {
                             handleStartEditPhase(phaseInfo.id);
                           }}
                           className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-secondary-800 hover:bg-opacity-20 rounded transition-all"
-                          title="Edit phase name"
+                          title="Modifica nome fase"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -1625,7 +1635,7 @@ const Checklist = ({ projectId }) => {
                             handleDeletePhaseClick(phaseInfo.id);
                           }}
                           className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-danger-600 hover:bg-opacity-20 rounded transition-all"
-                          title="Delete phase"
+                          title="Elimina fase"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1639,7 +1649,7 @@ const Checklist = ({ projectId }) => {
                   </div>
                   {editingPhaseId !== phaseInfo.id && (
                     <p className="text-xs mt-0.5 text-secondary-700">
-                      {phaseItems.filter(i => i.status === 'Complete').length} of {phaseItems.length} completed
+                      {phaseItems.filter(i => i.status === 'Complete').length} di {phaseItems.length} completate
                     </p>
                   )}
                 </div>
@@ -1651,22 +1661,22 @@ const Checklist = ({ projectId }) => {
                         e.stopPropagation();
                         handleAddCategoryClick(phaseInfo.id);
                       }}
-                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
-                      title="Add new category"
+                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg flex items-center gap-1 transition-colors"
+                      title="Aggiungi nuova categoria"
                     >
                       <Plus className="w-4 h-4" />
-                      Add Category
+                      Aggiungi categoria
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddItemClick(phaseInfo.id);
                       }}
-                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm flex items-center gap-1 transition-colors"
-                      title="Add item to existing category"
+                      className="px-3 py-1 bg-gray-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg flex items-center gap-1 transition-colors"
+                      title="Aggiungi elemento a categoria esistente"
                     >
                       <Plus className="w-4 h-4" />
-                      Add Item
+                      Aggiungi elemento
                     </button>
                   </div>
                 </div>
@@ -1712,7 +1722,7 @@ const Checklist = ({ projectId }) => {
                                   onChange={(e) => setEditingCategoryText(e.target.value)}
                                   className="flex-1 px-3 py-1 border-2 border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   autoFocus
-                                  placeholder="Enter category name..."
+                                  placeholder="Inserisci il nome della categoria..."
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleSaveEditCategory(phaseInfo.id, category);
                                     if (e.key === 'Escape') handleCancelEditCategory();
@@ -1721,14 +1731,14 @@ const Checklist = ({ projectId }) => {
                                 <button
                                   onClick={() => handleSaveEditCategory(phaseInfo.id, category)}
                                   className="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                  title="Save"
+                                  title="Salva"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={handleCancelEditCategory}
                                   className="p-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                                  title="Cancel"
+                                  title="Annulla"
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -1746,7 +1756,7 @@ const Checklist = ({ projectId }) => {
                                       handleStartEditCategory(phaseInfo.id, category);
                                     }}
                                     className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
-                                    title="Edit category name"
+                                    title="Modifica nome categoria"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                   </button>
@@ -1756,7 +1766,7 @@ const Checklist = ({ projectId }) => {
                                       handleDeleteCategoryClick(phaseInfo.id, category);
                                     }}
                                     className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
-                                    title="Delete category"
+                                    title="Elimina categoria"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -1766,7 +1776,7 @@ const Checklist = ({ projectId }) => {
                           </div>
                           
                           <div className="flex items-center gap-4">
-                            <span className="text-sm font-medium text-gray-600">
+                            <span className="font-medium text-gray-600">
                               {categoryItems.filter(i => i.status === 'Complete').length}/{categoryItems.length}
                             </span>
                             <div className="w-32 bg-gray-200 rounded-full h-2">
@@ -1796,9 +1806,9 @@ const Checklist = ({ projectId }) => {
                                       type="text"
                                       value={editingText}
                                       onChange={(e) => setEditingText(e.target.value)}
-                                      className="flex-1 px-3 py-1.5 text-sm border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      className="flex-1 px-3 py-1.5 border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                       autoFocus
-                                      placeholder="Enter requirement..."
+                                      placeholder="Inserisci il requisito..."
                                       onKeyDown={(e) => {
                                         if (e.key === 'Enter') handleSaveEdit(item.id);
                                         if (e.key === 'Escape') handleCancelEdit();
@@ -1807,14 +1817,14 @@ const Checklist = ({ projectId }) => {
                                     <button
                                       onClick={() => handleSaveEdit(item.id)}
                                       className="p-1.5 bg-green-600 text-white rounded hover:bg-green-700"
-                                      title="Save"
+                                      title="Salva"
                                     >
                                       <CheckCircle className="w-4 h-4" />
                                     </button>
                                     <button
                                       onClick={handleCancelEdit}
                                       className="p-1.5 bg-gray-600 text-white rounded hover:bg-gray-700"
-                                      title="Cancel"
+                                      title="Annulla"
                                     >
                                       <X className="w-4 h-4" />
                                     </button>
@@ -1828,12 +1838,12 @@ const Checklist = ({ projectId }) => {
                                         item.status === 'Complete' ? 'bg-green-500' :
                                         item.status === 'In Progress' ? 'bg-yellow-500' :
                                         'bg-gray-300'
-                                      }`} title={item.status}></div>
+                                      }`} title={getStatusLabel(item.status)}></div>
                                     </div>
 
                                     {/* Title with Edit/Delete buttons - grouped together */}
                                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-gray-900 truncate" title={`${itemNumber} — ${item.requirement}`}>
+                                      <p className="font-medium text-gray-900 truncate" title={`${itemNumber} — ${item.requirement}`}>
                                         <span className="text-gray-500 mr-2">{itemNumber} —</span>
                                         {item.requirement}
                                       </p>
@@ -1843,14 +1853,14 @@ const Checklist = ({ projectId }) => {
                                         <button
                                           onClick={() => handleStartEdit(item)}
                                           className="p-1 hover:bg-blue-100 text-blue-600 rounded transition-all"
-                                          title="Edit item name"
+                                          title="Modifica elemento"
                                         >
                                           <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button
                                           onClick={() => handleDeleteClick(item)}
                                           className="p-1 hover:bg-red-100 text-red-600 rounded transition-all"
-                                          title="Delete item"
+                                          title="Elimina elemento"
                                         >
                                           <Trash2 className="w-4 h-4" />
                                         </button>
@@ -1861,9 +1871,9 @@ const Checklist = ({ projectId }) => {
                                     <button
                                       onClick={() => handleUpdateItem(item.id, { status: cycleStatus(item.status) })}
                                       className={`px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${getStatusColor(item.status)} hover:shadow-md transition-all`}
-                                      title="Click to change status"
+                                      title="Clicca per cambiare stato"
                                     >
-                                      {item.status}
+                                      {getStatusLabel(item.status)}
                                     </button>
 
                                     {/* Verification Date - inline picker */}
@@ -1873,7 +1883,7 @@ const Checklist = ({ projectId }) => {
                                         value={item.verification_date || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verification_date: e.target.value })}
                                         className="date-input-centered w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        title="Verification date"
+                                        title="Data di verifica"
                                         style={{
                                           textAlign: 'center',
                                           color: !item.verification_date ? 'transparent' : undefined
@@ -1881,7 +1891,7 @@ const Checklist = ({ projectId }) => {
                                       />
                                       {!item.verification_date && (
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-xs text-gray-400">
-                                          Select date
+                                          Seleziona data
                                         </div>
                                       )}
                                     </div>
@@ -1892,7 +1902,7 @@ const Checklist = ({ projectId }) => {
                                         value={item.verified_by || ''}
                                         onChange={(e) => handleUpdateItem(item.id, { verified_by: e.target.value })}
                                         className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white cursor-pointer"
-                                        title={item.verified_by || 'Select verifier'}
+                                        title={item.verified_by || 'Seleziona verificatore'}
                                       >
                                         <option value="">—</option>
                                         <option value="Matteo Hon Fucci">M. Hon Fucci</option>
@@ -1905,7 +1915,7 @@ const Checklist = ({ projectId }) => {
                                     <button
                                       onClick={() => handleOpenNotes(item)}
                                       className="flex-shrink-0 p-1.5 hover:bg-blue-50 rounded transition-colors relative"
-                                      title={notesCount ? 'View/edit notes' : 'Add notes'}
+                                      title={notesCount ? 'Visualizza/modifica note' : 'Aggiungi note'}
                                     >
                                       <FileText className={`w-4 h-4 ${notesCount ? 'text-blue-600' : 'text-gray-400'}`} />
                                       {notesCount > 0 && (

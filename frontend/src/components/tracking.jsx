@@ -75,11 +75,11 @@ const Tracking = ({ projectId }) => {
   };
 
   const getStatusText = (progress) => {
-    if (progress === 100) return 'Complete';
-    if (progress >= 75) return 'Nearly Complete';
-    if (progress >= 50) return 'In Progress';
-    if (progress >= 25) return 'Started';
-    return 'Not Started';
+    if (progress === 100) return 'Completata';
+    if (progress >= 75) return 'Quasi completata';
+    if (progress >= 50) return 'In corso';
+    if (progress >= 25) return 'Avviata';
+    return 'Non avviata';
   };
 
   // Timeline calculation
@@ -106,9 +106,9 @@ const Tracking = ({ projectId }) => {
   };
 
   const phases = [
-    { id: 'Phase 1', name: 'Phase 1: Pre-Handover Assessment', color: 'blue' },
-    { id: 'Phase 2', name: 'Phase 2: Knowledge Transfer Sessions', color: 'yellow' },
-    { id: 'Phase 3', name: 'Phase 3: Final Sign-Offs', color: 'green' }
+    { id: 'Phase 1', name: 'Fase 1: Valutazione pre-consegna', color: 'blue' },
+    { id: 'Phase 2', name: 'Fase 2: Sessioni di trasferimento know-how', color: 'yellow' },
+    { id: 'Phase 3', name: 'Fase 3: Approvazioni finali', color: 'green' }
   ];
 
   const timeline = calculateTimeline();
@@ -130,38 +130,38 @@ const Tracking = ({ projectId }) => {
       {timeline && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-secondary-900">Project Timeline</h2>
-            <div className="flex items-center gap-2 text-sm text-secondary-600">
+            <h2 className="text-lg font-semibold text-secondary-900">Cronologia del progetto</h2>
+            <div className="flex items-center gap-2 text-secondary-600">
               <Clock className="w-4 h-4" />
-              <span>{timeline.remainingDays} days remaining</span>
+              <span>{timeline.remainingDays} giorni rimanenti</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-sm text-secondary-600 mb-1">Start Date</div>
+              <div className="text-secondary-600 mb-1">Data inizio</div>
               <div className="text-lg font-semibold text-secondary-900">
                 {timeline.start.toLocaleDateString()}
               </div>
             </div>
             <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-sm text-secondary-600 mb-1">Target Date</div>
+              <div className="text-secondary-600 mb-1">Data obiettivo</div>
               <div className="text-lg font-semibold text-secondary-900">
                 {timeline.end.toLocaleDateString()}
               </div>
             </div>
             <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-sm text-secondary-600 mb-1">Total Duration</div>
+              <div className="text-secondary-600 mb-1">Durata totale</div>
               <div className="text-lg font-semibold text-secondary-900">
-                {timeline.totalDays} days
+                {timeline.totalDays} giorni
               </div>
             </div>
           </div>
 
           {/* Time Progress Bar */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-secondary-600">Time Progress</span>
+            <div className="flex items-center justify-between">
+              <span className="text-secondary-600">Avanzamento temporale</span>
               <span className="font-semibold text-blue-600">{timeline.timeProgress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
@@ -171,15 +171,15 @@ const Tracking = ({ projectId }) => {
               />
             </div>
             <div className="flex items-center justify-between text-xs text-secondary-500">
-              <span>{timeline.elapsedDays} days elapsed</span>
-              <span>{timeline.remainingDays} days remaining</span>
+              <span>{timeline.elapsedDays} giorni trascorsi</span>
+              <span>{timeline.remainingDays} giorni rimanenti</span>
             </div>
           </div>
 
           {/* Work Progress vs Time Progress */}
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-secondary-600">Work Progress</span>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-secondary-600">Avanzamento lavori</span>
               <span className="font-semibold text-green-600">{overallProgress}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
@@ -197,15 +197,15 @@ const Tracking = ({ projectId }) => {
                 {overallProgress >= timeline.timeProgress ? (
                   <>
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">
-                      On Track - Work progress is ahead of schedule
+                    <span className="font-medium text-green-800">
+                      In linea - L'avanzamento è in anticipo sul programma
                     </span>
                   </>
                 ) : (
                   <>
                     <AlertCircle className="w-5 h-5 text-yellow-600" />
-                    <span className="text-sm font-medium text-yellow-800">
-                      Behind Schedule - Work progress is {timeline.timeProgress - overallProgress}% behind timeline
+                    <span className="font-medium text-yellow-800">
+                      In ritardo - L'avanzamento è del {timeline.timeProgress - overallProgress}% indietro rispetto al programma
                     </span>
                   </>
                 )}
@@ -218,27 +218,27 @@ const Tracking = ({ projectId }) => {
       {/* Gantt Chart */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-secondary-900">Gantt Chart</h2>
+          <h2 className="text-lg font-semibold text-secondary-900">Diagramma di Gantt</h2>
           <div className="flex gap-2">
             <button
               onClick={() => setGanttView('phase')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 ganttView === 'phase'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-secondary-600 hover:bg-gray-200'
               }`}
             >
-              By Phase
+              Per fase
             </button>
             <button
               onClick={() => setGanttView('category')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 ganttView === 'category'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-secondary-600 hover:bg-gray-200'
               }`}
             >
-              By Category
+              Per categoria
             </button>
           </div>
         </div>
@@ -262,10 +262,10 @@ const Tracking = ({ projectId }) => {
                       <h3 className="font-semibold text-secondary-900">{phase.name}</h3>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-secondary-600">
-                        {phaseItems.filter(i => i.status === 'Complete').length}/{phaseItems.length} tasks
+                      <span className="text-secondary-600">
+                        {phaseItems.filter(i => i.status === 'Complete').length}/{phaseItems.length} attività
                       </span>
-                      <span className="text-sm font-semibold text-blue-600">{progress}%</span>
+                      <span className="font-semibold text-blue-600">{progress}%</span>
                     </div>
                   </div>
 
@@ -288,19 +288,19 @@ const Tracking = ({ projectId }) => {
                   {/* Task Breakdown */}
                   <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                     <div className="bg-green-50 rounded p-2">
-                      <div className="font-medium text-green-700">Complete</div>
+                      <div className="font-medium text-green-700">Completate</div>
                       <div className="text-green-900 font-bold">
                         {phaseItems.filter(i => i.status === 'Complete').length}
                       </div>
                     </div>
                     <div className="bg-yellow-50 rounded p-2">
-                      <div className="font-medium text-yellow-700">In Progress</div>
+                      <div className="font-medium text-yellow-700">In corso</div>
                       <div className="text-yellow-900 font-bold">
                         {phaseItems.filter(i => i.status === 'In Progress').length}
                       </div>
                     </div>
                     <div className="bg-gray-50 rounded p-2">
-                      <div className="font-medium text-secondary-700">Not Started</div>
+                      <div className="font-medium text-secondary-700">Non avviate</div>
                       <div className="text-secondary-900 font-bold">
                         {phaseItems.filter(i => i.status === 'Not Started').length}
                       </div>
@@ -339,7 +339,7 @@ const Tracking = ({ projectId }) => {
                       return (
                         <div key={category} className="border border-gray-200 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-medium text-secondary-900">{category}</h4>
+                            <h4 className="font-medium text-secondary-900">{category}</h4>
                             <div className="flex items-center gap-3">
                               <span className="text-xs text-secondary-600">
                                 {categoryItems.filter(i => i.status === 'Complete').length}/{categoryItems.length}
@@ -367,7 +367,7 @@ const Tracking = ({ projectId }) => {
 
       {/* Phase Milestones */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-secondary-900 mb-4">Phase Milestones</h2>
+        <h2 className="text-lg font-semibold text-secondary-900 mb-4">Milestone delle fasi</h2>
 
         <div className="space-y-4">
           {phases.map((phase, index) => {
@@ -379,7 +379,7 @@ const Tracking = ({ projectId }) => {
               <div key={phase.id} className="flex items-start gap-4">
                 {/* Timeline Dot */}
                 <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                     isComplete ? 'bg-green-500 text-white' :
                     isInProgress ? 'bg-blue-500 text-white' :
                     'bg-gray-300 text-secondary-600'
@@ -402,15 +402,15 @@ const Tracking = ({ projectId }) => {
                       isInProgress ? 'bg-blue-100 text-blue-800' :
                       'bg-gray-100 text-secondary-800'
                     }`}>
-                      {isComplete ? 'Completed' : isInProgress ? 'In Progress' : 'Pending'}
+                      {isComplete ? 'Completata' : isInProgress ? 'In corso' : 'In attesa'}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-secondary-600">
-                    <span>{progress}% complete</span>
+                  <div className="flex items-center gap-4 text-secondary-600">
+                    <span>{progress}% completato</span>
                     <span>•</span>
                     <span>
-                      {checklistItems.filter(i => i.phase === phase.id).length} tasks
+                      {checklistItems.filter(i => i.phase === phase.id).length} attività
                     </span>
                   </div>
                 </div>

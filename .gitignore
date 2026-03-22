@@ -10,4 +10,4 @@ backend/.env
 # Database files (local development data)
 backend/database/handover.db
 *.db
-
+/backend/database
